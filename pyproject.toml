@@ -47,11 +47,19 @@ dev = [
     "pytest-xdist[psutil]~=3.8.0",
 ]
 
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+packages = []
+
 [tool.uv]
 package = false
 
 [tool.uv.workspace]
 members = ["packages/*"]
+exclude = ["analysis"]
 
 [tool.uv.sources]
 graphrag-chunking = { workspace = true }

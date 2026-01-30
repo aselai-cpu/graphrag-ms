@@ -1,0 +1,529 @@
+@startuml Global Search Activity Diagram
+title GraphRAG Global Search - Detailed Activity Flow (MAP-REDUCE)
+
+|#AntiqueWhite|CLI Layer|
+start
+:User executes query\n""graphrag query 'What are the main themes?' --method global"";
+
+:Parse CLI arguments;
+note right
+  - query string
+  - root directory
+  - data directory
+  - community_level
+  - response_type
+  - dynamic-community-selection
+  - streaming flag
+end note
+
+:Load configuration\n(settings.yaml);
+
+|#LightBlue|Data Loading|
+:Read Parquet files from output/;
+fork
+  :Load entities.parquet\n(optional for dynamic selection);
+fork again
+  :Load communities.parquet;
+fork again
+  :Load community_reports.parquet;
+end fork
+
+:Load embedding vector stores\n(if dynamic selection enabled);
+if (Dynamic selection enabled?) then (yes)
+  :Load entity_description embeddings;
+else (no)
+  :Skip embedding loading;
+endif
+
+|#LightGreen|Initialization|
+:Create GlobalSearch engine via factory;
+
+partition "Factory Setup" {
+  :Create completion model\n(LiteLLM);
+  :Load global search prompts;
+  note right
+    - MAP_SYSTEM_PROMPT
+    - REDUCE_SYSTEM_PROMPT
+    - GENERAL_KNOWLEDGE_INSTRUCTION
+  end note
+  :Create GlobalCommunityContext builder;
+  note right
+    Configured with:
+    - community_reports DataFrame
+    - communities DataFrame
+    - entities DataFrame (optional)
+    - token encoder
+    - dynamic selection settings
+  end note
+  :Set MAP-REDUCE parameters;
+  note right
+    - max_context_tokens: 8000
+    - data_max_tokens: 8000
+    - map_max_length: 1000 words
+    - reduce_max_length: 2000 words
+    - concurrent_coroutines: 32
+  end note
+}
+
+|#LightYellow|Query Execution|
+:Start GlobalSearch.search(query);
+
+if (Conversation history exists?) then (yes)
+  :Add conversation history to context;
+  note right
+    conversation_history_max_turns
+    (default: 5)
+  end note
+else (no)
+  :Skip conversation context;
+endif
+
+|#LightCoral|Phase 1: Community Selection|
+partition "Community Report Selection" {
+  if (Dynamic selection enabled?) then (yes)
+    |#LightCoral|Dynamic Selection Path|
+    :Initialize DynamicCommunitySelection;
+    note right
+      Parameters:
+      - rating_threshold (default: 7)
+      - keep_parent (default: true)
+      - num_repeats (default: 1)
+      - use_summary (default: true)
+      - max_level (default: 10)
+    end note
+
+    :Start with root communities (level 0);
+
+    repeat
+      :Rate batch of communities in parallel;
+      note right
+        For each community:
+        - Query: User query
+        - Description: Community report summary/full_content
+        - LLM rates relevance: 0-10 scale
+      end note
+
+      fork
+        :Community A: Call LLM for rating;
+      fork again
+        :Community B: Call LLM for rating;
+      fork again
+        :Community C: Call LLM for rating;
+      fork again
+        :... (up to concurrent_coroutines);
+      end fork
+
+      :Collect ratings from all LLM calls;
+      note right
+        Track:
+        - llm_calls count
+        - prompt_tokens
+        - output_tokens
+      end note
+
+      repeat
+        :For each rated community;
+
+        if (Rating ≥ threshold?) then (yes)
+          :Add to relevant_communities;
+
+          if (Has children?) then (yes)
+            :Add children to next queue;
+          endif
+
+          if (keep_parent = false?) then (yes)
+            :Remove parent from relevant set;
+          endif
+        else (no)
+          :Skip community;
+        endif
+
+      repeat while (More rated communities?) is (yes)
+      -> no;
+
+      if (Queue empty AND no relevant found?) then (yes)
+        :Add all communities at next level;
+        note right
+          Fallback mechanism to ensure
+          we don't return empty results
+        end note
+      endif
+
+    repeat while (Queue has communities?) is (yes)
+    -> no;
+
+    :Filter community_reports by relevant_communities;
+
+  else (no)
+    |#LightCoral|Static Selection Path|
+    :Select all reports at specified community_level;
+    note right
+      Default: level 2
+      Fast, no LLM calls
+    end note
+
+    :Filter by min_community_rank (optional);
+  endif
+
+  :Retrieved community reports;
+  note right
+    Selected reports will be used
+    in MAP phase
+  end note
+}
+
+|#LightSteelBlue|Phase 2: Context Batching|
+partition "Community Report Batching" {
+  :Build community context batches;
+  note right
+    Function: build_community_context()
+    - Format reports as CSV
+    - Shuffle data (random_state: 86)
+    - Apply token limits per batch
+    - Calculate community weights
+  end note
+
+  if (shuffle_data = true?) then (yes)
+    :Shuffle community reports randomly;
+    note right
+      Improves diversity across batches
+    end note
+  endif
+
+  :Initialize batch variables;
+  note right
+    - current_batch = []
+    - current_tokens = 0
+    - batches = []
+  end note
+
+  repeat
+    :Select next community report;
+
+    :Format report as CSV row;
+    note right
+      Columns:
+      - id
+      - community
+      - level
+      - title
+      - summary OR full_content
+      - rank (optional)
+      - weight/occurrence (optional)
+
+      Format: "id|community|level|title|summary|..."
+    end note
+
+    :Count tokens in formatted report;
+
+    if (current_tokens + report_tokens > max_context_tokens?) then (yes)
+      :Save current batch to batches;
+      :Start new batch;
+      :Reset current_tokens = 0;
+    else (no)
+      :Add report to current_batch;
+      :Update current_tokens;
+    endif
+
+  repeat while (More reports?) is (yes)
+  -> no;
+
+  :Save final batch to batches;
+
+  :Return batches of community reports;
+  note right
+    Each batch ≤ max_context_tokens
+    (default: 8000 tokens)
+
+    Multiple batches = Multiple MAP calls
+  end note
+}
+
+|#Lavender|Phase 3: MAP Phase (Parallel)|
+partition "MAP - Extract Key Points" {
+  :Prepare MAP phase execution;
+  note right
+    Each batch processed independently
+    in parallel with semaphore control
+  end note
+
+  :Create semaphore with concurrent_coroutines limit;
+  note right
+    Default: 32 concurrent MAP calls
+    Controls parallelism
+  end note
+
+  fork
+    |#Lavender|MAP Batch 1|
+    :Acquire semaphore;
+
+    :Build MAP prompt for batch 1;
+    note right
+      MAP_SYSTEM_PROMPT format:
+      - System: Prompt + context_data (community reports CSV)
+      - User: Query
+      - Parameters: max_length (1000 words)
+    end note
+
+    :Call LLM with JSON mode;
+    note right
+      response_format_json_object: true
+      Ensures structured output
+    end note
+
+    :Receive JSON response;
+    note right
+      Expected format:
+      {
+        "points": [
+          {
+            "description": "Key point text",
+            "score": 75  // 0-100
+          },
+          ...
+        ]
+      }
+    end note
+
+    :Parse JSON response;
+    if (Parse successful?) then (yes)
+      :Extract points array;
+    else (no)
+      :Warning: JSON parse failed;
+      :Return empty points list;
+    endif
+
+    :Release semaphore;
+
+    :Store SearchResult;
+    note right
+      SearchResult contains:
+      - response: list of {answer, score}
+      - context_data: community reports CSV
+      - llm_calls: 1
+      - prompt_tokens: context + prompt length
+      - output_tokens: response length
+    end note
+
+  fork again
+    |#Lavender|MAP Batch 2|
+    :Acquire semaphore;
+    :Build MAP prompt for batch 2;
+    :Call LLM with JSON mode;
+    :Receive & parse JSON response;
+    :Release semaphore;
+    :Store SearchResult;
+
+  fork again
+    |#Lavender|MAP Batch 3|
+    :Acquire semaphore;
+    :Build MAP prompt for batch 3;
+    :Call LLM with JSON mode;
+    :Receive & parse JSON response;
+    :Release semaphore;
+    :Store SearchResult;
+
+  fork again
+    |#Lavender|MAP Batch N|
+    :... (one per batch);
+    note right
+      Number of batches depends on:
+      - Total community reports
+      - Token limit per batch
+      - Community selection method
+
+      Typical: 2-10 batches
+    end note
+  end fork
+
+  :Collect all MAP responses;
+  note right
+    List[SearchResult]
+    Each with key points + scores
+  end note
+
+  :Aggregate statistics;
+  note right
+    Total MAP phase:
+    - llm_calls: N (one per batch)
+    - prompt_tokens: sum(all batches)
+    - output_tokens: sum(all responses)
+  end note
+}
+
+|#LightGoldenRodYellow|Phase 4: REDUCE Phase|
+partition "REDUCE - Synthesize Final Answer" {
+  :Collect all key points from MAP responses;
+
+  repeat
+    :For each MAP response;
+
+    if (Response is valid list?) then (yes)
+      repeat
+        :Extract key point;
+        note right
+          {
+            "analyst": batch_index,
+            "answer": description,
+            "score": importance_score
+          }
+        end note
+        :Add to key_points list;
+      repeat while (More points in response?) is (yes)
+      -> no;
+    endif
+
+  repeat while (More MAP responses?) is (yes)
+  -> no;
+
+  :Filter points with score > 0;
+  note right
+    Remove irrelevant points
+    (score = 0 means no relevant info)
+  end note
+
+  if (No points with score > 0?) then (yes)
+    if (allow_general_knowledge = false?) then (yes)
+      :No relevant data found;
+      :Return NO_DATA_ANSWER;
+      note right
+        Canned response:
+        "I do not have enough information to answer this question."
+      end note
+      stop
+    endif
+  endif
+
+  :Sort points by score (descending);
+  note right
+    Higher scored points first
+    Prioritizes most important info
+  end note
+
+  :Apply token budget for REDUCE context;
+  note right
+    Budget: data_max_tokens (default: 8000)
+  end note
+
+  repeat
+    :Select next key point;
+
+    :Format as analyst report;
+    note right
+      Format:
+      ----Analyst {index}----
+      Importance Score: {score}
+      {answer}
+    end note
+
+    :Count tokens in formatted point;
+
+    if (current_tokens + point_tokens ≤ data_max_tokens?) then (yes)
+      :Add to REDUCE context;
+      :Update current_tokens;
+    else (no)
+      :Stop adding points;
+      note right: Token budget exceeded
+    endif
+
+  repeat while (More points AND within budget?) is (yes)
+  -> no;
+
+  :Combine all selected points into report_data;
+
+  :Build REDUCE prompt;
+  note right
+    REDUCE_SYSTEM_PROMPT format:
+    - System: Prompt + report_data (analyst reports)
+    - Parameters:
+      - response_type (e.g., "Multiple Paragraphs")
+      - max_length (2000 words)
+    - Optional: GENERAL_KNOWLEDGE_INSTRUCTION
+  end note
+
+  if (allow_general_knowledge = true?) then (yes)
+    :Append general knowledge instruction;
+    note right
+      Allows LLM to use external knowledge
+      Risk: May increase hallucinations
+    end note
+  endif
+
+  :Call LLM for final synthesis;
+
+  if (Streaming enabled?) then (yes)
+    repeat
+      :Receive token chunk;
+      :Yield token to CLI;
+      note right
+        Real-time display
+        in terminal
+      end note
+      :Append to full_response;
+    repeat while (More tokens?) is (yes)
+    -> no;
+  else (no)
+    :Receive complete response;
+  endif
+
+  :Track REDUCE metadata;
+  note right
+    - llm_calls: 1
+    - prompt_tokens: REDUCE prompt length
+    - output_tokens: final answer length
+    - completion_time: duration
+  end note
+}
+
+|#PaleGreen|Phase 5: Result Assembly|
+partition "Create GlobalSearchResult" {
+  :Assemble GlobalSearchResult object;
+  note right
+    GlobalSearchResult contains:
+    - response: Final synthesized answer (string)
+    - context_data: Community reports used
+    - context_text: Formatted community context
+    - map_responses: List[SearchResult] from MAP
+    - reduce_context_data: Analyst reports
+    - reduce_context_text: Formatted reduce context
+    - completion_time: total duration (float)
+    - llm_calls: build_context + MAP (N) + REDUCE (1)
+    - prompt_tokens: sum(all phases)
+    - output_tokens: sum(all phases)
+    - llm_calls_categories: {"build_context": X, "map": N, "reduce": 1}
+    - prompt_tokens_categories: per-phase breakdown
+    - output_tokens_categories: per-phase breakdown
+  end note
+
+  :Return GlobalSearchResult to API layer;
+}
+
+|#AntiqueWhite|CLI Layer|
+:Display answer to user;
+
+if (Verbose flag?) then (yes)
+  :Display statistics;
+  note right
+    - LLM calls: N + 1 (MAP + REDUCE)
+      - build_context: X calls
+      - map: N calls
+      - reduce: 1 call
+    - Prompt tokens: Y
+    - Output tokens: Z
+    - Total tokens: Y + Z
+    - Completion time: T seconds
+  end note
+else (no)
+  :Skip statistics;
+endif
+
+:Exit with success;
+stop
+
+
+
+
+
+
+
+@enduml

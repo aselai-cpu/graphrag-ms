@@ -1,0 +1,401 @@
+@startuml Finalize Graph - Calculate Metrics and Complete Links
+' PlantUML v1.2017.15 compatible syntax
+title Step 5: Finalize Graph - Calculate Graph Metrics and Complete Entity-Text Unit Links
+
+start
+
+:Load entities.parquet (from Step 4);
+note right
+  entities_df contains:
+  - id: UUID
+  - title: "Microsoft"
+  - type: "ORGANIZATION"
+  - description: "Tech company..."
+  - text_unit_ids: ["doc_001_chunk_0", "doc_001_chunk_2", ...]
+end note
+
+:Load relationships.parquet (from Step 4);
+note right
+  relationships_df contains:
+  - id: UUID
+  - source: "Bill Gates"
+  - target: "Microsoft"
+  - description: "Co-founded..."
+  - weight: 3.0
+  - text_unit_ids: ["doc_001_chunk_0", ...]
+end note
+
+' === BUILD NETWORKX GRAPH ===
+partition "Build NetworkX Graph" {
+  :Initialize empty graph: G = nx.Graph();
+
+  :Add all entities as nodes;
+  note right
+    For each entity:
+    G.add_node(
+      entity["title"],
+      id=entity["id"],
+      type=entity["type"],
+      description=entity["description"]
+    )
+  end note
+
+  :Add all relationships as edges;
+  note right
+    For each relationship:
+    G.add_edge(
+      relationship["source"],
+      relationship["target"],
+      id=relationship["id"],
+      description=relationship["description"],
+      weight=relationship["weight"]
+    )
+  end note
+
+  :Graph structure created;
+  note right
+    Example graph:
+
+    Nodes: 1,200 entities
+    Edges: 3,500 relationships
+
+    Graph Properties:
+    - Undirected (bidirectional relationships)
+    - Weighted (by text unit co-occurrence)
+    - Multiple components possible
+  end note
+}
+
+' === CALCULATE NODE DEGREES ===
+partition "Calculate Node Degrees" {
+  :Call graph.degree() for all nodes;
+  note right
+    NetworkX degree calculation:
+    Returns dict: {node_name: degree_count}
+
+    Example:
+    {
+      "Microsoft": 15,      # Connected to 15 entities
+      "Bill Gates": 8,      # Connected to 8 entities
+      "Windows": 12,        # Connected to 12 entities
+      "Paul Allen": 5       # Connected to 5 entities
+    }
+  end note
+
+  :degrees = dict(G.degree());
+
+  :For each entity in entities_df;
+
+  repeat
+    :entity_name = entity["title"];
+
+    if (entity_name in degrees?) then (yes)
+      :entity["node_degree"] = degrees[entity_name];
+    else (no)
+      :entity["node_degree"] = 0;
+      note right: Isolated node (no relationships)
+    endif
+
+  repeat while (more entities?)
+
+  :Update entities_df with node_degree column;
+  note right
+    entities_df now includes:
+    - node_degree: Number of relationships
+
+    Example:
+    Microsoft: node_degree = 15
+    Bill Gates: node_degree = 8
+  end note
+}
+
+' === CALCULATE NODE FREQUENCY ===
+partition "Calculate Node Frequency" {
+  :For each entity in entities_df;
+
+  repeat
+    :Count text_unit_ids;
+    note right
+      Example:
+      Microsoft appears in 23 text units
+      entity["text_unit_ids"] = [
+        "doc_001_chunk_0",
+        "doc_001_chunk_2",
+        "doc_001_chunk_5",
+        ... (23 total)
+      ]
+
+      node_frequency = len(text_unit_ids) = 23
+    end note
+
+    :entity["node_frequency"] = len(entity["text_unit_ids"]);
+
+  repeat while (more entities?)
+
+  :Update entities_df with node_frequency column;
+  note right
+    node_frequency indicates how often
+    an entity is mentioned across documents
+
+    Higher frequency → more important entity
+  end note
+}
+
+' === ASSIGN HUMAN-READABLE IDS ===
+partition "Assign Human-Readable IDs" {
+  :Sort entities by importance;
+  note right
+    Sort criteria (example):
+    1. node_degree (descending)
+    2. node_frequency (descending)
+    3. title (alphabetically)
+  end note
+
+  :Assign sequential human_readable_id;
+  note right
+    entities_df["human_readable_id"] = range(len(entities_df))
+
+    Most important entities get lower IDs:
+    - Entity 0: Microsoft (degree=15, freq=23)
+    - Entity 1: Windows (degree=12, freq=18)
+    - Entity 2: Bill Gates (degree=8, freq=12)
+    ...
+  end note
+
+  :Similarly assign human_readable_id to relationships;
+  note right
+    relationships_df["human_readable_id"] = range(len(relationships_df))
+  end note
+}
+
+' === CALCULATE COMBINED DEGREE FOR RELATIONSHIPS ===
+partition "Calculate Combined Degree" {
+  :Create entity_degree_map;
+  note right
+    entity_degree_map = {
+      "Microsoft": 15,
+      "Bill Gates": 8,
+      "Windows": 12,
+      ...
+    }
+  end note
+
+  :For each relationship in relationships_df;
+
+  repeat
+    :source_name = relationship["source"];
+    :target_name = relationship["target"];
+
+    :source_degree = entity_degree_map[source_name];
+    :target_degree = entity_degree_map[target_name];
+
+    :combined_degree = source_degree + target_degree;
+
+    note right
+      Example:
+      Relationship: (Bill Gates, Microsoft)
+      - Bill Gates degree: 8
+      - Microsoft degree: 15
+      - Combined degree: 8 + 15 = 23
+
+      **Why combined_degree?**
+      Indicates importance of relationship
+      based on importance of connected entities.
+      Higher combined_degree = more significant connection.
+    end note
+
+    :relationship["combined_degree"] = combined_degree;
+
+  repeat while (more relationships?)
+
+  :Update relationships_df with combined_degree column;
+}
+
+' === UPDATE RELATIONSHIP WEIGHTS ===
+partition "Refine Relationship Weights" {
+  :Group relationships by (source, target) pair;
+
+  :Calculate co-occurrence count;
+  note right
+    Count how many text units mention
+    both source and target entities
+
+    Example:
+    (Bill Gates, Microsoft):
+    - Mentioned together in 8 text units
+    - weight = 8.0
+
+    Higher weight = stronger relationship
+  end note
+
+  :For each relationship;
+
+  repeat
+    :rel_key = (source, target);
+    :count = relationship_counts[rel_key];
+    :relationship["weight"] = float(count);
+  repeat while (more relationships?)
+
+  :Update relationships_df with refined weights;
+}
+
+' === VERIFY ENTITY-TEXT UNIT LINKS ===
+partition "Verify Bidirectional Links" {
+  :For each entity;
+
+  note right
+    **Verification of Entity → Text Unit Links:**
+
+    Each entity maintains list of text_unit_ids
+    where it was mentioned during extraction.
+
+    Example:
+    Entity: "Microsoft"
+    text_unit_ids: [
+      "doc_001_chunk_0",  # "Microsoft was founded..."
+      "doc_001_chunk_2",  # "...Microsoft develops..."
+      "doc_001_chunk_5",  # "...company Microsoft..."
+      "doc_002_chunk_1",  # "Microsoft reported..."
+      ...
+    ]
+
+    This will be used in Step 8 to create
+    reverse links from text units to entities.
+  end note
+
+  repeat
+    :Validate text_unit_ids is list;
+
+    if (text_unit_ids is None or empty?) then (yes)
+      :Set to empty list [];
+      note right: Entity not mentioned in any text unit
+    else (no)
+      :Ensure no duplicates;
+      :text_unit_ids = list(set(text_unit_ids));
+    endif
+
+  repeat while (more entities?)
+}
+
+' === CALCULATE ADDITIONAL GRAPH STATISTICS ===
+partition "Calculate Graph Statistics" {
+  :Calculate graph metrics;
+  note right
+    - Number of nodes: 1,200
+    - Number of edges: 3,500
+    - Graph density: 0.0058
+    - Number of components: 5
+    - Largest component size: 1,150 nodes
+    - Average degree: 5.83
+    - Average clustering coefficient: 0.42
+  end note
+
+  :Store graph object for next steps;
+  note right
+    Graph will be used in Step 7
+    for community detection
+  end note
+}
+
+' === FINAL OUTPUT ===
+:Create final entities DataFrame;
+note right
+  **Final entities_df schema:**
+
+  | Column              | Type         | Example                    |
+  |---------------------|--------------|----------------------------|
+  | id                  | string       | "e_001" (UUID)             |
+  | human_readable_id   | int          | 0                          |
+  | title               | string       | "Microsoft"                |
+  | type                | string       | "ORGANIZATION"             |
+  | description         | string       | "Technology company..."    |
+  | text_unit_ids       | list[string] | ["doc_001_chunk_0", ...]   |
+  | node_degree         | int          | 15                         |
+  | node_frequency      | int          | 23                         |
+end note
+
+:Create final relationships DataFrame;
+note right
+  **Final relationships_df schema:**
+
+  | Column              | Type         | Example                    |
+  |---------------------|--------------|----------------------------|
+  | id                  | string       | "r_001" (UUID)             |
+  | human_readable_id   | int          | 0                          |
+  | source              | string       | "Bill Gates"               |
+  | target              | string       | "Microsoft"                |
+  | description         | string       | "Co-founded in 1975"       |
+  | weight              | float        | 8.0                        |
+  | combined_degree     | int          | 23                         |
+  | text_unit_ids       | list[string] | ["doc_001_chunk_0", ...]   |
+end note
+
+:Write updated entities.parquet to storage;
+:Write updated relationships.parquet to storage;
+
+note right
+  **Entity-Text Unit Linking Complete:**
+
+  Forward links (Entity → Text Units):
+  - Each entity knows which text units mention it
+  - Stored in entity["text_unit_ids"]
+
+  Reverse links (Text Unit → Entities):
+  - Will be created in Step 8
+  - Stored in text_unit["entity_ids"]
+
+  **Use Cases:**
+  1. Citation: Show source text when displaying entity
+  2. Context: Retrieve relevant chunks for entity
+  3. Provenance: Track where information came from
+  4. Query: Find text units related to specific entities
+end note
+
+stop
+
+legend right
+  **Example Entity Record After Finalization:**
+
+  {
+    "id": "e_001",
+    "human_readable_id": 0,
+    "title": "Microsoft",
+    "type": "ORGANIZATION",
+    "description": "Technology company founded in 1975...",
+    "text_unit_ids": [
+      "doc_001_chunk_0",  # First mention
+      "doc_001_chunk_2",  # Second mention
+      "doc_001_chunk_5",  # Third mention
+      "doc_002_chunk_1",  # In different document
+      ...                 # 23 total mentions
+    ],
+    "node_degree": 15,      # Connected to 15 other entities
+    "node_frequency": 23    # Mentioned in 23 text chunks
+  }
+
+  **Example Relationship Record After Finalization:**
+
+  {
+    "id": "r_001",
+    "human_readable_id": 0,
+    "source": "Bill Gates",
+    "target": "Microsoft",
+    "description": "Co-founded the company in 1975",
+    "weight": 8.0,          # Mentioned together 8 times
+    "combined_degree": 23,  # 8 (Bill) + 15 (Microsoft)
+    "text_unit_ids": [
+      "doc_001_chunk_0",    # First co-mention
+      "doc_001_chunk_3",    # Second co-mention
+      "doc_002_chunk_1",    # In different document
+      ...                   # 8 total co-mentions
+    ]
+  }
+
+  **Graph Metrics Significance:**
+  - node_degree: Indicates entity importance in graph
+  - node_frequency: Indicates entity prominence in text
+  - weight: Indicates relationship strength
+  - combined_degree: Indicates relationship significance
+endlegend
+
+@enduml

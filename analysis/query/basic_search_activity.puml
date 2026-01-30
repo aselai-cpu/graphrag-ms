@@ -1,0 +1,240 @@
+@startuml Basic Search Activity Diagram
+title GraphRAG Basic Search - Detailed Activity Flow (Traditional RAG)
+
+|#AntiqueWhite|CLI Layer|
+start
+:User executes query\n""graphrag query 'What does the document say about X?' --method basic"";
+
+:Parse CLI arguments;
+note right
+  - query string
+  - root directory
+  - data directory
+  - response_type
+  - streaming flag
+end note
+
+:Load configuration\n(settings.yaml);
+
+|#LightBlue|Data Loading|
+:Read Parquet files from output/;
+:Load text_units.parquet;
+note right
+  Minimal data requirements:
+  - Only text units needed
+  - No graph structure required
+  - Simplest search method
+end note
+
+:Load embedding vector stores;
+:Load text_unit_text embeddings;
+note right
+  Vector store contains:
+  - Embeddings of text unit content
+  - Used for similarity search
+end note
+
+|#LightGreen|Initialization|
+:Create BasicSearch engine via factory;
+
+partition "Factory Setup" {
+  :Create completion model\n(LiteLLM);
+  :Create embedding model\n(for query embedding);
+  :Load basic search prompt;
+  note right
+    BASIC_SEARCH_SYSTEM_PROMPT
+    Simple RAG instructions
+  end note
+  :Create BasicSearchContext builder;
+  note right
+    Configured with:
+    - text_units DataFrame
+    - text_unit_embeddings vectorstore
+    - text_embedder model
+    - token encoder
+  end note
+  :Set retrieval parameters;
+  note right
+    - k: Number of text units (default: 10)
+    - max_context_tokens: 4000
+  end note
+}
+
+|#LightYellow|Query Execution|
+:Start BasicSearch.search(query);
+
+|#LightCoral|Phase 1: Vector Search|
+partition "Text Unit Retrieval" {
+  :Embed query using text embedding model;
+  note right
+    query_embedding = text_embedder.embedding(query)
+  end note
+
+  :Vector similarity search on text_unit_text embeddings;
+  note right
+    Search parameters:
+    - text: query string
+    - k: number of chunks (default: 10)
+    - metric: cosine similarity
+  end note
+
+  :Retrieve top-k similar text units;
+  note right
+    Returns list of VectorSearchResult:
+    - document.id: text unit ID
+    - score: similarity score
+    - metadata: additional info
+  end note
+
+  :Extract text unit IDs from search results;
+
+  :Filter text_units DataFrame by IDs;
+  note right
+    Create filtered list:
+    [{id: "unit_1", text: "content..."}, ...]
+  end note
+
+  :Create DataFrame of retrieved text units;
+}
+
+|#LightSteelBlue|Phase 2: Token Budget Filtering|
+partition "Apply Context Window Limit" {
+  :Initialize context building;
+  note right
+    - current_tokens = 0
+    - text_ids = []
+    - max_context_tokens = 4000 (default)
+  end note
+
+  :Count header tokens;
+  note right
+    Header format: "id|text\n"
+  end note
+
+  repeat
+    :Select next text unit from retrieved list;
+
+    :Format as CSV row;
+    note right
+      Format: "unit_id|text_content\n"
+      Separator: | (pipe)
+    end note
+
+    :Count tokens in formatted row;
+
+    if (current_tokens + row_tokens ≤ max_context_tokens?) then (yes)
+      :Add text unit to context;
+      :Add index to text_ids;
+      :Update current_tokens;
+    else (no)
+      :Token limit reached;
+      :Stop adding text units;
+      note right
+        Remaining text units discarded
+        Ensures we fit in LLM context
+      end note
+      break
+    endif
+
+  repeat while (More text units?) is (yes)
+  -> no;
+
+  :Filter DataFrame by selected indices;
+
+  :Convert to CSV format;
+  note right
+    CSV format:
+    id|text
+    unit_1|This is the content of unit 1...
+    unit_2|Another text unit content...
+    ...
+  end note
+
+  :Store as context_chunks;
+}
+
+|#Lavender|Phase 3: Answer Generation|
+partition "LLM Generation" {
+  :Build completion messages;
+  note right
+    System Message:
+    - BASIC_SEARCH_SYSTEM_PROMPT
+    - Formatted text units context (CSV)
+    - response_type parameter
+
+    User Message:
+    - User query
+  end note
+
+  :Call LLM with streaming;
+
+  if (Streaming enabled?) then (yes)
+    repeat
+      :Receive token chunk;
+      :Yield token to CLI;
+      note right
+        Real-time display
+        in terminal
+      end note
+      :Append to full_response;
+    repeat while (More tokens?) is (yes)
+    -> no;
+  else (no)
+    :Receive complete response;
+  endif
+
+  :Track LLM call metadata;
+  note right
+    - llm_calls: 1
+    - prompt_tokens: system + context + query
+    - output_tokens: response length
+    - completion_time: duration
+  end note
+}
+
+|#PaleGreen|Phase 4: Result Assembly|
+partition "Create SearchResult" {
+  :Assemble SearchResult object;
+  note right
+    SearchResult contains:
+    - response: Generated answer (string)
+    - context_data: {sources: DataFrame}
+    - context_text: Formatted CSV context
+    - completion_time: duration (float)
+    - llm_calls: 1
+    - prompt_tokens: input tokens
+    - output_tokens: generated tokens
+    - llm_calls_categories: {"build_context": 0, "response": 1}
+    - prompt_tokens_categories: per-phase breakdown
+    - output_tokens_categories: per-phase breakdown
+  end note
+
+  :Return SearchResult to API layer;
+}
+
+|#AntiqueWhite|CLI Layer|
+:Display answer to user;
+
+if (Verbose flag?) then (yes)
+  :Display statistics;
+  note right
+    - LLM calls: 1
+    - Prompt tokens: X
+    - Output tokens: Y
+    - Total tokens: X + Y
+    - Completion time: Z seconds
+  end note
+else (no)
+  :Skip statistics;
+endif
+
+:Exit with success;
+stop
+
+
+
+
+
+
+
+@enduml

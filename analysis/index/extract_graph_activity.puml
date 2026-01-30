@@ -1,0 +1,378 @@
+@startuml Extract Graph - Entity and Relationship Extraction
+' PlantUML v1.2017.15 compatible syntax
+title Step 4: Extract Graph - Entity and Relationship Extraction with Text Unit Linking
+
+start
+
+:Load text_units.parquet;
+note right
+  text_units DataFrame contains:
+  - id: "doc_001_chunk_0"
+  - text: "Microsoft was founded by..."
+  - n_tokens: 1150
+  - document_id: "doc_001"
+end note
+
+:Initialize LLM completion model;
+note right
+  Model: config.extract_graph.completion_model_id
+  Example: "gpt-4o"
+end note
+
+:Load extraction prompt template;
+note right
+  Prompt instructs LLM to extract:
+  - Entities (name, type, description)
+  - Relationships (source, target, description)
+end note
+
+:Initialize empty collections;
+note right
+  - all_entities = []
+  - all_relationships = []
+  - entity_to_text_units = {}
+  - relationship_to_text_units = {}
+end note
+
+partition "Process Each Text Unit" {
+  :Select next text_unit from DataFrame;
+
+  repeat
+    :text_unit_id = unit["id"];
+    :text_content = unit["text"];
+
+    note right
+      Example:
+      text_unit_id = "doc_001_chunk_0"
+      text_content = "Microsoft was founded by
+      Bill Gates and Paul Allen in 1975..."
+    end note
+
+    ' === INITIAL EXTRACTION ===
+    partition "Initial LLM Extraction" {
+      :Build extraction prompt with text_content;
+
+      :Call LLM with extraction prompt;
+      note right
+        Request:
+        {
+          "messages": [
+            {"role": "system", "content": extraction_prompt},
+            {"role": "user", "content": text_content}
+          ]
+        }
+      end note
+
+      :Parse LLM response;
+      note right
+        Response (JSON):
+        {
+          "entities": [
+            {"name": "Microsoft", "type": "ORG", "description": "..."},
+            {"name": "Bill Gates", "type": "PERSON", "description": "..."},
+            {"name": "Paul Allen", "type": "PERSON", "description": "..."}
+          ],
+          "relationships": [
+            {"source": "Bill Gates", "target": "Microsoft", "description": "Co-founded"},
+            {"source": "Paul Allen", "target": "Microsoft", "description": "Co-founded"}
+          ]
+        }
+      end note
+
+      :initial_entities = parsed_entities;
+      :initial_relationships = parsed_relationships;
+    }
+
+    ' === GLEANINGS (MULTI-TURN EXTRACTION) ===
+    if (max_gleanings > 0?) then (yes)
+      partition "Gleaning Iterations" {
+        :gleaning_round = 0;
+
+        repeat
+          :Build gleaning prompt;
+          note right
+            Prompt: "Previously extracted:
+            [list of entities/relationships]
+
+            Review the text again.
+            Did we miss any entities or relationships?"
+          end note
+
+          :Call LLM with gleaning prompt;
+
+          :Parse additional entities/relationships;
+
+          :Merge with initial_entities and initial_relationships;
+
+          :gleaning_round++;
+
+        repeat while (gleaning_round < max_gleanings)
+      }
+    endif
+
+    ' === LINK ENTITIES TO TEXT UNIT ===
+    partition "Link Entities to Text Unit" {
+      :For each extracted entity;
+
+      repeat
+        :entity_name = entity["name"];
+
+        ' Add text_unit_id to entity
+        :entity["text_unit_ids"] = [text_unit_id];
+
+        note right
+          Example:
+          entity = {
+            "name": "Microsoft",
+            "type": "ORGANIZATION",
+            "description": "Tech company...",
+            "text_unit_ids": ["doc_001_chunk_0"]
+          }
+        end note
+
+        :Add entity to all_entities;
+
+        ' Track reverse mapping
+        if (entity_name in entity_to_text_units?) then (yes)
+          :Append text_unit_id to existing list;
+          note right
+            entity_to_text_units["Microsoft"]
+            = ["doc_001_chunk_0", "doc_001_chunk_2", ...]
+          end note
+        else (no)
+          :Create new list with text_unit_id;
+          note right
+            entity_to_text_units["Microsoft"]
+            = ["doc_001_chunk_0"]
+          end note
+        endif
+
+      repeat while (more entities?)
+    }
+
+    ' === LINK RELATIONSHIPS TO TEXT UNIT ===
+    partition "Link Relationships to Text Unit" {
+      :For each extracted relationship;
+
+      repeat
+        :rel_key = (source, target);
+
+        ' Add text_unit_id to relationship
+        :relationship["text_unit_ids"] = [text_unit_id];
+
+        note right
+          Example:
+          relationship = {
+            "source": "Bill Gates",
+            "target": "Microsoft",
+            "description": "Co-founded in 1975",
+            "text_unit_ids": ["doc_001_chunk_0"]
+          }
+        end note
+
+        :Add relationship to all_relationships;
+
+        ' Track reverse mapping
+        if (rel_key in relationship_to_text_units?) then (yes)
+          :Append text_unit_id to existing list;
+        else (no)
+          :Create new list with text_unit_id;
+        endif
+
+      repeat while (more relationships?)
+    }
+
+  repeat while (more text_units?) is (yes)
+  ->no;
+}
+
+' === MERGE DUPLICATE ENTITIES ===
+partition "Merge Duplicate Entities" {
+  :Group entities by normalized name;
+  note right
+    Example grouping:
+    "Microsoft" → 23 mentions across text units
+    "microsoft" → 5 mentions
+    "Microsoft Corporation" → 8 mentions
+
+    After normalization:
+    "microsoft" → 36 total mentions
+  end note
+
+  :For each entity group;
+
+  repeat
+    :Merge text_unit_ids from all instances;
+    note right
+      Microsoft entity appears in chunks:
+      text_unit_ids = [
+        "doc_001_chunk_0",
+        "doc_001_chunk_2",
+        "doc_001_chunk_5",
+        "doc_002_chunk_1",
+        ...  (23 total)
+      ]
+    end note
+
+    :Merge descriptions (keep longest or concatenate);
+
+    :Create single merged entity;
+    note right
+      merged_entity = {
+        "id": "e_001" (UUID),
+        "title": "Microsoft",
+        "type": "ORGANIZATION",
+        "description": "Merged description...",
+        "text_unit_ids": [list of 23 text unit IDs]
+      }
+    end note
+
+    :Add to entities_df;
+
+  repeat while (more entity groups?)
+}
+
+' === MERGE DUPLICATE RELATIONSHIPS ===
+partition "Merge Duplicate Relationships" {
+  :Group relationships by (source, target) pair;
+  note right
+    Example grouping:
+    ("Bill Gates", "Microsoft") appears in:
+    - doc_001_chunk_0: "Co-founded in 1975"
+    - doc_001_chunk_3: "Founded the company"
+    - doc_002_chunk_1: "Started Microsoft"
+    → 3 mentions across chunks
+  end note
+
+  :For each relationship group;
+
+  repeat
+    :Merge text_unit_ids from all instances;
+    note right
+      Relationship appears in chunks:
+      text_unit_ids = [
+        "doc_001_chunk_0",
+        "doc_001_chunk_3",
+        "doc_002_chunk_1"
+      ]
+    end note
+
+    :Merge descriptions;
+
+    :Calculate weight = count of text_units;
+    note right
+      weight = 3.0
+      (appears in 3 different text units)
+    end note
+
+    :Create single merged relationship;
+    note right
+      merged_relationship = {
+        "id": "r_001" (UUID),
+        "source": "Bill Gates",
+        "target": "Microsoft",
+        "description": "Merged description...",
+        "weight": 3.0,
+        "text_unit_ids": [3 text unit IDs]
+      }
+    end note
+
+    :Add to relationships_df;
+
+  repeat while (more relationship groups?)
+}
+
+' === SUMMARIZE DESCRIPTIONS (OPTIONAL) ===
+if (summarize_descriptions.enabled?) then (yes)
+  partition "Summarize Entity Descriptions" {
+    :For each entity with long description;
+
+    repeat
+      if (len(description) > max_length?) then (yes)
+        :Build summarization prompt;
+        note right
+          Prompt: "Summarize this entity description
+          in max 200 characters:
+          [long description]"
+        end note
+
+        :Call LLM to summarize;
+
+        :Replace description with summary;
+      endif
+
+    repeat while (more entities?)
+  }
+
+  partition "Summarize Relationship Descriptions" {
+    :For each relationship with long description;
+
+    repeat
+      if (len(description) > max_length?) then (yes)
+        :Call LLM to summarize;
+        :Replace description with summary;
+      endif
+
+    repeat while (more relationships?)
+  }
+endif
+
+' === FINAL OUTPUT ===
+:Create final DataFrames;
+note right
+  entities_df columns:
+  - id: UUID
+  - title: Entity name
+  - type: Entity type
+  - description: Summary
+  - text_unit_ids: List of chunk IDs
+
+  relationships_df columns:
+  - id: UUID
+  - source: Source entity name
+  - target: Target entity name
+  - description: Summary
+  - weight: Co-occurrence count
+  - text_unit_ids: List of chunk IDs
+end note
+
+:Write entities.parquet to storage;
+:Write relationships.parquet to storage;
+
+note right
+  **Key Linking Mechanism:**
+
+  Each entity tracks ALL text units where it appears:
+  Entity "Microsoft" → text_unit_ids: [23 chunks]
+
+  Each relationship tracks ALL text units where it appears:
+  Rel ("Bill Gates", "Microsoft") → text_unit_ids: [3 chunks]
+
+  This creates bidirectional links:
+  - From text units → entities/relationships (in Step 8)
+  - From entities/relationships → text units (this step)
+end note
+
+stop
+
+legend right
+  **Example Entity Linking:**
+
+  Text Unit: "doc_001_chunk_0"
+  Text: "Microsoft was founded by Bill Gates..."
+
+  Extracted Entities:
+  1. Microsoft → text_unit_ids: ["doc_001_chunk_0", ...]
+  2. Bill Gates → text_unit_ids: ["doc_001_chunk_0", ...]
+
+  Extracted Relationships:
+  1. (Bill Gates, Microsoft) → text_unit_ids: ["doc_001_chunk_0", ...]
+
+  **Why This Matters:**
+  - Entities know which text chunks mention them
+  - Enables citation/provenance tracking
+  - Used in query time to retrieve source text
+  - Supports entity co-occurrence analysis
+endlegend
+
+@enduml

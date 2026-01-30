@@ -1,0 +1,235 @@
+@startuml GraphRAG Query Operation Sequence
+' PlantUML v1.2017.15 compatible syntax
+title GraphRAG Query Operation - Global Search Method
+
+actor User
+participant "CLI\n(main.py)" as CLI
+participant "QueryCLI\n(query.py)" as QueryCLI
+participant "API\n(api/query.py)" as API
+participant "Factory\n(factory.py)" as Factory
+participant "GlobalSearch\n(search.py)" as GlobalSearch
+participant "ContextBuilder\n(community_context.py)" as ContextBuilder
+participant "Storage" as Storage
+participant "VectorStore" as VectorStore
+participant "LLM\n(graphrag_llm)" as LLM
+
+User -> CLI: graphrag query "What are the main themes?" --method global
+activate CLI
+
+CLI -> QueryCLI: _query_cli(query, method, root, options)
+activate QueryCLI
+
+QueryCLI -> QueryCLI: Load configuration
+note right: Load settings.yaml\nfrom root directory
+
+QueryCLI -> QueryCLI: _resolve_output_files(config, data_dir)
+activate Storage
+QueryCLI -> Storage: Read entities.parquet
+Storage --> QueryCLI: entities DataFrame
+QueryCLI -> Storage: Read communities.parquet
+Storage --> QueryCLI: communities DataFrame
+QueryCLI -> Storage: Read community_reports.parquet
+Storage --> QueryCLI: community_reports DataFrame
+deactivate Storage
+
+alt method == "global"
+    QueryCLI -> API: global_search_streaming(config, query, ...)
+    note right: Other methods:\n- local_search_streaming\n- drift_search_streaming\n- basic_search_streaming
+else method == "local"
+    QueryCLI -> API: local_search_streaming(config, query, ...)
+    note right: Uses entities, relationships,\ncommunities, text_units,\ncovariates
+else method == "drift"
+    QueryCLI -> API: drift_search_streaming(config, query, ...)
+    note right: Combines global + local\nwith iterative refinement
+else method == "basic"
+    QueryCLI -> API: basic_search_streaming(config, query, ...)
+    note right: Simple vector search\nover text_units
+end
+
+activate API
+
+== Initialization Phase ==
+
+API -> API: Initialize loggers
+API -> API: Load prompts (map, reduce, knowledge)
+
+opt dynamic_community_selection enabled
+    API -> VectorStore: get_embedding_store()
+    activate VectorStore
+    VectorStore --> API: Entity description embeddings
+    deactivate VectorStore
+end
+
+API -> Factory: get_global_search_engine(config, data, prompts, embeddings)
+activate Factory
+
+Factory -> Factory: Create completion model
+note right: create_completion(model_config)
+
+Factory -> Factory: Create context builder
+note right: GlobalCommunityContext(\n  reports=community_reports,\n  entities=entities,\n  token_encoder=tokenizer\n)
+
+Factory --> API: GlobalSearch instance
+deactivate Factory
+
+== Query Execution Phase ==
+
+API -> GlobalSearch: stream_search(query)
+activate GlobalSearch
+
+GlobalSearch -> ContextBuilder: build_context(query)
+activate ContextBuilder
+
+opt dynamic_community_selection
+    ContextBuilder -> ContextBuilder: DynamicCommunitySelection.select()
+    note right: Filter community reports\nby LLM relevance rating
+
+    loop For each batch of reports
+        ContextBuilder -> LLM: Rate relevance (0-10)
+        activate LLM
+        note right: "How relevant is this\ncommunity to the query?"
+        LLM --> ContextBuilder: Ratings per report
+        deactivate LLM
+    end
+
+    ContextBuilder -> ContextBuilder: Filter by threshold
+    note right: Keep reports with\nrating >= threshold (default: 7)
+
+    opt keep_parent enabled
+        ContextBuilder -> ContextBuilder: Include parent communities
+    end
+else static selection
+    ContextBuilder -> ContextBuilder: Select all reports at community_level
+end
+
+ContextBuilder -> ContextBuilder: build_community_context()
+note right: Format reports as CSV table:\nid,community,level,title,summary
+
+ContextBuilder --> GlobalSearch: ContextBuilderResult
+deactivate ContextBuilder
+note right: context_chunks: formatted CSV\ncontext_records: raw DataFrames
+
+== MAP Phase (Parallel) ==
+
+GlobalSearch -> GlobalSearch: Split context into batches
+note right: Batch size based on\ndata_max_tokens config
+
+par Parallel MAP calls (asyncio.gather with semaphore)
+    loop For each batch
+        GlobalSearch -> LLM: _map_response_single_batch()
+        activate LLM
+        note right: System Prompt: MAP_SYSTEM_PROMPT\nContext: Community reports (CSV)\nQuery: User question\nMax Length: map_max_length
+
+        LLM --> GlobalSearch: JSON response with scored points
+        deactivate LLM
+        note right: Response format:\n{\n  "points": [\n    {\n      "description": "...",\n      "score": 75\n    },\n    ...\n  ]\n}
+    end
+end
+
+GlobalSearch -> GlobalSearch: Aggregate MAP results
+note right: Collect all key points\nfrom parallel responses
+
+GlobalSearch -> QueryCLI: on_map_response_end(map_results)
+note right: Callback for tracking
+
+== REDUCE Phase ==
+
+GlobalSearch -> LLM: _reduce_response()
+activate LLM
+note right: System Prompt: REDUCE_SYSTEM_PROMPT\nContext: All MAP responses\nQuery: User question\nMax Length: reduce_max_length
+
+alt Streaming enabled
+    loop For each token
+        LLM --> GlobalSearch: Token chunk
+        GlobalSearch -> API: Yield token
+        API -> QueryCLI: Yield token
+        QueryCLI -> User: Print token (real-time)
+    end
+else Non-streaming
+    LLM --> GlobalSearch: Complete response
+end
+
+deactivate LLM
+
+GlobalSearch -> GlobalSearch: Calculate statistics
+note right: - Total LLM calls\n- Prompt tokens\n- Output tokens\n- Completion time
+
+GlobalSearch --> API: SearchResult
+deactivate GlobalSearch
+
+note right of API
+  SearchResult contains:
+  - response: Final answer
+  - context_data: Raw records
+  - context_text: Formatted context
+  - llm_calls: Total calls
+  - prompt_tokens: Total input tokens
+  - output_tokens: Total output tokens
+  - completion_time: Duration
+  - Per-category breakdowns
+end note
+
+API --> QueryCLI: Stream complete with SearchResult
+deactivate API
+
+QueryCLI -> QueryCLI: Display final answer
+QueryCLI -> QueryCLI: Display statistics (if verbose)
+note right: Show token usage,\nLLM calls, timing
+
+QueryCLI --> CLI: Success
+deactivate QueryCLI
+
+CLI --> User: Exit
+deactivate CLI
+
+note over User, LLM
+  **Alternative Query Methods:**
+
+  **LOCAL SEARCH:**
+  1. Vector search to find relevant entities
+  2. Traverse entity neighborhoods
+  3. Gather entities, relationships, communities, text units, claims
+  4. Single LLM call with rich context
+  5. Return answer
+
+  **DRIFT SEARCH:**
+  1. PRIMER: Global MAP to generate follow-up questions
+  2. LOCAL: Run local search for each question
+  3. REDUCE: Synthesize all local answers
+  4. Return comprehensive answer
+
+  **BASIC SEARCH:**
+  1. Vector search on text_unit_text embeddings
+  2. Retrieve top-k text units
+  3. Single LLM call with text context
+  4. Return answer
+end note
+
+note over Storage
+  **Required Index Files:**
+
+  **Global Search:**
+  - entities.parquet
+  - communities.parquet
+  - community_reports.parquet
+  - entity_description embeddings (if dynamic)
+
+  **Local Search:**
+  - entities.parquet
+  - relationships.parquet
+  - communities.parquet
+  - community_reports.parquet
+  - text_units.parquet
+  - covariates.parquet (optional)
+  - entity_description embeddings
+  - text_unit_text embeddings
+
+  **DRIFT Search:**
+  - All files from global + local
+
+  **Basic Search:**
+  - text_units.parquet
+  - text_unit_text embeddings
+end note
+
+@enduml

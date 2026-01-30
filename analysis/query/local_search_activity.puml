@@ -1,0 +1,446 @@
+@startuml Local Search Activity Diagram
+title GraphRAG Local Search - Detailed Activity Flow
+
+|#AntiqueWhite|CLI Layer|
+start
+:User executes query\n""graphrag query 'How is X related to Y?' --method local"";
+
+:Parse CLI arguments;
+note right
+  - query string
+  - root directory
+  - data directory
+  - community_level
+  - response_type
+  - streaming flag
+end note
+
+:Load configuration\n(settings.yaml);
+
+|#LightBlue|Data Loading|
+:Read Parquet files from output/;
+fork
+  :Load entities.parquet;
+fork again
+  :Load relationships.parquet;
+fork again
+  :Load communities.parquet;
+fork again
+  :Load community_reports.parquet;
+fork again
+  :Load text_units.parquet;
+fork again
+  :Load covariates.parquet\n(optional);
+end fork
+
+:Load embedding vector stores;
+fork
+  :Load entity_description embeddings;
+fork again
+  :Load text_unit_text embeddings;
+end fork
+
+|#LightGreen|Initialization|
+:Create LocalSearch engine via factory;
+
+partition "Factory Setup" {
+  :Create completion model\n(LiteLLM);
+  :Create embedding model\n(for query embedding);
+  :Load local search prompt\n(system prompt);
+  :Create LocalSearchMixedContext builder;
+  note right
+    Configured with:
+    - entities DataFrame
+    - relationships DataFrame
+    - communities DataFrame
+    - community_reports DataFrame
+    - text_units DataFrame
+    - covariates DataFrame
+    - token encoder
+    - embedding vectorstore
+  end note
+  :Set token budgets;
+  note right
+    text_unit_budget = max_context_tokens × text_unit_prop
+    community_budget = max_context_tokens × community_prop
+    (default: 12000 tokens total, 0.5/0.5 split)
+  end note
+}
+
+|#LightYellow|Query Execution|
+:Start LocalSearch.search(query);
+
+if (Conversation history exists?) then (yes)
+  :Add conversation history to context;
+  note right
+    conversation_history_max_turns
+    (default: 5)
+  end note
+else (no)
+  :Skip conversation context;
+endif
+
+|#LightCoral|Phase 1: Entity Mapping|
+partition "Entity Extraction & Mapping" {
+  :Embed query using text embedding model;
+  note right
+    query_embedding = embedding_model.encode(query)
+  end note
+
+  :Vector similarity search on entity_description embeddings;
+  note right
+    Search parameters:
+    - k = top_k_entities × oversample_scaler
+    - default: 10 × 2 = 20 entities
+    - embedding_vectorstore_key: ID or TITLE
+  end note
+
+  :Retrieve similar entity descriptions;
+
+  :Filter excluded entities;
+
+  :Sort by similarity score (rank);
+
+  :Select top-k entities;
+  note right
+    top_k_mapped_entities
+    (default: 10)
+  end note
+
+  :Store selected entities as **seed_entities**;
+}
+
+|#LightSteelBlue|Phase 2: Graph Traversal|
+partition "Neighborhood Expansion" {
+  :Initialize entity_set with seed_entities;
+
+  repeat
+    :For each seed entity;
+
+    :Find relationships where entity is source or target;
+    note right
+      Query relationships DataFrame:
+      - df[(df.source == entity) | (df.target == entity)]
+    end note
+
+    :Extract connected entities (neighbors);
+
+    :Rank neighbors by entity.rank attribute;
+    note right
+      Entity rank = importance score
+      from indexing phase
+    end note
+
+    :Select top-k neighbors per entity;
+    note right
+      top_k_relationships
+      (default: 10)
+    end note
+
+    :Add neighbors to entity_set;
+
+  repeat while (More seed entities?) is (yes)
+  -> no;
+
+  :Final entity_set = seed_entities + neighbors;
+}
+
+|#Lavender|Phase 3: Context Building|
+partition "Multi-Source Context Assembly" {
+  fork
+    |#Lavender|Entity Context|
+    :Filter entities by entity_set;
+
+    :Select entity fields;
+    note right
+      - id
+      - entity (name)
+      - description
+      - rank
+    end note
+
+    :Format as CSV table;
+    note right
+      ""id,entity,description""
+      Ordered by rank (descending)
+    end note
+
+    :Count entity context tokens;
+
+    :Store as **entity_context**;
+
+  fork again
+    |#Lavender|Relationship Context|
+    :Get in-network relationships;
+    note right
+      Relationships between entities
+      in entity_set
+    end note
+
+    :Apply relationship count limit;
+    note right
+      top_k_relationships
+      (default: 10)
+    end note
+
+    :Select relationship fields;
+    note right
+      - id
+      - source
+      - target
+      - description
+      - rank
+    end note
+
+    :Format as CSV table;
+    note right
+      ""id,source,target,description""
+      Ordered by rank (descending)
+    end note
+
+    :Count relationship context tokens;
+
+    :Store as **relationship_context**;
+
+  fork again
+    |#Lavender|Community Context|
+    :Filter communities by entity_set membership;
+    note right
+      Communities containing
+      any of the selected entities
+    end note
+
+    :Get community reports for filtered communities;
+
+    :Apply token budget;
+    note right
+      community_budget = max_context_tokens × community_prop
+      (default: 12000 × 0.5 = 6000 tokens)
+    end note
+
+    repeat
+      :Select next community report;
+
+      :Count tokens in report summary;
+
+      if (current_tokens + report_tokens ≤ community_budget?) then (yes)
+        :Add report to context;
+        :Update current_tokens;
+      else (no)
+        :Stop adding reports;
+        note right: Token budget exceeded
+      endif
+
+    repeat while (More reports AND within budget?) is (yes)
+    -> no;
+
+    :Format as CSV table;
+    note right
+      ""id,community,summary""
+      Ordered by community size (descending)
+    end note
+
+    :Store as **community_context**;
+
+  fork again
+    |#Lavender|Text Unit Context|
+    :Filter text units by entity_set;
+    note right
+      Text units that mention
+      any entity in entity_set
+    end note
+
+    :Apply token budget;
+    note right
+      text_unit_budget = max_context_tokens × text_unit_prop
+      (default: 12000 × 0.5 = 6000 tokens)
+    end note
+
+    :Sort by relevance;
+    note right
+      Primary: entity rank
+      Secondary: text order
+    end note
+
+    repeat
+      :Select next text unit;
+
+      :Count tokens in text unit;
+
+      if (current_tokens + unit_tokens ≤ text_unit_budget?) then (yes)
+        :Add text unit to context;
+        :Update current_tokens;
+      else (no)
+        :Stop adding text units;
+        note right: Token budget exceeded
+      endif
+
+    repeat while (More text units AND within budget?) is (yes)
+    -> no;
+
+    :Format as CSV table;
+    note right
+      ""id,text""
+      Maintains original order
+    end note
+
+    :Store as **text_unit_context**;
+
+  fork again
+    |#Lavender|Covariate Context (Claims)|
+    if (Covariates available?) then (yes)
+      :Filter covariates by entity_set;
+      note right
+        Claims mentioning
+        entities in entity_set
+      end note
+
+      :Apply token budget;
+      note right
+        Remaining tokens after
+        other contexts
+      end note
+
+      :Format as structured records;
+      note right
+        ""id,subject,object,type,description""
+      end note
+
+      :Store as **covariate_context**;
+    else (no)
+      :Skip covariate context;
+    endif
+  end fork
+
+  :Combine all contexts into single context string;
+  note right
+    Format:
+    -----Entities-----
+    [entity_context]
+
+    -----Relationships-----
+    [relationship_context]
+
+    -----Reports-----
+    [community_context]
+
+    -----Sources-----
+    [text_unit_context]
+
+    -----Claims-----
+    [covariate_context]
+  end note
+
+  :Calculate total context tokens;
+
+  if (total_tokens > max_context_tokens?) then (yes)
+    :Warning: Context exceeds limit;
+    note right
+      This should not happen if
+      budgets are correctly enforced
+    end note
+    :Truncate context to fit limit;
+  else (no)
+    :Context within limits ✓;
+  endif
+
+  :Create ContextBuilderResult;
+  note right
+    Contains:
+    - context_chunks: formatted string
+    - context_records: raw DataFrames
+    - llm_calls: 0 (no LLM used)
+    - prompt_tokens: context token count
+  end note
+}
+
+|#LightGoldenRodYellow|Phase 4: Answer Generation|
+partition "LLM Generation" {
+  :Build completion messages;
+  note right
+    System Message:
+    - LOCAL_SEARCH_SYSTEM_PROMPT
+    - Formatted context
+
+    User Message:
+    - User query
+  end note
+
+  if (Streaming enabled?) then (yes)
+    :Call LLM with stream=True;
+
+    repeat
+      :Receive token chunk;
+
+      :Yield token to CLI;
+      note right
+        Real-time display
+        in terminal
+      end note
+
+      :Append to full_response;
+
+    repeat while (More tokens?) is (yes)
+    -> no;
+
+  else (no)
+    :Call LLM non-streaming;
+
+    :Receive complete response;
+  endif
+
+  :Track LLM call metadata;
+  note right
+    - prompt_tokens (input)
+    - output_tokens (generated)
+    - completion_time
+    - llm_calls: 1
+  end note
+}
+
+|#PaleGreen|Result Assembly|
+partition "Create SearchResult" {
+  :Assemble SearchResult object;
+  note right
+    SearchResult contains:
+    - response: LLM answer (string)
+    - context_data: raw DataFrames (dict)
+    - context_text: formatted context (string)
+    - completion_time: duration (float)
+    - llm_calls: 1
+    - prompt_tokens: context + system + query
+    - output_tokens: answer length
+    - llm_calls_categories: {"search": 1}
+    - prompt_tokens_categories: {"search": N}
+    - output_tokens_categories: {"search": M}
+  end note
+
+  :Return SearchResult to API layer;
+}
+
+|#AntiqueWhite|CLI Layer|
+:Display answer to user;
+
+if (Verbose flag?) then (yes)
+  :Display statistics;
+  note right
+    - LLM calls: 1
+    - Prompt tokens: X
+    - Output tokens: Y
+    - Total tokens: X + Y
+    - Completion time: Z seconds
+  end note
+else (no)
+  :Skip statistics;
+endif
+
+:Exit with success;
+stop
+
+
+
+
+
+
+
+@enduml

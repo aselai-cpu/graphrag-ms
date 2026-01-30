@@ -1,0 +1,244 @@
+@startuml GraphRAG Index Operation Sequence
+' PlantUML v1.2017.15 compatible syntax
+title GraphRAG Index Operation - Standard Method
+
+actor User
+participant "CLI\n(main.py)" as CLI
+participant "IndexCLI\n(index.py)" as IndexCLI
+participant "API\n(api/index.py)" as API
+participant "PipelineFactory\n(factory.py)" as Factory
+participant "Pipeline" as Pipeline
+participant "Storage" as Storage
+participant "Workflows" as Workflows
+participant "LLM\n(graphrag_llm)" as LLM
+participant "VectorStore\n(graphrag_vectors)" as VectorStore
+
+User -> CLI: graphrag index --method standard
+activate CLI
+
+CLI -> IndexCLI: _index_cli(root, method, verbose, cache)
+activate IndexCLI
+
+IndexCLI -> IndexCLI: Load configuration from root_dir
+note right: Loads settings.yaml\nor .env configuration
+
+IndexCLI -> IndexCLI: Initialize loggers
+IndexCLI -> IndexCLI: Setup signal handlers
+
+IndexCLI -> API: build_index(config, method, cache)
+activate API
+
+API -> API: Create input/output/cache storage
+API -> Storage: create_storage(config)
+activate Storage
+Storage --> API: Storage instances
+deactivate Storage
+
+API -> Factory: create_pipeline(config, method)
+activate Factory
+
+alt method == "standard"
+    Factory -> Factory: Create standard pipeline
+    note right: Workflows:\n1. load_input_documents\n2. create_base_text_units\n3. create_final_documents\n4. extract_graph (LLM)\n5. finalize_graph\n6. extract_covariates\n7. create_communities\n8. create_final_text_units\n9. create_community_reports (LLM)\n10. generate_text_embeddings
+else method == "fast"
+    Factory -> Factory: Create fast pipeline
+    note right: Workflows:\n1. load_input_documents\n2. create_base_text_units\n3. create_final_documents\n4. extract_graph_nlp (NLP)\n5. prune_graph\n6. finalize_graph\n7. create_communities\n8. create_final_text_units\n9. create_community_reports_text\n10. generate_text_embeddings
+end
+
+Factory --> API: Pipeline instance
+deactivate Factory
+
+API -> API: run_pipeline(pipeline, context)
+activate Pipeline
+
+== Workflow 1: Load Input Documents ==
+Pipeline -> Workflows: load_input_documents(config, context)
+activate Workflows
+Workflows -> Storage: Read documents from input_storage
+Storage --> Workflows: Document data
+Workflows -> Storage: Write documents.parquet to output
+Workflows --> Pipeline: documents DataFrame
+deactivate Workflows
+note right: documents.parquet created
+
+== Workflow 2: Create Base Text Units ==
+Pipeline -> Workflows: create_base_text_units(config, context)
+activate Workflows
+Workflows -> Workflows: Chunk documents using chunking strategy
+note right: Default: 1200 tokens,\n100 token overlap
+Workflows -> Storage: Write text_units to storage
+Workflows --> Pipeline: text_units DataFrame
+deactivate Workflows
+
+== Workflow 3: Create Final Documents ==
+Pipeline -> Workflows: create_final_documents(config, context)
+activate Workflows
+Workflows -> Workflows: Enrich documents with metadata
+Workflows -> Storage: Write final documents.parquet
+Workflows --> Pipeline: documents DataFrame
+deactivate Workflows
+
+== Workflow 4: Extract Graph (Standard) ==
+Pipeline -> Workflows: extract_graph(config, context)
+activate Workflows
+Workflows -> Storage: Load text_units
+Storage --> Workflows: text_units DataFrame
+
+loop For each text unit (batched)
+    Workflows -> LLM: Extract entities and relationships
+    activate LLM
+    note right: Prompt: extraction_prompt\nModel: config.extract_graph.completion_model_id
+    LLM --> Workflows: Extracted entities & relationships
+    deactivate LLM
+
+    opt max_gleanings > 0
+        Workflows -> LLM: Gleaning iteration (more thorough)
+        activate LLM
+        LLM --> Workflows: Additional entities & relationships
+        deactivate LLM
+    end
+end
+
+Workflows -> LLM: Summarize entity descriptions
+activate LLM
+LLM --> Workflows: Summarized descriptions
+deactivate LLM
+
+Workflows -> LLM: Summarize relationship descriptions
+activate LLM
+LLM --> Workflows: Summarized descriptions
+deactivate LLM
+
+Workflows -> Storage: Write entities.parquet
+Workflows -> Storage: Write relationships.parquet
+Workflows --> Pipeline: entities & relationships DataFrames
+deactivate Workflows
+note right: Raw entities.parquet\nand relationships.parquet created
+
+== Workflow 5: Finalize Graph ==
+Pipeline -> Workflows: finalize_graph(config, context)
+activate Workflows
+Workflows -> Workflows: Calculate node degrees
+Workflows -> Workflows: Calculate combined degrees
+Workflows -> Storage: Update entities.parquet
+Workflows -> Storage: Update relationships.parquet
+Workflows --> Pipeline: Finalized graph DataFrames
+deactivate Workflows
+
+== Workflow 6: Extract Covariates (Optional) ==
+opt config.extract_claims.enabled
+    Pipeline -> Workflows: extract_covariates(config, context)
+    activate Workflows
+    Workflows -> LLM: Extract claims from text units
+    activate LLM
+    LLM --> Workflows: Extracted claims
+    deactivate LLM
+    Workflows -> Storage: Write covariates.parquet
+    Workflows --> Pipeline: covariates DataFrame
+    deactivate Workflows
+end
+
+== Workflow 7: Create Communities ==
+Pipeline -> Workflows: create_communities(config, context)
+activate Workflows
+Workflows -> Workflows: Build NetworkX graph from entities/relationships
+Workflows -> Workflows: Apply Leiden clustering algorithm
+note right: Hierarchical community detection\nmax_cluster_size: 10 (default)\nuse_lcc: true
+Workflows -> Storage: Write communities.parquet
+Workflows --> Pipeline: communities DataFrame
+deactivate Workflows
+note right: Hierarchical communities.parquet\nwith levels and parent/child relationships
+
+== Workflow 8: Create Final Text Units ==
+Pipeline -> Workflows: create_final_text_units(config, context)
+activate Workflows
+Workflows -> Workflows: Link text units to entities/relationships/communities
+Workflows -> Storage: Write final text_units.parquet
+Workflows --> Pipeline: text_units DataFrame
+deactivate Workflows
+
+== Workflow 9: Create Community Reports ==
+Pipeline -> Workflows: create_community_reports(config, context)
+activate Workflows
+
+loop For each community (at each level)
+    Workflows -> Workflows: Build local context
+    note right: Include:\n- Community entities\n- Relationships\n- Claims (if enabled)
+
+    Workflows -> LLM: Generate community report
+    activate LLM
+    note right: Prompt: graph_prompt\nModel: config.community_reports.completion_model_id
+    LLM --> Workflows: Report (summary, findings, rating)
+    deactivate LLM
+end
+
+Workflows -> Storage: Write community_reports.parquet
+Workflows --> Pipeline: community_reports DataFrame
+deactivate Workflows
+note right: community_reports.parquet\nwith LLM-generated summaries
+
+== Workflow 10: Generate Text Embeddings ==
+Pipeline -> Workflows: generate_text_embeddings(config, context)
+activate Workflows
+
+Workflows -> Workflows: Prepare texts for embedding
+note right: Three types:\n1. text_unit_text\n2. entity_description\n3. community_full_content
+
+loop For each embedding type
+    loop For each batch of texts
+        Workflows -> LLM: Generate embeddings
+        activate LLM
+        note right: Model: config.embed_text.embedding_model_id\nBatch size: 16 (default)
+        LLM --> Workflows: Embedding vectors
+        deactivate LLM
+    end
+
+    Workflows -> VectorStore: Load embeddings into vector store
+    activate VectorStore
+    VectorStore --> Workflows: Stored successfully
+    deactivate VectorStore
+end
+
+Workflows --> Pipeline: Embeddings complete
+deactivate Workflows
+note right: Vector indexes created\nin configured vector store
+
+== Pipeline Complete ==
+Pipeline -> Storage: Write context.json
+note right: Save pipeline state\nfor future updates
+
+Pipeline -> Storage: Write stats.json
+note right: Save statistics:\n- Workflow durations\n- Token usage\n- Error counts
+
+Pipeline --> API: Pipeline results with stats
+deactivate Pipeline
+
+API --> IndexCLI: Index complete
+deactivate API
+
+IndexCLI --> CLI: Success/Failure status
+deactivate IndexCLI
+
+CLI --> User: Exit with status code
+deactivate CLI
+
+note over Storage
+  **Output Storage Structure:**
+  output/
+  ├── documents.parquet
+  ├── text_units.parquet
+  ├── entities.parquet
+  ├── relationships.parquet
+  ├── communities.parquet
+  ├── community_reports.parquet
+  ├── covariates.parquet (optional)
+  ├── context.json
+  └── stats.json
+
+  **Vector Store:**
+  - text_unit_text embeddings
+  - entity_description embeddings
+  - community_full_content embeddings
+end note
+
+@enduml

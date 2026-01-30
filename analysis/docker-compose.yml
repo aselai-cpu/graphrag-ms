@@ -1,0 +1,42 @@
+services:
+  neo4j:
+    image: neo4j:5.16-community
+    container_name: speedkg-neo4j
+    environment:
+      - NEO4J_AUTH=neo4j/${NEO4J_PASSWORD:-speedkg123}
+      - NEO4J_PLUGINS=["apoc","graph-data-science"]
+      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*,gds.*
+      - NEO4J_dbms_security_procedures_allowlist=apoc.*,gds.*
+      - NEO4J_dbms_memory_heap_initial__size=2G
+      - NEO4J_dbms_memory_heap_max__size=4G
+      - NEO4J_server_memory_pagecache_size=1G
+      - NEO4J_gds_enterprise_license__file=/licenses/gds.license
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - neo4j_plugins:/plugins
+      - ./data:/import
+      - /Users/aselaillayapparachchi/code/GraphRAG/Microsoft/quickstart/output:/graphrag-output:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -O /dev/null -q http://localhost:7474 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - speedkg-network
+
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
+  neo4j_plugins:
+
+networks:
+  speedkg-network:
+    driver: bridge

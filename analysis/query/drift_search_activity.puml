@@ -1,0 +1,418 @@
+@startuml DRIFT Search Activity Diagram
+title GraphRAG DRIFT Search - Detailed Activity Flow (Iterative Refinement)
+
+|#AntiqueWhite|CLI Layer|
+start
+:User executes query\n""graphrag query 'Analyze X from multiple perspectives' --method drift"";
+
+:Parse CLI arguments;
+note right
+  - query string
+  - root directory
+  - data directory
+  - response_type
+  - streaming flag
+end note
+
+:Load configuration\n(settings.yaml);
+
+|#LightBlue|Data Loading|
+:Read Parquet files from output/;
+fork
+  :Load entities.parquet;
+fork again
+  :Load relationships.parquet;
+fork again
+  :Load communities.parquet;
+fork again
+  :Load community_reports.parquet;
+fork again
+  :Load text_units.parquet;
+fork again
+  :Load covariates.parquet\n(optional);
+end fork
+
+:Load embedding vector stores;
+fork
+  :Load entity_description embeddings;
+fork again
+  :Load text_unit_text embeddings;
+end fork
+
+|#LightGreen|Initialization|
+:Create DRIFTSearch engine via factory;
+
+partition "Factory Setup" {
+  :Create completion model\n(LiteLLM);
+  :Create embedding model;
+  :Load DRIFT search prompts;
+  note right
+    - DRIFT_PRIMER_PROMPT
+    - LOCAL_SEARCH_SYSTEM_PROMPT
+    - DRIFT_REDUCE_PROMPT
+  end note
+  :Create DRIFTSearchContextBuilder;
+  note right
+    Combines:
+    - GlobalCommunityContext
+    - LocalSearchMixedContext
+  end note
+  :Create DRIFTPrimer;
+  :Initialize LocalSearch engine;
+  note right
+    Reuses local search implementation
+    with JSON response format
+  end note
+  :Initialize QueryState;
+  note right
+    Tracks:
+    - Actions (query + answer pairs)
+    - Follow-up queries
+    - Token usage
+  end note
+  :Set DRIFT parameters;
+  note right
+    - n_depth: Iteration depth (default: 2)
+    - drift_k_followups: Actions per iteration (default: 3)
+    - primer_folds: Parallel primer calls (default: 10)
+  end note
+}
+
+|#LightYellow|Query Execution|
+:Start DRIFTSearch.search(query);
+
+:Initialize token tracking;
+note right
+  llm_calls = {}
+  prompt_tokens = {}
+  output_tokens = {}
+end note
+
+if (QueryState empty?) then (yes)
+  |#LightCoral|Stage 1: PRIMER (Global Context)|
+  partition "Primer - Generate Initial Context" {
+    :Build global context (community selection);
+    note right
+      Uses GlobalCommunityContext
+      - Selects relevant community reports
+      - Can use dynamic selection
+      - Returns top-k reports
+    end note
+
+    :Track build_context tokens;
+
+    :Split community reports into folds;
+    note right
+      Split into primer_folds (default: 10)
+      Enables parallel processing
+      Each fold gets subset of reports
+    end note
+
+    fork
+      |#LightCoral|Primer Fold 1|
+      :Format DRIFT_PRIMER_PROMPT;
+      note right
+        System: DRIFT_PRIMER_PROMPT
+        - Query
+        - Community reports for this fold
+      end note
+
+      :Call LLM with PrimerResponse format;
+      note right
+        Structured output:
+        {
+          "intermediate_answer": str,
+          "score": int (0-100),
+          "follow_up_queries": [str, ...]
+        }
+      end note
+
+      :Parse PrimerResponse;
+
+    fork again
+      |#LightCoral|Primer Fold 2|
+      :Format DRIFT_PRIMER_PROMPT;
+      :Call LLM;
+      :Parse PrimerResponse;
+
+    fork again
+      |#LightCoral|Primer Fold 3|
+      :Format DRIFT_PRIMER_PROMPT;
+      :Call LLM;
+      :Parse PrimerResponse;
+
+    fork again
+      |#LightCoral|... More Folds|
+      note right
+        Total: primer_folds (default: 10)
+        All executed in parallel
+      end note
+    end fork
+
+    :Collect all primer responses;
+    note right
+      Each response contains:
+      - intermediate_answer (2000 chars)
+      - score (relevance 0-100)
+      - follow_up_queries (5+)
+    end note
+
+    :Track primer tokens;
+    note right
+      llm_calls["primer"] = primer_folds
+      prompt_tokens["primer"] = sum(all prompts)
+      output_tokens["primer"] = sum(all outputs)
+    end note
+
+    :Process primer results;
+    note right
+      - Combine intermediate answers
+      - Extract all follow-up queries
+      - Calculate average score
+    end note
+
+    :Create initial DriftAction;
+    note right
+      DriftAction:
+      - query: original query
+      - answer: combined intermediate answers
+      - score: average
+      - follow_ups: list of follow-up queries
+    end note
+
+    :Add initial action to QueryState;
+    :Add follow-ups to QueryState queue;
+  }
+else (no)
+  :Skip primer (resume existing state);
+endif
+
+|#LightSteelBlue|Stage 2: ITERATIVE LOCAL SEARCH|
+partition "Main DRIFT Loop" {
+  :Initialize loop variables;
+  note right
+    epochs = 0
+    n_depth = 2 (default)
+  end note
+
+  repeat
+    :Rank incomplete actions;
+    note right
+      Sort by:
+      1. Score (descending)
+      2. Depth (prefer shallower)
+
+      Selects actions that need answers
+    end note
+
+    if (Actions available?) then (yes)
+      :Select top-k actions;
+      note right
+        k = drift_k_followups (default: 3)
+        Limits concurrent searches
+      end note
+
+      |#LightSteelBlue|Parallel Local Searches|
+      fork
+        |#Lavender|Action 1: Local Search|
+        :Execute LocalSearch for follow-up query 1;
+        note right
+          LocalSearch process:
+          1. Entity mapping (vector search)
+          2. Graph traversal
+          3. Context building (multi-source)
+          4. LLM generation with JSON response
+        end note
+
+        :Parse JSON response;
+        note right
+          Expected format:
+          {
+            "response": str,
+            "score": float,
+            "follow_up_queries": [str, ...]
+          }
+        end note
+
+        :Update DriftAction;
+        note right
+          - Set answer
+          - Set score
+          - Extract new follow-ups
+          - Track tokens
+        end note
+
+      fork again
+        |#Lavender|Action 2: Local Search|
+        :Execute LocalSearch for follow-up query 2;
+        :Parse JSON response;
+        :Update DriftAction;
+
+      fork again
+        |#Lavender|Action 3: Local Search|
+        :Execute LocalSearch for follow-up query 3;
+        :Parse JSON response;
+        :Update DriftAction;
+      end fork
+
+      :Collect all action results;
+
+      repeat
+        :For each completed action;
+        :Add action to QueryState;
+        :Extract follow-up queries from action;
+        :Add follow-ups to QueryState queue;
+        note right
+          New follow-ups become candidates
+          for next iteration
+        end note
+      repeat while (More actions?) is (yes)
+      -> no;
+
+      :Increment epochs;
+
+    else (no)
+      :No more actions to process;
+      :Exit DRIFT loop early;
+      note right
+        All queries answered or
+        no viable follow-ups
+      end note
+      break
+    endif
+
+  repeat while (epochs < n_depth?) is (yes)
+  -> no;
+
+  :Calculate action token usage;
+  note right
+    llm_calls["action"] = sum(all local searches)
+    prompt_tokens["action"] = sum(all prompts)
+    output_tokens["action"] = sum(all outputs)
+  end note
+
+  :Serialize QueryState;
+  note right
+    Extract:
+    - All answers (graph of responses)
+    - Context data (entities, relationships, etc.)
+    - Context text (formatted)
+  end note
+}
+
+|#LightGoldenRodYellow|Stage 3: REDUCE Phase|
+partition "Reduce - Synthesize Final Answer" {
+  if (Reduce enabled?) then (yes)
+    :Extract all answers from QueryState;
+    note right
+      Traverse query graph
+      Collect all completed actions
+      Format as list of answers
+    end note
+
+    :Build REDUCE prompt;
+    note right
+      DRIFT_REDUCE_PROMPT format:
+      - System: Reduce instruction
+      - Context: All intermediate answers
+      - response_type parameter
+      - User: Original query
+    end note
+
+    :Call LLM for synthesis;
+    note right
+      Model parameters:
+      - reduce_temperature (from config)
+      - reduce_max_completion_tokens
+    end note
+
+    if (Streaming?) then (yes)
+      repeat
+        :Receive token chunk;
+        :Yield token to CLI;
+        :Append to full_response;
+      repeat while (More tokens?) is (yes)
+      -> no;
+    else (no)
+      :Receive complete response;
+    endif
+
+    :Track reduce tokens;
+    note right
+      llm_calls["reduce"] = 1
+      prompt_tokens["reduce"] = reduce prompt length
+      output_tokens["reduce"] = response length
+    end note
+
+    :Store reduced response;
+
+  else (no)
+    :Return raw QueryState responses;
+    note right
+      No synthesis
+      Returns all answers as-is
+    end note
+  endif
+}
+
+|#PaleGreen|Stage 4: Result Assembly|
+partition "Create SearchResult" {
+  :Assemble SearchResult object;
+  note right
+    SearchResult contains:
+    - response: Final synthesized answer OR raw responses
+    - context_data: Graph of all context used
+    - context_text: Formatted context
+    - completion_time: total duration (float)
+    - llm_calls: build_context + primer + action + reduce
+    - prompt_tokens: sum(all phases)
+    - output_tokens: sum(all phases)
+    - llm_calls_categories: per-phase breakdown
+    - prompt_tokens_categories: per-phase breakdown
+    - output_tokens_categories: per-phase breakdown
+  end note
+
+  :Calculate total statistics;
+  note right
+    Example breakdown:
+    {
+      "build_context": 0-100 (dynamic selection)
+      "primer": 10 (primer_folds)
+      "action": 6-20+ (local searches)
+      "reduce": 1
+    }
+  end note
+
+  :Return SearchResult to API layer;
+}
+
+|#AntiqueWhite|CLI Layer|
+:Display answer to user;
+
+if (Verbose flag?) then (yes)
+  :Display statistics;
+  note right
+    - LLM calls: 17-130+ calls
+      - build_context: 0-100
+      - primer: 10
+      - action: 6-20+
+      - reduce: 1
+    - Prompt tokens: X
+    - Output tokens: Y
+    - Total tokens: X + Y
+    - Completion time: Z seconds
+  end note
+else (no)
+  :Skip statistics;
+endif
+
+:Exit with success;
+stop
+
+
+
+
+
+
+
+@enduml
