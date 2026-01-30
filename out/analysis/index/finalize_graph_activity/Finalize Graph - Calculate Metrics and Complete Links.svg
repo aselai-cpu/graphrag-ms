@@ -1,0 +1,803 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="6080px" preserveAspectRatio="none" style="width:978px;height:6080px;" version="1.1" viewBox="0 0 978 6080" width="978px" zoomAndPan="magnify"><defs><filter height="300%" id="f1mwmm6zw74r2" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><text fill="#000000" font-family="sans-serif" font-size="18" lengthAdjust="spacing" textLength="743" x="116.875" y="27.4023">Step 5: Finalize Graph - Calculate Graph Metrics and Complete Entity-Text Unit Links</text><ellipse cx="320.25" cy="41.1992" fill="#000000" filter="url(#f1mwmm6zw74r2)" rx="10" ry="10" style="stroke:none;stroke-width:1.0;"/><path d="M451.75,61.1992 L451.75,108.1309 L431.75,112.1309 L451.75,116.1309 L451.75,163.0625 A0,0 0 0 0 451.75,163.0625 L861.75,163.0625 A0,0 0 0 0 861.75,163.0625 L861.75,71.1992 L851.75,61.1992 L451.75,61.1992 A0,0 0 0 0 451.75,61.1992 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M851.75,61.1992 L851.75,71.1992 L861.75,71.1992 L851.75,61.1992 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="129" x="457.75" y="78.7676">entities_df contains:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="64" x="457.75" y="94.0781">- id: UUID</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="115" x="457.75" y="109.3887">- title: "Microsoft"</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="156" x="457.75" y="124.6992">- type: "ORGANIZATION"</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="204" x="457.75" y="140.0098">- description: "Tech company..."</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="389" x="457.75" y="155.3203">- text_unit_ids: ["doc_001_chunk_0", "doc_001_chunk_2", ...]</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="223" x="208.75" y="95.0645"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="203" x="218.75" y="116.666">Load entities.parquet (from Step 4)</text><path d="M467.75,173.0625 L467.75,227.6494 L447.75,231.6494 L467.75,235.6494 L467.75,290.2363 A0,0 0 0 0 467.75,290.2363 L744.75,290.2363 A0,0 0 0 0 744.75,290.2363 L744.75,183.0625 L734.75,173.0625 L467.75,173.0625 A0,0 0 0 0 467.75,173.0625 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M734.75,173.0625 L734.75,183.0625 L744.75,183.0625 L734.75,173.0625 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="164" x="473.75" y="190.6309">relationships_df contains:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="64" x="473.75" y="205.9414">- id: UUID</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="130" x="473.75" y="221.252">- source: "Bill Gates"</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="127" x="473.75" y="236.5625">- target: "Microsoft"</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="190" x="473.75" y="251.873">- description: "Co-founded..."</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="82" x="473.75" y="267.1836">- weight: 3.0</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="256" x="473.75" y="282.4941">- text_unit_ids: ["doc_001_chunk_0", ...]</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="255" x="192.75" y="214.583"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="235" x="202.75" y="236.1846">Load relationships.parquet (from Step 4)</text><rect fill="#FFFFFF" filter="url(#f1mwmm6zw74r2)" height="510.0742" style="stroke:#000000;stroke-width:2.0;" width="536" x="189.25" y="300.2363"/><path d="M349.25,300.2363 L349.25,309.7246 L339.25,319.7246 L189.25,319.7246 " fill="none" style="stroke:#000000;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="150" x="192.25" y="314.7715">Build NetworkX Graph</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="242" x="199.25" y="336.7246"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="222" x="209.25" y="358.3262">Initialize empty graph: G = nx.Graph()</text><path d="M421.25,380.8574 L421.25,435.4443 L401.25,439.4443 L421.25,443.4443 L421.25,498.0313 A0,0 0 0 0 421.25,498.0313 L656.25,498.0313 A0,0 0 0 0 656.25,498.0313 L656.25,390.8574 L646.25,380.8574 L421.25,380.8574 A0,0 0 0 0 421.25,380.8574 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M646.25,380.8574 L646.25,390.8574 L656.25,390.8574 L646.25,380.8574 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="97" x="427.25" y="398.4258">For each entity:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="78" x="427.25" y="413.7363">G.add_node(</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="83" x="435.25" y="429.0469">entity["title"],</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="92" x="435.25" y="444.3574">id=entity["id"],</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="122" x="435.25" y="459.668">type=entity["type"],</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="206" x="435.25" y="474.9785">description=entity["description"]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="4" x="427.25" y="490.2891">)</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="162" x="239.25" y="422.3779"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="142" x="249.25" y="443.9795">Add all entities as nodes</text><path d="M437.25,508.0313 L437.25,570.2734 L417.25,574.2734 L437.25,578.2734 L437.25,640.5156 A0,0 0 0 0 437.25,640.5156 L715.25,640.5156 A0,0 0 0 0 715.25,640.5156 L715.25,518.0313 L705.25,508.0313 L437.25,508.0313 A0,0 0 0 0 437.25,508.0313 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M705.25,508.0313 L705.25,518.0313 L715.25,518.0313 L705.25,508.0313 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="136" x="443.25" y="525.5996">For each relationship:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="77" x="443.25" y="540.9102">G.add_edge(</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="139" x="451.25" y="556.2207">relationship["source"],</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="134" x="451.25" y="571.5313">relationship["target"],</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="131" x="451.25" y="586.8418">id=relationship["id"],</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="249" x="451.25" y="602.1523">description=relationship["description"],</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="187" x="451.25" y="617.4629">weight=relationship["weight"]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="4" x="443.25" y="632.7734">)</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="194" x="223.25" y="557.207"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="174" x="233.25" y="578.8086">Add all relationships as edges</text><path d="M419.75,650.5156 L419.75,720.4131 L399.75,724.4131 L419.75,728.4131 L419.75,798.3105 A0,0 0 0 0 419.75,798.3105 L697.75,798.3105 A0,0 0 0 0 697.75,798.3105 L697.75,660.5156 L687.75,650.5156 L419.75,650.5156 A0,0 0 0 0 419.75,650.5156 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M687.75,650.5156 L687.75,660.5156 L697.75,660.5156 L687.75,650.5156 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="97" x="425.75" y="668.084">Example graph:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="429.75" y="683.3945"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="135" x="425.75" y="698.7051">Nodes: 1,200 entities</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="167" x="425.75" y="714.0156">Edges: 3,500 relationships</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="429.75" y="729.3262"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="108" x="425.75" y="744.6367">Graph Properties:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="257" x="425.75" y="759.9473">- Undirected (bidirectional relationships)</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="251" x="425.75" y="775.2578">- Weighted (by text unit co-occurrence)</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="202" x="425.75" y="790.5684">- Multiple components possible</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="159" x="240.75" y="707.3467"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="139" x="250.75" y="728.9482">Graph structure created</text><rect fill="#FFFFFF" filter="url(#f1mwmm6zw74r2)" height="684.9883" style="stroke:#000000;stroke-width:2.0;" width="778" x="34.25" y="820.3105"/><path d="M207.25,820.3105 L207.25,829.7988 L197.25,839.7988 L34.25,839.7988 " fill="none" style="stroke:#000000;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="163" x="37.25" y="834.8457">Calculate Node Degrees</text><path d="M444.25,849.7988 L444.25,927.3516 L424.25,931.3516 L444.25,935.3516 L444.25,1012.9043 A0,0 0 0 0 444.25,1012.9043 L766.25,1012.9043 A0,0 0 0 0 766.25,1012.9043 L766.25,859.7988 L756.25,849.7988 L444.25,849.7988 A0,0 0 0 0 444.25,849.7988 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M756.25,849.7988 L756.25,859.7988 L766.25,859.7988 L756.25,849.7988 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="184" x="450.25" y="867.3672">NetworkX degree calculation:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="257" x="450.25" y="882.6777">Returns dict: {node_name: degree_count}</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="454.25" y="897.9883"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="57" x="450.25" y="913.2988">Example:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="4" x="450.25" y="928.6094">{</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="289" x="458.25" y="943.9199">"Microsoft": 15,      # Connected to 15 entities</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="271" x="458.25" y="959.2305">"Bill Gates": 8,      # Connected to 8 entities</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="293" x="458.25" y="974.541">"Windows": 12,        # Connected to 12 entities</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="275" x="458.25" y="989.8516">"Paul Allen": 5       # Connected to 5 entities</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="4" x="450.25" y="1005.1621">}</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="208" x="216.25" y="914.2852"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="188" x="226.25" y="935.8867">Call graph.degree() for all nodes</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="176" x="232.25" y="1032.9043"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="156" x="242.25" y="1054.5059">degrees = dict(G.degree())</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="181" x="229.75" y="1087.0371"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="161" x="239.75" y="1108.6387">For each entity in entities_df</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="175" x="232.75" y="1185.1699"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="155" x="242.75" y="1206.7715">entity_name = entity["title"]</text><polygon fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" points="255.75,1239.3027,384.75,1239.3027,396.75,1251.3027,384.75,1263.3027,255.75,1263.3027,243.75,1251.3027,255.75,1239.3027" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="129" x="255.75" y="1255.46">entity_name in degrees?</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="18" x="225.75" y="1248.9824">yes</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="14" x="396.75" y="1248.9824">no</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="285" x="54.25" y="1273.3027"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="265" x="64.25" y="1294.9043">entity["node_degree"] = degrees[entity_name]</text><path d="M548.25,1277.7139 L548.25,1286.3691 L528.25,1290.3691 L548.25,1294.3691 L548.25,1303.0244 A0,0 0 0 0 548.25,1303.0244 L768.25,1303.0244 A0,0 0 0 0 768.25,1303.0244 L768.25,1287.7139 L758.25,1277.7139 L548.25,1277.7139 A0,0 0 0 0 548.25,1277.7139 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M758.25,1277.7139 L758.25,1287.7139 L768.25,1287.7139 L758.25,1277.7139 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="199" x="554.25" y="1295.2822">Isolated node (no relationships)</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="169" x="359.25" y="1273.3027"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="149" x="369.25" y="1294.9043">entity["node_degree"] = 0</text><polygon fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" points="320.25,1313.4355,332.25,1325.4355,320.25,1337.4355,308.25,1325.4355,320.25,1313.4355" style="stroke:#A80036;stroke-width:1.5;"/><polygon fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" points="320.25,1141.1699,332.25,1153.1699,320.25,1165.1699,308.25,1153.1699,320.25,1141.1699" style="stroke:#A80036;stroke-width:1.5;"/><polygon fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" points="282.75,1357.4355,357.75,1357.4355,369.75,1369.4355,357.75,1381.4355,282.75,1381.4355,270.75,1369.4355,282.75,1357.4355" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="75" x="282.75" y="1373.5928">more entities?</text><path d="M478.75,1391.4355 L478.75,1438.3672 L458.75,1442.3672 L478.75,1446.3672 L478.75,1493.2988 A0,0 0 0 0 478.75,1493.2988 L752.75,1493.2988 A0,0 0 0 0 752.75,1493.2988 L752.75,1401.4355 L742.75,1391.4355 L478.75,1391.4355 A0,0 0 0 0 478.75,1391.4355 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M742.75,1391.4355 L742.75,1401.4355 L752.75,1401.4355 L742.75,1391.4355 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="158" x="484.75" y="1409.0039">entities_df now includes:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="253" x="484.75" y="1424.3145">- node_degree: Number of relationships</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="488.75" y="1439.625"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="57" x="484.75" y="1454.9355">Example:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="182" x="484.75" y="1470.2461">Microsoft: node_degree = 15</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="172" x="484.75" y="1485.5566">Bill Gates: node_degree = 8</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="277" x="181.75" y="1425.3008"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="257" x="191.75" y="1446.9023">Update entities_df with node_degree column</text><rect fill="#FFFFFF" filter="url(#f1mwmm6zw74r2)" height="479.1016" style="stroke:#000000;stroke-width:2.0;" width="635" x="149.75" y="1515.2988"/><path d="M337.75,1515.2988 L337.75,1524.7871 L327.75,1534.7871 L149.75,1534.7871 " fill="none" style="stroke:#000000;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="178" x="152.75" y="1529.834">Calculate Node Frequency</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="181" x="229.75" y="1551.7871"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="161" x="239.75" y="1573.3887">For each entity in entities_df</text><path d="M404.75,1639.9199 L404.75,1717.4727 L384.75,1721.4727 L404.75,1725.4727 L404.75,1803.0254 A0,0 0 0 0 404.75,1803.0254 L687.75,1803.0254 A0,0 0 0 0 687.75,1803.0254 L687.75,1649.9199 L677.75,1639.9199 L404.75,1639.9199 A0,0 0 0 0 404.75,1639.9199 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M677.75,1639.9199 L677.75,1649.9199 L687.75,1649.9199 L677.75,1639.9199 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="57" x="410.75" y="1657.4883">Example:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="214" x="410.75" y="1672.7988">Microsoft appears in 23 text units</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="159" x="410.75" y="1688.1094">entity["text_unit_ids"] = [</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="129" x="418.75" y="1703.4199">"doc_001_chunk_0",</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="129" x="418.75" y="1718.7305">"doc_001_chunk_2",</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="129" x="418.75" y="1734.041">"doc_001_chunk_5",</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="73" x="418.75" y="1749.3516">... (23 total)</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="4" x="410.75" y="1764.6621">]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="414.75" y="1779.9727"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="262" x="410.75" y="1795.2832">node_frequency = len(text_unit_ids) = 23</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="129" x="255.75" y="1704.4063"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="109" x="265.75" y="1726.0078">Count text_unit_ids</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="321" x="159.75" y="1823.0254"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="301" x="169.75" y="1844.627">entity["node_frequency"] = len(entity["text_unit_ids"])</text><polygon fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" points="320.25,1605.9199,332.25,1617.9199,320.25,1629.9199,308.25,1617.9199,320.25,1605.9199" style="stroke:#A80036;stroke-width:1.5;"/><polygon fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" points="282.75,1877.1582,357.75,1877.1582,369.75,1889.1582,357.75,1901.1582,282.75,1901.1582,270.75,1889.1582,282.75,1877.1582" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="75" x="282.75" y="1893.3154">more entities?</text><path d="M486.75,1911.1582 L486.75,1942.7793 L466.75,1946.7793 L486.75,1950.7793 L486.75,1982.4004 A0,0 0 0 0 486.75,1982.4004 L774.75,1982.4004 A0,0 0 0 0 774.75,1982.4004 L774.75,1921.1582 L764.75,1911.1582 L486.75,1911.1582 A0,0 0 0 0 486.75,1911.1582 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M764.75,1911.1582 L764.75,1921.1582 L774.75,1921.1582 L764.75,1911.1582 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="228" x="492.75" y="1928.7266">node_frequency indicates how often</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="260" x="492.75" y="1944.0371">an entity is mentioned across documents</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="496.75" y="1959.3477"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="267" x="492.75" y="1974.6582">Higher frequency → more important entity</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="293" x="173.75" y="1929.7129"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="273" x="183.75" y="1951.3145">Update entities_df with node_frequency column</text><rect fill="#FFFFFF" filter="url(#f1mwmm6zw74r2)" height="294.0371" style="stroke:#000000;stroke-width:2.0;" width="810" x="151.75" y="2004.4004"/><path d="M356.75,2004.4004 L356.75,2013.8887 L346.75,2023.8887 L151.75,2023.8887 " fill="none" style="stroke:#000000;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="195" x="154.75" y="2018.9355">Assign Human-Readable IDs</text><path d="M427.25,2033.8887 L427.25,2065.5098 L407.25,2069.5098 L427.25,2073.5098 L427.25,2105.1309 A0,0 0 0 0 427.25,2105.1309 L648.25,2105.1309 A0,0 0 0 0 648.25,2105.1309 L648.25,2043.8887 L638.25,2033.8887 L427.25,2033.8887 A0,0 0 0 0 427.25,2033.8887 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M638.25,2033.8887 L638.25,2043.8887 L648.25,2043.8887 L638.25,2033.8887 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="142" x="433.25" y="2051.457">Sort criteria (example):</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="180" x="433.25" y="2066.7676">1. node_degree (descending)</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="200" x="433.25" y="2082.0781">2. node_frequency (descending)</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="140" x="433.25" y="2097.3887">3. title (alphabetically)</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="174" x="233.25" y="2052.4434"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="154" x="243.25" y="2074.0449">Sort entities by importance</text><path d="M459.25,2115.1309 L459.25,2169.7178 L439.25,2173.7178 L459.25,2177.7178 L459.25,2232.3047 A0,0 0 0 0 459.25,2232.3047 L842.25,2232.3047 A0,0 0 0 0 842.25,2232.3047 L842.25,2125.1309 L832.25,2115.1309 L459.25,2115.1309 A0,0 0 0 0 459.25,2115.1309 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M832.25,2115.1309 L832.25,2125.1309 L842.25,2125.1309 L832.25,2115.1309 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="362" x="465.25" y="2132.6992">entities_df["human_readable_id"] = range(len(entities_df))</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="469.25" y="2148.0098"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="239" x="465.25" y="2163.3203">Most important entities get lower IDs:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="267" x="465.25" y="2178.6309">- Entity 0: Microsoft (degree=15, freq=23)</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="263" x="465.25" y="2193.9414">- Entity 1: Windows (degree=12, freq=18)</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="257" x="465.25" y="2209.252">- Entity 2: Bill Gates (degree=8, freq=12)</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="12" x="465.25" y="2224.5625">...</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="238" x="201.25" y="2156.6514"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="218" x="211.25" y="2178.2529">Assign sequential human_readable_id</text><path d="M498.75,2256.7158 L498.75,2265.3711 L478.75,2269.3711 L498.75,2273.3711 L498.75,2282.0264 A0,0 0 0 0 498.75,2282.0264 L951.75,2282.0264 A0,0 0 0 0 951.75,2282.0264 L951.75,2266.7158 L941.75,2256.7158 L498.75,2256.7158 A0,0 0 0 0 498.75,2256.7158 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M941.75,2256.7158 L941.75,2266.7158 L951.75,2266.7158 L941.75,2256.7158 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="432" x="504.75" y="2274.2842">relationships_df["human_readable_id"] = range(len(relationships_df))</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="317" x="161.75" y="2252.3047"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="297" x="171.75" y="2273.9063">Similarly assign human_readable_id to relationships</text><rect fill="#FFFFFF" filter="url(#f1mwmm6zw74r2)" height="803.3867" style="stroke:#000000;stroke-width:2.0;" width="772.5" x="141.75" y="2308.4375"/><path d="M342.75,2308.4375 L342.75,2317.9258 L332.75,2327.9258 L141.75,2327.9258 " fill="none" style="stroke:#000000;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="191" x="144.75" y="2322.9727">Calculate Combined Degree</text><path d="M426.25,2337.9258 L426.25,2384.8574 L406.25,2388.8574 L426.25,2392.8574 L426.25,2439.7891 A0,0 0 0 0 426.25,2439.7891 L588.25,2439.7891 A0,0 0 0 0 588.25,2439.7891 L588.25,2347.9258 L578.25,2337.9258 L426.25,2337.9258 A0,0 0 0 0 426.25,2337.9258 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M578.25,2337.9258 L578.25,2347.9258 L588.25,2347.9258 L578.25,2337.9258 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="141" x="432.25" y="2355.4941">entity_degree_map = {</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="98" x="440.25" y="2370.8047">"Microsoft": 15,</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="88" x="440.25" y="2386.1152">"Bill Gates": 8,</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="94" x="440.25" y="2401.4258">"Windows": 12,</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="12" x="440.25" y="2416.7363">...</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="4" x="432.25" y="2432.0469">}</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="172" x="234.25" y="2371.791"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="152" x="244.25" y="2393.3926">Create entity_degree_map</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="249" x="195.75" y="2459.7891"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="229" x="205.75" y="2481.3906">For each relationship in relationships_df</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="235" x="202.75" y="2557.9219"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="215" x="212.75" y="2579.5234">source_name = relationship["source"]</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="227" x="206.75" y="2612.0547"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="207" x="216.75" y="2633.6563">target_name = relationship["target"]</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="317" x="161.75" y="2666.1875"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="297" x="171.75" y="2687.7891">source_degree = entity_degree_map[source_name]</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="309" x="165.75" y="2720.3203"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="289" x="175.75" y="2741.9219">target_degree = entity_degree_map[target_name]</text><path d="M503.25,2784.4531 L503.25,2862.0059 L483.25,2866.0059 L503.25,2870.0059 L503.25,2947.5586 A0,0 0 0 0 503.25,2947.5586 L880.25,2947.5586 A0,0 0 0 0 880.25,2947.5586 L880.25,2794.4531 L870.25,2784.4531 L503.25,2784.4531 A0,0 0 0 0 503.25,2784.4531 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M870.25,2784.4531 L870.25,2794.4531 L880.25,2794.4531 L870.25,2784.4531 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="57" x="509.25" y="2802.0215">Example:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="220" x="509.25" y="2817.332">Relationship: (Bill Gates, Microsoft)</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="132" x="509.25" y="2832.6426">- Bill Gates degree: 8</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="142" x="509.25" y="2847.9531">- Microsoft degree: 15</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="206" x="509.25" y="2863.2637">- Combined degree: 8 + 15 = 23</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="513.25" y="2878.5742"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="161" x="509.25" y="2893.8848">Why combined_degree?</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="228" x="509.25" y="2909.1953">Indicates importance of relationship</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="273" x="509.25" y="2924.5059">based on importance of connected entities.</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="356" x="509.25" y="2939.8164">Higher combined_degree = more significant connection.</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="326" x="157.25" y="2848.9395"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="306" x="167.25" y="2870.541">combined_degree = source_degree + target_degree</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="329" x="155.75" y="2967.5586"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="309" x="165.75" y="2989.1602">relationship["combined_degree"] = combined_degree</text><polygon fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" points="320.25,2513.9219,332.25,2525.9219,320.25,2537.9219,308.25,2525.9219,320.25,2513.9219" style="stroke:#A80036;stroke-width:1.5;"/><polygon fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" points="267.25,3021.6914,373.25,3021.6914,385.25,3033.6914,373.25,3045.6914,267.25,3045.6914,255.25,3033.6914,267.25,3021.6914" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="106" x="267.25" y="3037.8486">more relationships?</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="337" x="151.75" y="3065.6914"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="317" x="161.75" y="3087.293">Update relationships_df with combined_degree column</text><rect fill="#FFFFFF" filter="url(#f1mwmm6zw74r2)" height="599.0801" style="stroke:#000000;stroke-width:2.0;" width="534" x="172.25" y="3121.8242"/><path d="M372.25,3121.8242 L372.25,3131.3125 L362.25,3141.3125 L172.25,3141.3125 " fill="none" style="stroke:#000000;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="190" x="175.25" y="3136.3594">Refine Relationship Weights</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="270" x="185.25" y="3158.3125"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="250" x="195.25" y="3179.9141">Group relationships by (source, target) pair</text><path d="M437.25,3202.4453 L437.25,3272.3428 L417.25,3276.3428 L437.25,3280.3428 L437.25,3350.2402 A0,0 0 0 0 437.25,3350.2402 L696.25,3350.2402 A0,0 0 0 0 696.25,3350.2402 L696.25,3212.4453 L686.25,3202.4453 L437.25,3202.4453 A0,0 0 0 0 437.25,3202.4453 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M686.25,3202.4453 L686.25,3212.4453 L696.25,3212.4453 L686.25,3202.4453 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="227" x="443.25" y="3220.0137">Count how many text units mention</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="194" x="443.25" y="3235.3242">both source and target entities</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="447.25" y="3250.6348"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="57" x="443.25" y="3265.9453">Example:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="138" x="443.25" y="3281.2559">(Bill Gates, Microsoft):</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="228" x="443.25" y="3296.5664">- Mentioned together in 8 text units</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="92" x="443.25" y="3311.877">- weight = 8.0</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="447.25" y="3327.1875"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="238" x="443.25" y="3342.498">Higher weight = stronger relationship</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="194" x="223.25" y="3259.2764"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="174" x="233.25" y="3280.8779">Calculate co-occurrence count</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="140" x="250.25" y="3370.2402"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="120" x="260.25" y="3391.8418">For each relationship</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="167" x="236.75" y="3468.373"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="147" x="246.75" y="3489.9746">rel_key = (source, target)</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="228" x="206.25" y="3522.5059"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="208" x="216.25" y="3544.1074">count = relationship_counts[rel_key]</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="222" x="209.25" y="3576.6387"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="202" x="219.25" y="3598.2402">relationship["weight"] = float(count)</text><polygon fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" points="320.25,3424.373,332.25,3436.373,320.25,3448.373,308.25,3436.373,320.25,3424.373" style="stroke:#A80036;stroke-width:1.5;"/><polygon fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" points="267.25,3630.7715,373.25,3630.7715,385.25,3642.7715,373.25,3654.7715,267.25,3654.7715,255.25,3642.7715,267.25,3630.7715" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="106" x="267.25" y="3646.9287">more relationships?</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="276" x="182.25" y="3674.7715"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="256" x="192.25" y="3696.373">Update relationships_df with refined weights</text><rect fill="#FFFFFF" filter="url(#f1mwmm6zw74r2)" height="626.166" style="stroke:#000000;stroke-width:2.0;" width="735.25" x="11" y="3730.9043"/><path d="M188,3730.9043 L188,3740.3926 L178,3750.3926 L11,3750.3926 " fill="none" style="stroke:#000000;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="167" x="14" y="3745.4395">Verify Bidirectional Links</text><path d="M392.25,3760.3926 L392.25,3891.5322 L372.25,3895.5322 L392.25,3899.5322 L392.25,4030.6719 A0,0 0 0 0 392.25,4030.6719 L736.25,4030.6719 A0,0 0 0 0 736.25,4030.6719 L736.25,3770.3926 L726.25,3760.3926 L392.25,3760.3926 A0,0 0 0 0 392.25,3760.3926 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M726.25,3760.3926 L726.25,3770.3926 L736.25,3770.3926 L726.25,3760.3926 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="263" x="398.25" y="3777.9609">Verification of Entity → Text Unit Links:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="402.25" y="3793.2715"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="263" x="398.25" y="3808.582">Each entity maintains list of text_unit_ids</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="266" x="398.25" y="3823.8926">where it was mentioned during extraction.</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="402.25" y="3839.2031"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="57" x="398.25" y="3854.5137">Example:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="114" x="398.25" y="3869.8242">Entity: "Microsoft"</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="95" x="398.25" y="3885.1348">text_unit_ids: [</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="315" x="406.25" y="3900.4453">"doc_001_chunk_0",  # "Microsoft was founded..."</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="303" x="406.25" y="3915.7559">"doc_001_chunk_2",  # "...Microsoft develops..."</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="304" x="406.25" y="3931.0664">"doc_001_chunk_5",  # "...company Microsoft..."</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="288" x="406.25" y="3946.377">"doc_002_chunk_1",  # "Microsoft reported..."</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="12" x="406.25" y="3961.6875">...</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="4" x="398.25" y="3976.998">]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="402.25" y="3992.3086"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="224" x="398.25" y="4007.6191">This will be used in Step 8 to create</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="251" x="398.25" y="4022.9297">reverse links from text units to entities.</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="104" x="268.25" y="3878.4658"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="84" x="278.25" y="3900.0674">For each entity</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="176" x="232.25" y="4094.6719"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="156" x="242.25" y="4116.2734">Validate text_unit_ids is list</text><polygon fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" points="235.75,4148.8047,404.75,4148.8047,416.75,4160.8047,404.75,4172.8047,235.75,4172.8047,223.75,4160.8047,235.75,4148.8047" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="169" x="235.75" y="4164.9619">text_unit_ids is None or empty?</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="18" x="205.75" y="4158.4844">yes</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="14" x="416.75" y="4158.4844">no</text><path d="M167,4187.2158 L167,4195.8711 L147,4199.8711 L167,4203.8711 L167,4212.5264 A0,0 0 0 0 167,4212.5264 L420,4212.5264 A0,0 0 0 0 420,4212.5264 L420,4197.2158 L410,4187.2158 L167,4187.2158 A0,0 0 0 0 167,4187.2158 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M410,4187.2158 L410,4197.2158 L420,4197.2158 L410,4187.2158 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="232" x="173" y="4204.7842">Entity not mentioned in any text unit</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="124" x="23" y="4182.8047"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="104" x="33" y="4204.4063">Set to empty list []</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="140" x="485.5" y="4182.8047"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="120" x="495.5" y="4204.4063">Ensure no duplicates</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="231" x="440" y="4236.9375"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="211" x="450" y="4258.5391">text_unit_ids = list(set(text_unit_ids))</text><polygon fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" points="320.25,4277.0703,332.25,4289.0703,320.25,4301.0703,308.25,4289.0703,320.25,4277.0703" style="stroke:#A80036;stroke-width:1.5;"/><polygon fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" points="320.25,4050.6719,332.25,4062.6719,320.25,4074.6719,308.25,4062.6719,320.25,4050.6719" style="stroke:#A80036;stroke-width:1.5;"/><polygon fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" points="282.75,4321.0703,357.75,4321.0703,369.75,4333.0703,357.75,4345.0703,282.75,4345.0703,270.75,4333.0703,282.75,4321.0703" style="stroke:#A80036;stroke-width:1.5;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacing" textLength="75" x="282.75" y="4337.2275">more entities?</text><rect fill="#FFFFFF" filter="url(#f1mwmm6zw74r2)" height="216.0391" style="stroke:#000000;stroke-width:2.0;" width="492.5" x="204.75" y="4367.0703"/><path d="M387.75,4367.0703 L387.75,4376.5586 L377.75,4386.5586 L204.75,4386.5586 " fill="none" style="stroke:#000000;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="173" x="207.75" y="4381.6055">Calculate Graph Statistics</text><path d="M418.25,4396.5586 L418.25,4451.1455 L398.25,4455.1455 L418.25,4459.1455 L418.25,4513.7324 A0,0 0 0 0 418.25,4513.7324 L687.25,4513.7324 A0,0 0 0 0 687.25,4513.7324 L687.25,4406.5586 L677.25,4396.5586 L418.25,4396.5586 A0,0 0 0 0 418.25,4396.5586 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M677.25,4396.5586 L677.25,4406.5586 L687.25,4406.5586 L677.25,4396.5586 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="165" x="424.25" y="4414.127">- Number of nodes: 1,200</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="164" x="424.25" y="4429.4375">- Number of edges: 3,500</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="151" x="424.25" y="4444.748">- Graph density: 0.0058</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="177" x="424.25" y="4460.0586">- Number of components: 5</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="248" x="424.25" y="4475.3691">- Largest component size: 1,150 nodes</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="144" x="424.25" y="4490.6797">- Average degree: 5.83</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="236" x="424.25" y="4505.9902">- Average clustering coefficient: 0.42</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="156" x="242.25" y="4438.0791"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="136" x="252.25" y="4459.6807">Calculate graph metrics</text><path d="M445.75,4530.4883 L445.75,4546.7988 L425.75,4550.7988 L445.75,4554.7988 L445.75,4571.1094 A0,0 0 0 0 445.75,4571.1094 L641.75,4571.1094 A0,0 0 0 0 641.75,4571.1094 L641.75,4540.4883 L631.75,4530.4883 L445.75,4530.4883 A0,0 0 0 0 445.75,4530.4883 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M631.75,4530.4883 L631.75,4540.4883 L641.75,4540.4883 L631.75,4530.4883 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="175" x="451.75" y="4548.0566">Graph will be used in Step 7</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="156" x="451.75" y="4563.3672">for community detection</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="211" x="214.75" y="4533.7324"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="191" x="224.75" y="4555.334">Store graph object for next steps</text><path d="M439.25,4593.1094 L439.25,4687.9727 L419.25,4691.9727 L439.25,4695.9727 L439.25,4790.8359 A0,0 0 0 0 439.25,4790.8359 L847.25,4790.8359 A0,0 0 0 0 847.25,4790.8359 L847.25,4603.1094 L837.25,4593.1094 L439.25,4593.1094 A0,0 0 0 0 439.25,4593.1094 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M837.25,4593.1094 L837.25,4603.1094 L847.25,4603.1094 L837.25,4593.1094 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="166" x="445.25" y="4610.6777">Final entities_df schema:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="449.25" y="4625.9883"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="49" x="449.25" y="4643.2988">Column</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="30" x="587.25" y="4643.2988">Type</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="53" x="660.25" y="4643.2988">Example</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="445.25" y="4658.6094">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="453.25" y="4658.6094">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="461.25" y="4658.6094">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="469.25" y="4658.6094">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="8" x="477.25" y="4658.6094">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="583.25" y="4658.6094">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="591.25" y="4658.6094">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="32" x="599.25" y="4658.6094">----</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="656.25" y="4658.6094">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="664.25" y="4658.6094">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="672.25" y="4658.6094">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="680.25" y="4658.6094">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="688.25" y="4658.6094">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="24" x="696.25" y="4658.6094">---</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="12" x="449.25" y="4673.9199">id</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="37" x="587.25" y="4673.9199">string</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="92" x="660.25" y="4673.9199">"e_001" (UUID)</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="122" x="449.25" y="4689.2305">human_readable_id</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="17" x="587.25" y="4689.2305">int</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="8" x="660.25" y="4689.2305">0</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="25" x="449.25" y="4704.541">title</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="37" x="587.25" y="4704.541">string</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="70" x="660.25" y="4704.541">"Microsoft"</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="27" x="449.25" y="4719.8516">type</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="37" x="587.25" y="4719.8516">string</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="109" x="660.25" y="4719.8516">"ORGANIZATION"</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="71" x="449.25" y="4735.1621">description</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="37" x="587.25" y="4735.1621">string</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="156" x="660.25" y="4735.1621">"Technology company..."</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="83" x="449.25" y="4750.4727">text_unit_ids</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="65" x="587.25" y="4750.4727">list[string]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="153" x="660.25" y="4750.4727">["doc_001_chunk_0", ...]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="80" x="449.25" y="4765.7832">node_degree</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="17" x="587.25" y="4765.7832">int</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="16" x="660.25" y="4765.7832">15</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="100" x="449.25" y="4781.0938">node_frequency</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="17" x="587.25" y="4781.0938">int</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="16" x="660.25" y="4781.0938">23</text><line style="stroke:#000000;stroke-width:1.0;" x1="445.25" x2="832.25" y1="4630.7305" y2="4630.7305"/><line style="stroke:#000000;stroke-width:1.0;" x1="445.25" x2="832.25" y1="4646.041" y2="4646.041"/><line style="stroke:#000000;stroke-width:1.0;" x1="445.25" x2="832.25" y1="4661.3516" y2="4661.3516"/><line style="stroke:#000000;stroke-width:1.0;" x1="445.25" x2="832.25" y1="4676.6621" y2="4676.6621"/><line style="stroke:#000000;stroke-width:1.0;" x1="445.25" x2="832.25" y1="4691.9727" y2="4691.9727"/><line style="stroke:#000000;stroke-width:1.0;" x1="445.25" x2="832.25" y1="4707.2832" y2="4707.2832"/><line style="stroke:#000000;stroke-width:1.0;" x1="445.25" x2="832.25" y1="4722.5938" y2="4722.5938"/><line style="stroke:#000000;stroke-width:1.0;" x1="445.25" x2="832.25" y1="4737.9043" y2="4737.9043"/><line style="stroke:#000000;stroke-width:1.0;" x1="445.25" x2="832.25" y1="4753.2148" y2="4753.2148"/><line style="stroke:#000000;stroke-width:1.0;" x1="445.25" x2="832.25" y1="4768.5254" y2="4768.5254"/><line style="stroke:#000000;stroke-width:1.0;" x1="445.25" x2="832.25" y1="4783.8359" y2="4783.8359"/><line style="stroke:#000000;stroke-width:1.0;" x1="445.25" x2="445.25" y1="4630.7305" y2="4783.8359"/><line style="stroke:#000000;stroke-width:1.0;" x1="583.25" x2="583.25" y1="4630.7305" y2="4783.8359"/><line style="stroke:#000000;stroke-width:1.0;" x1="656.25" x2="656.25" y1="4630.7305" y2="4783.8359"/><line style="stroke:#000000;stroke-width:1.0;" x1="832.25" x2="832.25" y1="4630.7305" y2="4783.8359"/><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="198" x="221.25" y="4674.9063"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="178" x="231.25" y="4696.5078">Create final entities DataFrame</text><path d="M455.25,4800.8359 L455.25,4895.6992 L435.25,4899.6992 L455.25,4903.6992 L455.25,4998.5625 A0,0 0 0 0 455.25,4998.5625 L858.25,4998.5625 A0,0 0 0 0 858.25,4998.5625 L858.25,4810.8359 L848.25,4800.8359 L455.25,4800.8359 A0,0 0 0 0 455.25,4800.8359 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M848.25,4800.8359 L848.25,4810.8359 L858.25,4810.8359 L848.25,4800.8359 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="204" x="461.25" y="4818.4043">Final relationships_df schema:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="465.25" y="4833.7148"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="49" x="465.25" y="4851.0254">Column</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="30" x="603.25" y="4851.0254">Type</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="53" x="676.25" y="4851.0254">Example</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="461.25" y="4866.3359">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="469.25" y="4866.3359">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="477.25" y="4866.3359">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="485.25" y="4866.3359">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="8" x="493.25" y="4866.3359">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="599.25" y="4866.3359">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="607.25" y="4866.3359">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="32" x="615.25" y="4866.3359">----</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="672.25" y="4866.3359">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="680.25" y="4866.3359">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="688.25" y="4866.3359">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="696.25" y="4866.3359">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" text-decoration="line-through" textLength="8" x="704.25" y="4866.3359">-</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="24" x="712.25" y="4866.3359">---</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="12" x="465.25" y="4881.6465">id</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="37" x="603.25" y="4881.6465">string</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="90" x="676.25" y="4881.6465">"r_001" (UUID)</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="122" x="465.25" y="4896.957">human_readable_id</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="17" x="603.25" y="4896.957">int</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="8" x="676.25" y="4896.957">0</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="42" x="465.25" y="4912.2676">source</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="37" x="603.25" y="4912.2676">string</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="68" x="676.25" y="4912.2676">"Bill Gates"</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="37" x="465.25" y="4927.5781">target</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="37" x="603.25" y="4927.5781">string</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="70" x="676.25" y="4927.5781">"Microsoft"</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="71" x="465.25" y="4942.8887">description</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="37" x="603.25" y="4942.8887">string</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="139" x="676.25" y="4942.8887">"Co-founded in 1975"</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="42" x="465.25" y="4958.1992">weight</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="29" x="603.25" y="4958.1992">float</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="20" x="676.25" y="4958.1992">8.0</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="111" x="465.25" y="4973.5098">combined_degree</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="17" x="603.25" y="4973.5098">int</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="16" x="676.25" y="4973.5098">23</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="83" x="465.25" y="4988.8203">text_unit_ids</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="65" x="603.25" y="4988.8203">list[string]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="153" x="676.25" y="4988.8203">["doc_001_chunk_0", ...]</text><line style="stroke:#000000;stroke-width:1.0;" x1="461.25" x2="843.25" y1="4838.457" y2="4838.457"/><line style="stroke:#000000;stroke-width:1.0;" x1="461.25" x2="843.25" y1="4853.7676" y2="4853.7676"/><line style="stroke:#000000;stroke-width:1.0;" x1="461.25" x2="843.25" y1="4869.0781" y2="4869.0781"/><line style="stroke:#000000;stroke-width:1.0;" x1="461.25" x2="843.25" y1="4884.3887" y2="4884.3887"/><line style="stroke:#000000;stroke-width:1.0;" x1="461.25" x2="843.25" y1="4899.6992" y2="4899.6992"/><line style="stroke:#000000;stroke-width:1.0;" x1="461.25" x2="843.25" y1="4915.0098" y2="4915.0098"/><line style="stroke:#000000;stroke-width:1.0;" x1="461.25" x2="843.25" y1="4930.3203" y2="4930.3203"/><line style="stroke:#000000;stroke-width:1.0;" x1="461.25" x2="843.25" y1="4945.6309" y2="4945.6309"/><line style="stroke:#000000;stroke-width:1.0;" x1="461.25" x2="843.25" y1="4960.9414" y2="4960.9414"/><line style="stroke:#000000;stroke-width:1.0;" x1="461.25" x2="843.25" y1="4976.252" y2="4976.252"/><line style="stroke:#000000;stroke-width:1.0;" x1="461.25" x2="843.25" y1="4991.5625" y2="4991.5625"/><line style="stroke:#000000;stroke-width:1.0;" x1="461.25" x2="461.25" y1="4838.457" y2="4991.5625"/><line style="stroke:#000000;stroke-width:1.0;" x1="599.25" x2="599.25" y1="4838.457" y2="4991.5625"/><line style="stroke:#000000;stroke-width:1.0;" x1="672.25" x2="672.25" y1="4838.457" y2="4991.5625"/><line style="stroke:#000000;stroke-width:1.0;" x1="843.25" x2="843.25" y1="4838.457" y2="4991.5625"/><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="230" x="205.25" y="4882.6328"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="210" x="215.25" y="4904.2344">Create final relationships DataFrame</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="259" x="190.75" y="5018.5625"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="239" x="200.75" y="5040.1641">Write updated entities.parquet to storage</text><path d="M485.75,5062.6953 L485.75,5178.5244 L465.75,5182.5244 L485.75,5186.5244 L485.75,5302.3535 A0,0 0 0 0 485.75,5302.3535 L834.75,5302.3535 A0,0 0 0 0 834.75,5302.3535 L834.75,5072.6953 L824.75,5062.6953 L485.75,5062.6953 A0,0 0 0 0 485.75,5062.6953 " fill="#FBFB77" filter="url(#f1mwmm6zw74r2)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M824.75,5062.6953 L824.75,5072.6953 L834.75,5072.6953 L824.75,5062.6953 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="235" x="491.75" y="5080.2637">Entity-Text Unit Linking Complete:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="495.75" y="5095.5742"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="223" x="491.75" y="5110.8848">Forward links (Entity → Text Units):</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="301" x="491.75" y="5126.1953">- Each entity knows which text units mention it</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="209" x="491.75" y="5141.5059">- Stored in entity["text_unit_ids"]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="495.75" y="5156.8164"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="225" x="491.75" y="5172.127">Reverse links (Text Unit → Entities):</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="163" x="491.75" y="5187.4375">- Will be created in Step 8</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="209" x="491.75" y="5202.748">- Stored in text_unit["entity_ids"]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="495.75" y="5218.0586"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="71" x="491.75" y="5233.3691">Use Cases:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="328" x="491.75" y="5248.6797">1. Citation: Show source text when displaying entity</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="290" x="491.75" y="5263.9902">2. Context: Retrieve relevant chunks for entity</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="320" x="491.75" y="5279.3008">3. Provenance: Track where information came from</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="321" x="491.75" y="5294.6113">4. Query: Find text units related to specific entities</text><rect fill="#FEFECE" filter="url(#f1mwmm6zw74r2)" height="34.1328" rx="12.5" ry="12.5" style="stroke:#A80036;stroke-width:1.5;" width="291" x="174.75" y="5165.458"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="271" x="184.75" y="5187.0596">Write updated relationships.parquet to storage</text><ellipse cx="320.25" cy="5333.3535" fill="#FFFFFF" filter="url(#f1mwmm6zw74r2)" rx="11" ry="11" style="stroke:#000000;stroke-width:1.0;"/><ellipse cx="320.25" cy="5333.3535" fill="#000000" rx="6" ry="6" style="stroke:#7F7F7F;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="51.1992" y2="95.0645"/><polygon fill="#A80036" points="316.25,85.0645,320.25,95.0645,324.25,85.0645,320.25,89.0645" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="129.1973" y2="214.583"/><polygon fill="#A80036" points="316.25,204.583,320.25,214.583,324.25,204.583,320.25,208.583" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="370.8574" y2="422.3779"/><polygon fill="#A80036" points="316.25,412.3779,320.25,422.3779,324.25,412.3779,320.25,416.3779" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="456.5107" y2="557.207"/><polygon fill="#A80036" points="316.25,547.207,320.25,557.207,324.25,547.207,320.25,551.207" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="591.3398" y2="707.3467"/><polygon fill="#A80036" points="316.25,697.3467,320.25,707.3467,324.25,697.3467,320.25,701.3467" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="248.7158" y2="336.7246"/><polygon fill="#A80036" points="316.25,326.7246,320.25,336.7246,324.25,326.7246,320.25,330.7246" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="948.418" y2="1032.9043"/><polygon fill="#A80036" points="316.25,1022.9043,320.25,1032.9043,324.25,1022.9043,320.25,1026.9043" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="1067.0371" y2="1087.0371"/><polygon fill="#A80036" points="316.25,1077.0371,320.25,1087.0371,324.25,1077.0371,320.25,1081.0371" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="243.75" x2="196.75" y1="1251.3027" y2="1251.3027"/><line style="stroke:#A80036;stroke-width:1.5;" x1="196.75" x2="196.75" y1="1251.3027" y2="1273.3027"/><polygon fill="#A80036" points="192.75,1263.3027,196.75,1273.3027,200.75,1263.3027,196.75,1267.3027" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="396.75" x2="443.75" y1="1251.3027" y2="1251.3027"/><line style="stroke:#A80036;stroke-width:1.5;" x1="443.75" x2="443.75" y1="1251.3027" y2="1273.3027"/><polygon fill="#A80036" points="439.75,1263.3027,443.75,1273.3027,447.75,1263.3027,443.75,1267.3027" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="196.75" x2="196.75" y1="1307.4355" y2="1325.4355"/><line style="stroke:#A80036;stroke-width:1.5;" x1="196.75" x2="308.25" y1="1325.4355" y2="1325.4355"/><polygon fill="#A80036" points="298.25,1321.4355,308.25,1325.4355,298.25,1329.4355,302.25,1325.4355" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="443.75" x2="443.75" y1="1307.4355" y2="1325.4355"/><line style="stroke:#A80036;stroke-width:1.5;" x1="443.75" x2="332.25" y1="1325.4355" y2="1325.4355"/><polygon fill="#A80036" points="342.25,1321.4355,332.25,1325.4355,342.25,1329.4355,338.25,1325.4355" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="1219.3027" y2="1239.3027"/><polygon fill="#A80036" points="316.25,1229.3027,320.25,1239.3027,324.25,1229.3027,320.25,1233.3027" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="1165.1699" y2="1185.1699"/><polygon fill="#A80036" points="316.25,1175.1699,320.25,1185.1699,324.25,1175.1699,320.25,1179.1699" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="369.75" x2="790.25" y1="1369.4355" y2="1369.4355"/><polygon fill="#A80036" points="786.25,1263.8027,790.25,1253.8027,794.25,1263.8027,790.25,1259.8027" style="stroke:#A80036;stroke-width:1.5;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="790.25" x2="790.25" y1="1153.1699" y2="1369.4355"/><line style="stroke:#A80036;stroke-width:1.5;" x1="790.25" x2="332.25" y1="1153.1699" y2="1153.1699"/><polygon fill="#A80036" points="342.25,1149.1699,332.25,1153.1699,342.25,1157.1699,338.25,1153.1699" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="1337.4355" y2="1357.4355"/><polygon fill="#A80036" points="316.25,1347.4355,320.25,1357.4355,324.25,1347.4355,320.25,1351.4355" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="1121.1699" y2="1141.1699"/><polygon fill="#A80036" points="316.25,1131.1699,320.25,1141.1699,324.25,1131.1699,320.25,1135.1699" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="1381.4355" y2="1425.3008"/><polygon fill="#A80036" points="316.25,1415.3008,320.25,1425.3008,324.25,1415.3008,320.25,1419.3008" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="741.4795" y2="914.2852"/><polygon fill="#A80036" points="316.25,904.2852,320.25,914.2852,324.25,904.2852,320.25,908.2852" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="1738.5391" y2="1823.0254"/><polygon fill="#A80036" points="316.25,1813.0254,320.25,1823.0254,324.25,1813.0254,320.25,1817.0254" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="1629.9199" y2="1704.4063"/><polygon fill="#A80036" points="316.25,1694.4063,320.25,1704.4063,324.25,1694.4063,320.25,1698.4063" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="369.75" x2="699.75" y1="1889.1582" y2="1889.1582"/><polygon fill="#A80036" points="695.75,1766.0391,699.75,1756.0391,703.75,1766.0391,699.75,1762.0391" style="stroke:#A80036;stroke-width:1.5;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="699.75" x2="699.75" y1="1617.9199" y2="1889.1582"/><line style="stroke:#A80036;stroke-width:1.5;" x1="699.75" x2="332.25" y1="1617.9199" y2="1617.9199"/><polygon fill="#A80036" points="342.25,1613.9199,332.25,1617.9199,342.25,1621.9199,338.25,1617.9199" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="1857.1582" y2="1877.1582"/><polygon fill="#A80036" points="316.25,1867.1582,320.25,1877.1582,324.25,1867.1582,320.25,1871.1582" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="1585.9199" y2="1605.9199"/><polygon fill="#A80036" points="316.25,1595.9199,320.25,1605.9199,324.25,1595.9199,320.25,1599.9199" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="1901.1582" y2="1929.7129"/><polygon fill="#A80036" points="316.25,1919.7129,320.25,1929.7129,324.25,1919.7129,320.25,1923.7129" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="1459.4336" y2="1551.7871"/><polygon fill="#A80036" points="316.25,1541.7871,320.25,1551.7871,324.25,1541.7871,320.25,1545.7871" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="2086.5762" y2="2156.6514"/><polygon fill="#A80036" points="316.25,2146.6514,320.25,2156.6514,324.25,2146.6514,320.25,2150.6514" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="2190.7842" y2="2252.3047"/><polygon fill="#A80036" points="316.25,2242.3047,320.25,2252.3047,324.25,2242.3047,320.25,2246.3047" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="1963.8457" y2="2052.4434"/><polygon fill="#A80036" points="316.25,2042.4434,320.25,2052.4434,324.25,2042.4434,320.25,2046.4434" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="2405.9238" y2="2459.7891"/><polygon fill="#A80036" points="316.25,2449.7891,320.25,2459.7891,324.25,2449.7891,320.25,2453.7891" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="2592.0547" y2="2612.0547"/><polygon fill="#A80036" points="316.25,2602.0547,320.25,2612.0547,324.25,2602.0547,320.25,2606.0547" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="2646.1875" y2="2666.1875"/><polygon fill="#A80036" points="316.25,2656.1875,320.25,2666.1875,324.25,2656.1875,320.25,2660.1875" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="2700.3203" y2="2720.3203"/><polygon fill="#A80036" points="316.25,2710.3203,320.25,2720.3203,324.25,2710.3203,320.25,2714.3203" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="2754.4531" y2="2848.9395"/><polygon fill="#A80036" points="316.25,2838.9395,320.25,2848.9395,324.25,2838.9395,320.25,2842.9395" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="2883.0723" y2="2967.5586"/><polygon fill="#A80036" points="316.25,2957.5586,320.25,2967.5586,324.25,2957.5586,320.25,2961.5586" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="2537.9219" y2="2557.9219"/><polygon fill="#A80036" points="316.25,2547.9219,320.25,2557.9219,324.25,2547.9219,320.25,2551.9219" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="385.25" x2="892.25" y1="3033.6914" y2="3033.6914"/><polygon fill="#A80036" points="888.25,2774.4531,892.25,2764.4531,896.25,2774.4531,892.25,2770.4531" style="stroke:#A80036;stroke-width:1.5;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="892.25" x2="892.25" y1="2525.9219" y2="3033.6914"/><line style="stroke:#A80036;stroke-width:1.5;" x1="892.25" x2="332.25" y1="2525.9219" y2="2525.9219"/><polygon fill="#A80036" points="342.25,2521.9219,332.25,2525.9219,342.25,2529.9219,338.25,2525.9219" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="3001.6914" y2="3021.6914"/><polygon fill="#A80036" points="316.25,3011.6914,320.25,3021.6914,324.25,3011.6914,320.25,3015.6914" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="2493.9219" y2="2513.9219"/><polygon fill="#A80036" points="316.25,2503.9219,320.25,2513.9219,324.25,2503.9219,320.25,2507.9219" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="3045.6914" y2="3065.6914"/><polygon fill="#A80036" points="316.25,3055.6914,320.25,3065.6914,324.25,3055.6914,320.25,3059.6914" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="2286.4375" y2="2371.791"/><polygon fill="#A80036" points="316.25,2361.791,320.25,2371.791,324.25,2361.791,320.25,2365.791" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="3192.4453" y2="3259.2764"/><polygon fill="#A80036" points="316.25,3249.2764,320.25,3259.2764,324.25,3249.2764,320.25,3253.2764" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="3293.4092" y2="3370.2402"/><polygon fill="#A80036" points="316.25,3360.2402,320.25,3370.2402,324.25,3360.2402,320.25,3364.2402" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="3502.5059" y2="3522.5059"/><polygon fill="#A80036" points="316.25,3512.5059,320.25,3522.5059,324.25,3512.5059,320.25,3516.5059" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="3556.6387" y2="3576.6387"/><polygon fill="#A80036" points="316.25,3566.6387,320.25,3576.6387,324.25,3566.6387,320.25,3570.6387" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="3448.373" y2="3468.373"/><polygon fill="#A80036" points="316.25,3458.373,320.25,3468.373,324.25,3458.373,320.25,3462.373" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="385.25" x2="446.25" y1="3642.7715" y2="3642.7715"/><polygon fill="#A80036" points="442.25,3549.5723,446.25,3539.5723,450.25,3549.5723,446.25,3545.5723" style="stroke:#A80036;stroke-width:1.5;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="446.25" x2="446.25" y1="3436.373" y2="3642.7715"/><line style="stroke:#A80036;stroke-width:1.5;" x1="446.25" x2="332.25" y1="3436.373" y2="3436.373"/><polygon fill="#A80036" points="342.25,3432.373,332.25,3436.373,342.25,3440.373,338.25,3436.373" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="3610.7715" y2="3630.7715"/><polygon fill="#A80036" points="316.25,3620.7715,320.25,3630.7715,324.25,3620.7715,320.25,3624.7715" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="3404.373" y2="3424.373"/><polygon fill="#A80036" points="316.25,3414.373,320.25,3424.373,324.25,3414.373,320.25,3418.373" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="3654.7715" y2="3674.7715"/><polygon fill="#A80036" points="316.25,3664.7715,320.25,3674.7715,324.25,3664.7715,320.25,3668.7715" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="3099.8242" y2="3158.3125"/><polygon fill="#A80036" points="316.25,3148.3125,320.25,3158.3125,324.25,3148.3125,320.25,3152.3125" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="555.5" x2="555.5" y1="4216.9375" y2="4236.9375"/><polygon fill="#A80036" points="551.5,4226.9375,555.5,4236.9375,559.5,4226.9375,555.5,4230.9375" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="223.75" x2="85" y1="4160.8047" y2="4160.8047"/><line style="stroke:#A80036;stroke-width:1.5;" x1="85" x2="85" y1="4160.8047" y2="4182.8047"/><polygon fill="#A80036" points="81,4172.8047,85,4182.8047,89,4172.8047,85,4176.8047" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="416.75" x2="555.5" y1="4160.8047" y2="4160.8047"/><line style="stroke:#A80036;stroke-width:1.5;" x1="555.5" x2="555.5" y1="4160.8047" y2="4182.8047"/><polygon fill="#A80036" points="551.5,4172.8047,555.5,4182.8047,559.5,4172.8047,555.5,4176.8047" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="85" x2="85" y1="4216.9375" y2="4289.0703"/><line style="stroke:#A80036;stroke-width:1.5;" x1="85" x2="308.25" y1="4289.0703" y2="4289.0703"/><polygon fill="#A80036" points="298.25,4285.0703,308.25,4289.0703,298.25,4293.0703,302.25,4289.0703" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="555.5" x2="555.5" y1="4271.0703" y2="4289.0703"/><line style="stroke:#A80036;stroke-width:1.5;" x1="555.5" x2="332.25" y1="4289.0703" y2="4289.0703"/><polygon fill="#A80036" points="342.25,4285.0703,332.25,4289.0703,342.25,4293.0703,338.25,4289.0703" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="4128.8047" y2="4148.8047"/><polygon fill="#A80036" points="316.25,4138.8047,320.25,4148.8047,324.25,4138.8047,320.25,4142.8047" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="4074.6719" y2="4094.6719"/><polygon fill="#A80036" points="316.25,4084.6719,320.25,4094.6719,324.25,4084.6719,320.25,4088.6719" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="369.75" x2="693" y1="4333.0703" y2="4333.0703"/><polygon fill="#A80036" points="689,4207.8711,693,4197.8711,697,4207.8711,693,4203.8711" style="stroke:#A80036;stroke-width:1.5;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="693" x2="693" y1="4062.6719" y2="4333.0703"/><line style="stroke:#A80036;stroke-width:1.5;" x1="693" x2="332.25" y1="4062.6719" y2="4062.6719"/><polygon fill="#A80036" points="342.25,4058.6719,332.25,4062.6719,342.25,4066.6719,338.25,4062.6719" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="4301.0703" y2="4321.0703"/><polygon fill="#A80036" points="316.25,4311.0703,320.25,4321.0703,324.25,4311.0703,320.25,4315.0703" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="3912.5986" y2="4050.6719"/><polygon fill="#A80036" points="316.25,4040.6719,320.25,4050.6719,324.25,4040.6719,320.25,4044.6719" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="3708.9043" y2="3878.4658"/><polygon fill="#A80036" points="316.25,3868.4658,320.25,3878.4658,324.25,3868.4658,320.25,3872.4658" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="4472.2119" y2="4533.7324"/><polygon fill="#A80036" points="316.25,4523.7324,320.25,4533.7324,324.25,4523.7324,320.25,4527.7324" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="4345.0703" y2="4438.0791"/><polygon fill="#A80036" points="316.25,4428.0791,320.25,4438.0791,324.25,4428.0791,320.25,4432.0791" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="4567.8652" y2="4674.9063"/><polygon fill="#A80036" points="316.25,4664.9063,320.25,4674.9063,324.25,4664.9063,320.25,4668.9063" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="4709.0391" y2="4882.6328"/><polygon fill="#A80036" points="316.25,4872.6328,320.25,4882.6328,324.25,4872.6328,320.25,4876.6328" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="4916.7656" y2="5018.5625"/><polygon fill="#A80036" points="316.25,5008.5625,320.25,5018.5625,324.25,5008.5625,320.25,5012.5625" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="5052.6953" y2="5165.458"/><polygon fill="#A80036" points="316.25,5155.458,320.25,5165.458,324.25,5155.458,320.25,5159.458" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.5;" x1="320.25" x2="320.25" y1="5199.5908" y2="5322.3535"/><polygon fill="#A80036" points="316.25,5312.3535,320.25,5322.3535,324.25,5312.3535,320.25,5316.3535" style="stroke:#A80036;stroke-width:1.0;"/><rect fill="#DDDDDD" height="702.5078" rx="5" ry="5" style="stroke:#000000;stroke-width:1.0;" width="406" x="551.75" y="5357.3535"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="295" x="557.75" y="5375.8887">Example Entity Record After Finalization:</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="561.75" y="5392.377"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="5" x="557.75" y="5408.8652">{</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="87" x="565.75" y="5425.3535">"id": "e_001",</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="166" x="565.75" y="5441.8418">"human_readable_id": 0,</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="122" x="565.75" y="5458.3301">"title": "Microsoft",</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="167" x="565.75" y="5474.8184">"type": "ORGANIZATION",</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="386" x="565.75" y="5491.3066">"description": "Technology company founded in 1975...",</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="111" x="565.75" y="5507.7949">"text_unit_ids": [</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="250" x="573.75" y="5524.2832">"doc_001_chunk_0",  # First mention</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="270" x="573.75" y="5540.7715">"doc_001_chunk_2",  # Second mention</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="257" x="573.75" y="5557.2598">"doc_001_chunk_5",  # Third mention</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="308" x="573.75" y="5573.748">"doc_002_chunk_1",  # In different document</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="214" x="573.75" y="5590.2363">...                 # 23 total mentions</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="9" x="565.75" y="5606.7246">],</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="376" x="565.75" y="5623.2129">"node_degree": 15,      # Connected to 15 other entities</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="371" x="565.75" y="5639.7012">"node_frequency": 23    # Mentioned in 23 text chunks</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="5" x="557.75" y="5656.1895">}</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="561.75" y="5672.6777"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="344" x="557.75" y="5689.166">Example Relationship Record After Finalization:</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="561.75" y="5705.6543"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="5" x="557.75" y="5722.1426">{</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="85" x="565.75" y="5738.6309">"id": "r_001",</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="166" x="565.75" y="5755.1191">"human_readable_id": 0,</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="140" x="565.75" y="5771.6074">"source": "Bill Gates",</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="137" x="565.75" y="5788.0957">"target": "Microsoft",</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="343" x="565.75" y="5804.584">"description": "Co-founded the company in 1975",</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="333" x="565.75" y="5821.0723">"weight": 8.0,          # Mentioned together 8 times</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="342" x="565.75" y="5837.5605">"combined_degree": 23,  # 8 (Bill) + 15 (Microsoft)</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="111" x="565.75" y="5854.0488">"text_unit_ids": [</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="282" x="573.75" y="5870.5371">"doc_001_chunk_0",    # First co-mention</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="302" x="573.75" y="5887.0254">"doc_001_chunk_3",    # Second co-mention</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="316" x="573.75" y="5903.5137">"doc_002_chunk_1",    # In different document</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="237" x="573.75" y="5920.002">...                   # 8 total co-mentions</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="5" x="565.75" y="5936.4902">]</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="5" x="557.75" y="5952.9785">}</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="0" x="561.75" y="5969.4668"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="194" x="557.75" y="5985.9551">Graph Metrics Significance:</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="357" x="557.75" y="6002.4434">- node_degree: Indicates entity importance in graph</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="367" x="557.75" y="6018.9316">- node_frequency: Indicates entity prominence in text</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="275" x="557.75" y="6035.4199">- weight: Indicates relationship strength</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="375" x="557.75" y="6051.9082">- combined_degree: Indicates relationship significance</text><!--MD5=[d72b17f42982086dc74dd64a4367d9a4]
+@startuml Finalize Graph - Calculate Metrics and Complete Links
+' PlantUML v1.2017.15 compatible syntax
+title Step 5: Finalize Graph - Calculate Graph Metrics and Complete Entity-Text Unit Links
+
+start
+
+:Load entities.parquet (from Step 4);
+note right
+  entities_df contains:
+  - id: UUID
+  - title: "Microsoft"
+  - type: "ORGANIZATION"
+  - description: "Tech company..."
+  - text_unit_ids: ["doc_001_chunk_0", "doc_001_chunk_2", ...]
+end note
+
+:Load relationships.parquet (from Step 4);
+note right
+  relationships_df contains:
+  - id: UUID
+  - source: "Bill Gates"
+  - target: "Microsoft"
+  - description: "Co-founded..."
+  - weight: 3.0
+  - text_unit_ids: ["doc_001_chunk_0", ...]
+end note
+
+' === BUILD NETWORKX GRAPH ===
+partition "Build NetworkX Graph" {
+  :Initialize empty graph: G = nx.Graph();
+
+  :Add all entities as nodes;
+  note right
+    For each entity:
+    G.add_node(
+      entity["title"],
+      id=entity["id"],
+      type=entity["type"],
+      description=entity["description"]
+    )
+  end note
+
+  :Add all relationships as edges;
+  note right
+    For each relationship:
+    G.add_edge(
+      relationship["source"],
+      relationship["target"],
+      id=relationship["id"],
+      description=relationship["description"],
+      weight=relationship["weight"]
+    )
+  end note
+
+  :Graph structure created;
+  note right
+    Example graph:
+
+    Nodes: 1,200 entities
+    Edges: 3,500 relationships
+
+    Graph Properties:
+    - Undirected (bidirectional relationships)
+    - Weighted (by text unit co-occurrence)
+    - Multiple components possible
+  end note
+}
+
+' === CALCULATE NODE DEGREES ===
+partition "Calculate Node Degrees" {
+  :Call graph.degree() for all nodes;
+  note right
+    NetworkX degree calculation:
+    Returns dict: {node_name: degree_count}
+
+    Example:
+    {
+      "Microsoft": 15,      # Connected to 15 entities
+      "Bill Gates": 8,      # Connected to 8 entities
+      "Windows": 12,        # Connected to 12 entities
+      "Paul Allen": 5       # Connected to 5 entities
+    }
+  end note
+
+  :degrees = dict(G.degree());
+
+  :For each entity in entities_df;
+
+  repeat
+    :entity_name = entity["title"];
+
+    if (entity_name in degrees?) then (yes)
+      :entity["node_degree"] = degrees[entity_name];
+    else (no)
+      :entity["node_degree"] = 0;
+      note right: Isolated node (no relationships)
+    endif
+
+  repeat while (more entities?)
+
+  :Update entities_df with node_degree column;
+  note right
+    entities_df now includes:
+    - node_degree: Number of relationships
+
+    Example:
+    Microsoft: node_degree = 15
+    Bill Gates: node_degree = 8
+  end note
+}
+
+' === CALCULATE NODE FREQUENCY ===
+partition "Calculate Node Frequency" {
+  :For each entity in entities_df;
+
+  repeat
+    :Count text_unit_ids;
+    note right
+      Example:
+      Microsoft appears in 23 text units
+      entity["text_unit_ids"] = [
+        "doc_001_chunk_0",
+        "doc_001_chunk_2",
+        "doc_001_chunk_5",
+        ... (23 total)
+      ]
+
+      node_frequency = len(text_unit_ids) = 23
+    end note
+
+    :entity["node_frequency"] = len(entity["text_unit_ids"]);
+
+  repeat while (more entities?)
+
+  :Update entities_df with node_frequency column;
+  note right
+    node_frequency indicates how often
+    an entity is mentioned across documents
+
+    Higher frequency → more important entity
+  end note
+}
+
+' === ASSIGN HUMAN-READABLE IDS ===
+partition "Assign Human-Readable IDs" {
+  :Sort entities by importance;
+  note right
+    Sort criteria (example):
+    1. node_degree (descending)
+    2. node_frequency (descending)
+    3. title (alphabetically)
+  end note
+
+  :Assign sequential human_readable_id;
+  note right
+    entities_df["human_readable_id"] = range(len(entities_df))
+
+    Most important entities get lower IDs:
+    - Entity 0: Microsoft (degree=15, freq=23)
+    - Entity 1: Windows (degree=12, freq=18)
+    - Entity 2: Bill Gates (degree=8, freq=12)
+    ...
+  end note
+
+  :Similarly assign human_readable_id to relationships;
+  note right
+    relationships_df["human_readable_id"] = range(len(relationships_df))
+  end note
+}
+
+' === CALCULATE COMBINED DEGREE FOR RELATIONSHIPS ===
+partition "Calculate Combined Degree" {
+  :Create entity_degree_map;
+  note right
+    entity_degree_map = {
+      "Microsoft": 15,
+      "Bill Gates": 8,
+      "Windows": 12,
+      ...
+    }
+  end note
+
+  :For each relationship in relationships_df;
+
+  repeat
+    :source_name = relationship["source"];
+    :target_name = relationship["target"];
+
+    :source_degree = entity_degree_map[source_name];
+    :target_degree = entity_degree_map[target_name];
+
+    :combined_degree = source_degree + target_degree;
+
+    note right
+      Example:
+      Relationship: (Bill Gates, Microsoft)
+      - Bill Gates degree: 8
+      - Microsoft degree: 15
+      - Combined degree: 8 + 15 = 23
+
+      **Why combined_degree?**
+      Indicates importance of relationship
+      based on importance of connected entities.
+      Higher combined_degree = more significant connection.
+    end note
+
+    :relationship["combined_degree"] = combined_degree;
+
+  repeat while (more relationships?)
+
+  :Update relationships_df with combined_degree column;
+}
+
+' === UPDATE RELATIONSHIP WEIGHTS ===
+partition "Refine Relationship Weights" {
+  :Group relationships by (source, target) pair;
+
+  :Calculate co-occurrence count;
+  note right
+    Count how many text units mention
+    both source and target entities
+
+    Example:
+    (Bill Gates, Microsoft):
+    - Mentioned together in 8 text units
+    - weight = 8.0
+
+    Higher weight = stronger relationship
+  end note
+
+  :For each relationship;
+
+  repeat
+    :rel_key = (source, target);
+    :count = relationship_counts[rel_key];
+    :relationship["weight"] = float(count);
+  repeat while (more relationships?)
+
+  :Update relationships_df with refined weights;
+}
+
+' === VERIFY ENTITY-TEXT UNIT LINKS ===
+partition "Verify Bidirectional Links" {
+  :For each entity;
+
+  note right
+    **Verification of Entity → Text Unit Links:**
+
+    Each entity maintains list of text_unit_ids
+    where it was mentioned during extraction.
+
+    Example:
+    Entity: "Microsoft"
+    text_unit_ids: [
+      "doc_001_chunk_0",  # "Microsoft was founded..."
+      "doc_001_chunk_2",  # "...Microsoft develops..."
+      "doc_001_chunk_5",  # "...company Microsoft..."
+      "doc_002_chunk_1",  # "Microsoft reported..."
+      ...
+    ]
+
+    This will be used in Step 8 to create
+    reverse links from text units to entities.
+  end note
+
+  repeat
+    :Validate text_unit_ids is list;
+
+    if (text_unit_ids is None or empty?) then (yes)
+      :Set to empty list [];
+      note right: Entity not mentioned in any text unit
+    else (no)
+      :Ensure no duplicates;
+      :text_unit_ids = list(set(text_unit_ids));
+    endif
+
+  repeat while (more entities?)
+}
+
+' === CALCULATE ADDITIONAL GRAPH STATISTICS ===
+partition "Calculate Graph Statistics" {
+  :Calculate graph metrics;
+  note right
+    - Number of nodes: 1,200
+    - Number of edges: 3,500
+    - Graph density: 0.0058
+    - Number of components: 5
+    - Largest component size: 1,150 nodes
+    - Average degree: 5.83
+    - Average clustering coefficient: 0.42
+  end note
+
+  :Store graph object for next steps;
+  note right
+    Graph will be used in Step 7
+    for community detection
+  end note
+}
+
+' === FINAL OUTPUT ===
+:Create final entities DataFrame;
+note right
+  **Final entities_df schema:**
+
+  | Column              | Type         | Example                    |
+  |- - - - - - - - - - - - - - - - - - - - -|- - - - - - - - - - - - - -|- - - - - - - - - - - - - - - - - - - - - - - - - - - -|
+  | id                  | string       | "e_001" (UUID)             |
+  | human_readable_id   | int          | 0                          |
+  | title               | string       | "Microsoft"                |
+  | type                | string       | "ORGANIZATION"             |
+  | description         | string       | "Technology company..."    |
+  | text_unit_ids       | list[string] | ["doc_001_chunk_0", ...]   |
+  | node_degree         | int          | 15                         |
+  | node_frequency      | int          | 23                         |
+end note
+
+:Create final relationships DataFrame;
+note right
+  **Final relationships_df schema:**
+
+  | Column              | Type         | Example                    |
+  |- - - - - - - - - - - - - - - - - - - - -|- - - - - - - - - - - - - -|- - - - - - - - - - - - - - - - - - - - - - - - - - - -|
+  | id                  | string       | "r_001" (UUID)             |
+  | human_readable_id   | int          | 0                          |
+  | source              | string       | "Bill Gates"               |
+  | target              | string       | "Microsoft"                |
+  | description         | string       | "Co-founded in 1975"       |
+  | weight              | float        | 8.0                        |
+  | combined_degree     | int          | 23                         |
+  | text_unit_ids       | list[string] | ["doc_001_chunk_0", ...]   |
+end note
+
+:Write updated entities.parquet to storage;
+:Write updated relationships.parquet to storage;
+
+note right
+  **Entity-Text Unit Linking Complete:**
+
+  Forward links (Entity → Text Units):
+  - Each entity knows which text units mention it
+  - Stored in entity["text_unit_ids"]
+
+  Reverse links (Text Unit → Entities):
+  - Will be created in Step 8
+  - Stored in text_unit["entity_ids"]
+
+  **Use Cases:**
+  1. Citation: Show source text when displaying entity
+  2. Context: Retrieve relevant chunks for entity
+  3. Provenance: Track where information came from
+  4. Query: Find text units related to specific entities
+end note
+
+stop
+
+legend right
+  **Example Entity Record After Finalization:**
+
+  {
+    "id": "e_001",
+    "human_readable_id": 0,
+    "title": "Microsoft",
+    "type": "ORGANIZATION",
+    "description": "Technology company founded in 1975...",
+    "text_unit_ids": [
+      "doc_001_chunk_0",  # First mention
+      "doc_001_chunk_2",  # Second mention
+      "doc_001_chunk_5",  # Third mention
+      "doc_002_chunk_1",  # In different document
+      ...                 # 23 total mentions
+    ],
+    "node_degree": 15,      # Connected to 15 other entities
+    "node_frequency": 23    # Mentioned in 23 text chunks
+  }
+
+  **Example Relationship Record After Finalization:**
+
+  {
+    "id": "r_001",
+    "human_readable_id": 0,
+    "source": "Bill Gates",
+    "target": "Microsoft",
+    "description": "Co-founded the company in 1975",
+    "weight": 8.0,          # Mentioned together 8 times
+    "combined_degree": 23,  # 8 (Bill) + 15 (Microsoft)
+    "text_unit_ids": [
+      "doc_001_chunk_0",    # First co-mention
+      "doc_001_chunk_3",    # Second co-mention
+      "doc_002_chunk_1",    # In different document
+      ...                   # 8 total co-mentions
+    ]
+  }
+
+  **Graph Metrics Significance:**
+  - node_degree: Indicates entity importance in graph
+  - node_frequency: Indicates entity prominence in text
+  - weight: Indicates relationship strength
+  - combined_degree: Indicates relationship significance
+endlegend
+
+@enduml
+
+@startuml Finalize Graph - Calculate Metrics and Complete Links
+title Step 5: Finalize Graph - Calculate Graph Metrics and Complete Entity-Text Unit Links
+
+start
+
+:Load entities.parquet (from Step 4);
+note right
+  entities_df contains:
+  - id: UUID
+  - title: "Microsoft"
+  - type: "ORGANIZATION"
+  - description: "Tech company..."
+  - text_unit_ids: ["doc_001_chunk_0", "doc_001_chunk_2", ...]
+end note
+
+:Load relationships.parquet (from Step 4);
+note right
+  relationships_df contains:
+  - id: UUID
+  - source: "Bill Gates"
+  - target: "Microsoft"
+  - description: "Co-founded..."
+  - weight: 3.0
+  - text_unit_ids: ["doc_001_chunk_0", ...]
+end note
+
+partition "Build NetworkX Graph" {
+  :Initialize empty graph: G = nx.Graph();
+
+  :Add all entities as nodes;
+  note right
+    For each entity:
+    G.add_node(
+      entity["title"],
+      id=entity["id"],
+      type=entity["type"],
+      description=entity["description"]
+    )
+  end note
+
+  :Add all relationships as edges;
+  note right
+    For each relationship:
+    G.add_edge(
+      relationship["source"],
+      relationship["target"],
+      id=relationship["id"],
+      description=relationship["description"],
+      weight=relationship["weight"]
+    )
+  end note
+
+  :Graph structure created;
+  note right
+    Example graph:
+
+    Nodes: 1,200 entities
+    Edges: 3,500 relationships
+
+    Graph Properties:
+    - Undirected (bidirectional relationships)
+    - Weighted (by text unit co-occurrence)
+    - Multiple components possible
+  end note
+}
+
+partition "Calculate Node Degrees" {
+  :Call graph.degree() for all nodes;
+  note right
+    NetworkX degree calculation:
+    Returns dict: {node_name: degree_count}
+
+    Example:
+    {
+      "Microsoft": 15,      # Connected to 15 entities
+      "Bill Gates": 8,      # Connected to 8 entities
+      "Windows": 12,        # Connected to 12 entities
+      "Paul Allen": 5       # Connected to 5 entities
+    }
+  end note
+
+  :degrees = dict(G.degree());
+
+  :For each entity in entities_df;
+
+  repeat
+    :entity_name = entity["title"];
+
+    if (entity_name in degrees?) then (yes)
+      :entity["node_degree"] = degrees[entity_name];
+    else (no)
+      :entity["node_degree"] = 0;
+      note right: Isolated node (no relationships)
+    endif
+
+  repeat while (more entities?)
+
+  :Update entities_df with node_degree column;
+  note right
+    entities_df now includes:
+    - node_degree: Number of relationships
+
+    Example:
+    Microsoft: node_degree = 15
+    Bill Gates: node_degree = 8
+  end note
+}
+
+partition "Calculate Node Frequency" {
+  :For each entity in entities_df;
+
+  repeat
+    :Count text_unit_ids;
+    note right
+      Example:
+      Microsoft appears in 23 text units
+      entity["text_unit_ids"] = [
+        "doc_001_chunk_0",
+        "doc_001_chunk_2",
+        "doc_001_chunk_5",
+        ... (23 total)
+      ]
+
+      node_frequency = len(text_unit_ids) = 23
+    end note
+
+    :entity["node_frequency"] = len(entity["text_unit_ids"]);
+
+  repeat while (more entities?)
+
+  :Update entities_df with node_frequency column;
+  note right
+    node_frequency indicates how often
+    an entity is mentioned across documents
+
+    Higher frequency → more important entity
+  end note
+}
+
+partition "Assign Human-Readable IDs" {
+  :Sort entities by importance;
+  note right
+    Sort criteria (example):
+    1. node_degree (descending)
+    2. node_frequency (descending)
+    3. title (alphabetically)
+  end note
+
+  :Assign sequential human_readable_id;
+  note right
+    entities_df["human_readable_id"] = range(len(entities_df))
+
+    Most important entities get lower IDs:
+    - Entity 0: Microsoft (degree=15, freq=23)
+    - Entity 1: Windows (degree=12, freq=18)
+    - Entity 2: Bill Gates (degree=8, freq=12)
+    ...
+  end note
+
+  :Similarly assign human_readable_id to relationships;
+  note right
+    relationships_df["human_readable_id"] = range(len(relationships_df))
+  end note
+}
+
+partition "Calculate Combined Degree" {
+  :Create entity_degree_map;
+  note right
+    entity_degree_map = {
+      "Microsoft": 15,
+      "Bill Gates": 8,
+      "Windows": 12,
+      ...
+    }
+  end note
+
+  :For each relationship in relationships_df;
+
+  repeat
+    :source_name = relationship["source"];
+    :target_name = relationship["target"];
+
+    :source_degree = entity_degree_map[source_name];
+    :target_degree = entity_degree_map[target_name];
+
+    :combined_degree = source_degree + target_degree;
+
+    note right
+      Example:
+      Relationship: (Bill Gates, Microsoft)
+      - Bill Gates degree: 8
+      - Microsoft degree: 15
+      - Combined degree: 8 + 15 = 23
+
+      **Why combined_degree?**
+      Indicates importance of relationship
+      based on importance of connected entities.
+      Higher combined_degree = more significant connection.
+    end note
+
+    :relationship["combined_degree"] = combined_degree;
+
+  repeat while (more relationships?)
+
+  :Update relationships_df with combined_degree column;
+}
+
+partition "Refine Relationship Weights" {
+  :Group relationships by (source, target) pair;
+
+  :Calculate co-occurrence count;
+  note right
+    Count how many text units mention
+    both source and target entities
+
+    Example:
+    (Bill Gates, Microsoft):
+    - Mentioned together in 8 text units
+    - weight = 8.0
+
+    Higher weight = stronger relationship
+  end note
+
+  :For each relationship;
+
+  repeat
+    :rel_key = (source, target);
+    :count = relationship_counts[rel_key];
+    :relationship["weight"] = float(count);
+  repeat while (more relationships?)
+
+  :Update relationships_df with refined weights;
+}
+
+partition "Verify Bidirectional Links" {
+  :For each entity;
+
+  note right
+    **Verification of Entity → Text Unit Links:**
+
+    Each entity maintains list of text_unit_ids
+    where it was mentioned during extraction.
+
+    Example:
+    Entity: "Microsoft"
+    text_unit_ids: [
+      "doc_001_chunk_0",  # "Microsoft was founded..."
+      "doc_001_chunk_2",  # "...Microsoft develops..."
+      "doc_001_chunk_5",  # "...company Microsoft..."
+      "doc_002_chunk_1",  # "Microsoft reported..."
+      ...
+    ]
+
+    This will be used in Step 8 to create
+    reverse links from text units to entities.
+  end note
+
+  repeat
+    :Validate text_unit_ids is list;
+
+    if (text_unit_ids is None or empty?) then (yes)
+      :Set to empty list [];
+      note right: Entity not mentioned in any text unit
+    else (no)
+      :Ensure no duplicates;
+      :text_unit_ids = list(set(text_unit_ids));
+    endif
+
+  repeat while (more entities?)
+}
+
+partition "Calculate Graph Statistics" {
+  :Calculate graph metrics;
+  note right
+    - Number of nodes: 1,200
+    - Number of edges: 3,500
+    - Graph density: 0.0058
+    - Number of components: 5
+    - Largest component size: 1,150 nodes
+    - Average degree: 5.83
+    - Average clustering coefficient: 0.42
+  end note
+
+  :Store graph object for next steps;
+  note right
+    Graph will be used in Step 7
+    for community detection
+  end note
+}
+
+:Create final entities DataFrame;
+note right
+  **Final entities_df schema:**
+
+  | Column              | Type         | Example                    |
+  |- - - - - - - - - - - - - - - - - - - - -|- - - - - - - - - - - - - -|- - - - - - - - - - - - - - - - - - - - - - - - - - - -|
+  | id                  | string       | "e_001" (UUID)             |
+  | human_readable_id   | int          | 0                          |
+  | title               | string       | "Microsoft"                |
+  | type                | string       | "ORGANIZATION"             |
+  | description         | string       | "Technology company..."    |
+  | text_unit_ids       | list[string] | ["doc_001_chunk_0", ...]   |
+  | node_degree         | int          | 15                         |
+  | node_frequency      | int          | 23                         |
+end note
+
+:Create final relationships DataFrame;
+note right
+  **Final relationships_df schema:**
+
+  | Column              | Type         | Example                    |
+  |- - - - - - - - - - - - - - - - - - - - -|- - - - - - - - - - - - - -|- - - - - - - - - - - - - - - - - - - - - - - - - - - -|
+  | id                  | string       | "r_001" (UUID)             |
+  | human_readable_id   | int          | 0                          |
+  | source              | string       | "Bill Gates"               |
+  | target              | string       | "Microsoft"                |
+  | description         | string       | "Co-founded in 1975"       |
+  | weight              | float        | 8.0                        |
+  | combined_degree     | int          | 23                         |
+  | text_unit_ids       | list[string] | ["doc_001_chunk_0", ...]   |
+end note
+
+:Write updated entities.parquet to storage;
+:Write updated relationships.parquet to storage;
+
+note right
+  **Entity-Text Unit Linking Complete:**
+
+  Forward links (Entity → Text Units):
+  - Each entity knows which text units mention it
+  - Stored in entity["text_unit_ids"]
+
+  Reverse links (Text Unit → Entities):
+  - Will be created in Step 8
+  - Stored in text_unit["entity_ids"]
+
+  **Use Cases:**
+  1. Citation: Show source text when displaying entity
+  2. Context: Retrieve relevant chunks for entity
+  3. Provenance: Track where information came from
+  4. Query: Find text units related to specific entities
+end note
+
+stop
+
+legend right
+  **Example Entity Record After Finalization:**
+
+  {
+    "id": "e_001",
+    "human_readable_id": 0,
+    "title": "Microsoft",
+    "type": "ORGANIZATION",
+    "description": "Technology company founded in 1975...",
+    "text_unit_ids": [
+      "doc_001_chunk_0",  # First mention
+      "doc_001_chunk_2",  # Second mention
+      "doc_001_chunk_5",  # Third mention
+      "doc_002_chunk_1",  # In different document
+      ...                 # 23 total mentions
+    ],
+    "node_degree": 15,      # Connected to 15 other entities
+    "node_frequency": 23    # Mentioned in 23 text chunks
+  }
+
+  **Example Relationship Record After Finalization:**
+
+  {
+    "id": "r_001",
+    "human_readable_id": 0,
+    "source": "Bill Gates",
+    "target": "Microsoft",
+    "description": "Co-founded the company in 1975",
+    "weight": 8.0,          # Mentioned together 8 times
+    "combined_degree": 23,  # 8 (Bill) + 15 (Microsoft)
+    "text_unit_ids": [
+      "doc_001_chunk_0",    # First co-mention
+      "doc_001_chunk_3",    # Second co-mention
+      "doc_002_chunk_1",    # In different document
+      ...                   # 8 total co-mentions
+    ]
+  }
+
+  **Graph Metrics Significance:**
+  - node_degree: Indicates entity importance in graph
+  - node_frequency: Indicates entity prominence in text
+  - weight: Indicates relationship strength
+  - combined_degree: Indicates relationship significance
+endlegend
+
+@enduml
+
+PlantUML version 1.2021.00(Sun Jan 10 18:25:05 SGT 2021)
+(MIT source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: SG
+--></g></svg>

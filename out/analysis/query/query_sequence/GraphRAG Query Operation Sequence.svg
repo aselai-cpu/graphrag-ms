@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="3969px" preserveAspectRatio="none" style="width:2609px;height:3969px;" version="1.1" viewBox="0 0 2609 3969" width="2609px" zoomAndPan="magnify"><defs><filter height="300%" id="f126s3j6dqjqs7" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><text fill="#000000" font-family="sans-serif" font-size="18" lengthAdjust="spacing" textLength="449" x="1076.5" y="29.4023">GraphRAG Query Operation - Global Search Method</text><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="2990.625" style="stroke:#A80036;stroke-width:1.0;" width="10" x="455.5" y="154.998"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="2932.0039" style="stroke:#A80036;stroke-width:1.0;" width="10" x="737.5" y="184.3086"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="2856.3828" style="stroke:#A80036;stroke-width:1.0;" width="10" x="1034.5" y="133.6875"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="172.1738" style="stroke:#A80036;stroke-width:1.0;" width="10" x="1455.5" y="1044.8691"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="1509.3008" style="stroke:#A80036;stroke-width:1.0;" width="10" x="1637.5" y="1289.6641"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="483.2686" style="stroke:#A80036;stroke-width:1.0;" width="10" x="1823.5" y="1318.9746"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="180.8633" style="stroke:#A80036;stroke-width:1.0;" width="10" x="2081.5" y="276.2402"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="29.3105" style="stroke:#A80036;stroke-width:1.0;" width="10" x="2176" y="979.248"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="41.9658" style="stroke:#A80036;stroke-width:1.0;" width="10" x="2295" y="1464.1826"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="131.1738" style="stroke:#A80036;stroke-width:1.0;" width="10" x="2295" y="2018.7275"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="260.0947" style="stroke:#A80036;stroke-width:1.0;" width="10" x="2295" y="2432.3174"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="326.5918" style="stroke:#000000;stroke-width:2.0;" width="570.5" x="689" y="472.1035"/><rect fill="#FFFFFF" height="84.8867" style="stroke:none;stroke-width:1.0;" width="570.5" x="689" y="574.6563"/><rect fill="#FFFFFF" height="69.5762" style="stroke:none;stroke-width:1.0;" width="570.5" x="689" y="659.543"/><rect fill="#FFFFFF" height="69.5762" style="stroke:none;stroke-width:1.0;" width="570.5" x="689" y="729.1191"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="75.9316" style="stroke:#000000;stroke-width:2.0;" width="1268" x="972" y="940.627"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="372.6816" style="stroke:#000000;stroke-width:2.0;" width="794" x="1717" y="1333.9746"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="101.2422" style="stroke:#000000;stroke-width:2.0;" width="774" x="1727" y="1412.9063"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="59.6211" style="stroke:#000000;stroke-width:2.0;" width="301.5" x="1727" y="1582.7695"/><rect fill="#FFFFFF" height="57.2656" style="stroke:none;stroke-width:1.0;" width="794" x="1717" y="1649.3906"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="310.9688" style="stroke:#000000;stroke-width:2.0;" width="1023.5" x="1568.5" y="1927.8301"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="279.6582" style="stroke:#000000;stroke-width:2.0;" width="1003.5" x="1578.5" y="1952.1406"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="210.1289" style="stroke:#000000;stroke-width:2.0;" width="2370" x="10" y="2475.2832"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="134.5527" style="stroke:#000000;stroke-width:2.0;" width="2350" x="20" y="2499.5938"/><rect fill="#FFFFFF" height="44.2656" style="stroke:none;stroke-width:1.0;" width="2370" x="10" y="2641.1465"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="48" x2="48" y1="123.6875" y2="3885.2871"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="460.5" x2="460.5" y1="123.6875" y2="3885.2871"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="742" x2="742" y1="123.6875" y2="3885.2871"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="1039" x2="1039" y1="123.6875" y2="3885.2871"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="1460" x2="1460" y1="123.6875" y2="3885.2871"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="1642.5" x2="1642.5" y1="123.6875" y2="3885.2871"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="1828" x2="1828" y1="123.6875" y2="3885.2871"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="2086" x2="2086" y1="123.6875" y2="3885.2871"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="2181" x2="2181" y1="123.6875" y2="3885.2871"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:5.0,5.0;" x1="2300" x2="2300" y1="123.6875" y2="3885.2871"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="31" x="30" y="120.7344">User</text><ellipse cx="48.5" cy="50.1992" fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" rx="8" ry="8" style="stroke:#A80036;stroke-width:2.0;"/><path d="M48.5,58.1992 L48.5,85.1992 M35.5,66.1992 L61.5,66.1992 M48.5,85.1992 L35.5,100.1992 M48.5,85.1992 L61.5,100.1992 " fill="none" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:2.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="31" x="30" y="3897.8223">User</text><ellipse cx="48.5" cy="3910.7754" fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" rx="8" ry="8" style="stroke:#A80036;stroke-width:2.0;"/><path d="M48.5,3918.7754 L48.5,3945.7754 M35.5,3926.7754 L61.5,3926.7754 M48.5,3945.7754 L35.5,3960.7754 M48.5,3945.7754 L61.5,3960.7754 " fill="none" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:2.0;"/><rect fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" height="46.9766" style="stroke:#A80036;stroke-width:1.5;" width="78" x="419.5" y="71.7109"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="21" x="448" y="92.2461">CLI</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="64" x="426.5" y="108.7344">(main.py)</text><rect fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" height="46.9766" style="stroke:#A80036;stroke-width:1.5;" width="78" x="419.5" y="3884.2871"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="21" x="448" y="3904.8223">CLI</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="64" x="426.5" y="3921.3105">(main.py)</text><rect fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" height="46.9766" style="stroke:#A80036;stroke-width:1.5;" width="83" x="699" y="71.7109"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="62" x="709.5" y="92.2461">QueryCLI</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="69" x="706" y="108.7344">(query.py)</text><rect fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" height="46.9766" style="stroke:#A80036;stroke-width:1.5;" width="83" x="699" y="3884.2871"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="62" x="709.5" y="3904.8223">QueryCLI</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="69" x="706" y="3921.3105">(query.py)</text><rect fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" height="46.9766" style="stroke:#A80036;stroke-width:1.5;" width="111" x="982" y="71.7109"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="22" x="1026.5" y="92.2461">API</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="97" x="989" y="108.7344">(api/query.py)</text><rect fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" height="46.9766" style="stroke:#A80036;stroke-width:1.5;" width="111" x="982" y="3884.2871"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="22" x="1026.5" y="3904.8223">API</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="97" x="989" y="3921.3105">(api/query.py)</text><rect fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" height="46.9766" style="stroke:#A80036;stroke-width:1.5;" width="91" x="1413" y="71.7109"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="50" x="1433.5" y="92.2461">Factory</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="77" x="1420" y="108.7344">(factory.py)</text><rect fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" height="46.9766" style="stroke:#A80036;stroke-width:1.5;" width="91" x="1413" y="3884.2871"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="50" x="1433.5" y="3904.8223">Factory</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="77" x="1420" y="3921.3105">(factory.py)</text><rect fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" height="46.9766" style="stroke:#A80036;stroke-width:1.5;" width="104" x="1588.5" y="71.7109"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="90" x="1595.5" y="92.2461">GlobalSearch</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="75" x="1603" y="108.7344">(search.py)</text><rect fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" height="46.9766" style="stroke:#A80036;stroke-width:1.5;" width="104" x="1588.5" y="3884.2871"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="90" x="1595.5" y="3904.8223">GlobalSearch</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="75" x="1603" y="3921.3105">(search.py)</text><rect fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" height="46.9766" style="stroke:#A80036;stroke-width:1.5;" width="179" x="1737" y="71.7109"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="103" x="1775" y="92.2461">ContextBuilder</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="165" x="1744" y="108.7344">(community_context.py)</text><rect fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" height="46.9766" style="stroke:#A80036;stroke-width:1.5;" width="179" x="1737" y="3884.2871"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="103" x="1775" y="3904.8223">ContextBuilder</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="165" x="1744" y="3921.3105">(community_context.py)</text><rect fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" height="30.4883" style="stroke:#A80036;stroke-width:1.5;" width="67" x="2051" y="88.1992"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="53" x="2058" y="108.7344">Storage</text><rect fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" height="30.4883" style="stroke:#A80036;stroke-width:1.5;" width="67" x="2051" y="3884.2871"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="53" x="2058" y="3904.8223">Storage</text><rect fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" height="30.4883" style="stroke:#A80036;stroke-width:1.5;" width="94" x="2132" y="88.1992"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="80" x="2139" y="108.7344">VectorStore</text><rect fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" height="30.4883" style="stroke:#A80036;stroke-width:1.5;" width="94" x="2132" y="3884.2871"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="80" x="2139" y="3904.8223">VectorStore</text><rect fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" height="46.9766" style="stroke:#A80036;stroke-width:1.5;" width="116" x="2240" y="71.7109"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="26" x="2285" y="92.2461">LLM</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="102" x="2247" y="108.7344">(graphrag_llm)</text><rect fill="#FEFECE" filter="url(#f126s3j6dqjqs7)" height="46.9766" style="stroke:#A80036;stroke-width:1.5;" width="116" x="2240" y="3884.2871"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="26" x="2285" y="3904.8223">LLM</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="102" x="2247" y="3921.3105">(graphrag_llm)</text><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="2990.625" style="stroke:#A80036;stroke-width:1.0;" width="10" x="455.5" y="154.998"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="2932.0039" style="stroke:#A80036;stroke-width:1.0;" width="10" x="737.5" y="184.3086"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="2856.3828" style="stroke:#A80036;stroke-width:1.0;" width="10" x="1034.5" y="133.6875"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="172.1738" style="stroke:#A80036;stroke-width:1.0;" width="10" x="1455.5" y="1044.8691"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="1509.3008" style="stroke:#A80036;stroke-width:1.0;" width="10" x="1637.5" y="1289.6641"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="483.2686" style="stroke:#A80036;stroke-width:1.0;" width="10" x="1823.5" y="1318.9746"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="180.8633" style="stroke:#A80036;stroke-width:1.0;" width="10" x="2081.5" y="276.2402"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="29.3105" style="stroke:#A80036;stroke-width:1.0;" width="10" x="2176" y="979.248"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="41.9658" style="stroke:#A80036;stroke-width:1.0;" width="10" x="2295" y="1464.1826"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="131.1738" style="stroke:#A80036;stroke-width:1.0;" width="10" x="2295" y="2018.7275"/><rect fill="#FFFFFF" filter="url(#f126s3j6dqjqs7)" height="260.0947" style="stroke:#A80036;stroke-width:1.0;" width="10" x="2295" y="2432.3174"/><polygon fill="#A80036" points="443.5,150.998,453.5,154.998,443.5,158.998,447.5,154.998" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="48.5" x2="449.5" y1="154.998" y2="154.998"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="388" x="55.5" y="150.2559">graphrag query "What are the main themes?" --method global</text><polygon fill="#A80036" points="725.5,180.3086,735.5,184.3086,725.5,188.3086,729.5,184.3086" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="465.5" x2="731.5" y1="184.3086" y2="184.3086"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="253" x="472.5" y="179.5664">_query_cli(query, method, root, options)</text><line style="stroke:#A80036;stroke-width:1.0;" x1="747.5" x2="789.5" y1="219.7744" y2="219.7744"/><line style="stroke:#A80036;stroke-width:1.0;" x1="789.5" x2="789.5" y1="219.7744" y2="232.7744"/><line style="stroke:#A80036;stroke-width:1.0;" x1="748.5" x2="789.5" y1="232.7744" y2="232.7744"/><polygon fill="#A80036" points="758.5,228.7744,748.5,232.7744,758.5,236.7744,754.5,232.7744" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="119" x="754.5" y="215.0322">Load configuration</text><path d="M885,197.3086 L885,237.3086 L1026,237.3086 L1026,207.3086 L1016,197.3086 L885,197.3086 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M1016,197.3086 L1016,207.3086 L1026,207.3086 L1016,197.3086 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="119" x="891" y="214.877">Load settings.yaml</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="120" x="891" y="230.1875">from root directory</text><line style="stroke:#A80036;stroke-width:1.0;" x1="747.5" x2="794.5" y1="263.2402" y2="263.2402"/><line style="stroke:#A80036;stroke-width:1.0;" x1="794.5" x2="794.5" y1="263.2402" y2="276.2402"/><line style="stroke:#A80036;stroke-width:1.0;" x1="753.5" x2="794.5" y1="276.2402" y2="276.2402"/><polygon fill="#A80036" points="763.5,272.2402,753.5,276.2402,763.5,280.2402,759.5,276.2402" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="242" x="759.5" y="258.498">_resolve_output_files(config, data_dir)</text><polygon fill="#A80036" points="2069.5,306.5508,2079.5,310.5508,2069.5,314.5508,2073.5,310.5508" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="747.5" x2="2075.5" y1="310.5508" y2="310.5508"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="133" x="754.5" y="305.8086">Read entities.parquet</text><polygon fill="#A80036" points="758.5,335.8613,748.5,339.8613,758.5,343.8613,754.5,339.8613" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="752.5" x2="2080.5" y1="339.8613" y2="339.8613"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="118" x="764.5" y="335.1191">entities DataFrame</text><polygon fill="#A80036" points="2069.5,365.1719,2079.5,369.1719,2069.5,373.1719,2073.5,369.1719" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="747.5" x2="2075.5" y1="369.1719" y2="369.1719"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="168" x="754.5" y="364.4297">Read communities.parquet</text><polygon fill="#A80036" points="758.5,394.4824,748.5,398.4824,758.5,402.4824,754.5,398.4824" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="752.5" x2="2080.5" y1="398.4824" y2="398.4824"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="153" x="764.5" y="393.7402">communities DataFrame</text><polygon fill="#A80036" points="2069.5,423.793,2079.5,427.793,2069.5,431.793,2073.5,427.793" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="747.5" x2="2075.5" y1="427.793" y2="427.793"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="209" x="754.5" y="423.0508">Read community_reports.parquet</text><polygon fill="#A80036" points="758.5,453.1035,748.5,457.1035,758.5,461.1035,754.5,457.1035" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="752.5" x2="2085.5" y1="457.1035" y2="457.1035"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="194" x="764.5" y="452.3613">community_reports DataFrame</text><path d="M689,472.1035 L751,472.1035 L751,479.1035 L741,489.1035 L689,489.1035 L689,472.1035 " fill="#EEEEEE" style="stroke:#000000;stroke-width:1.0;"/><rect fill="none" height="326.5918" style="stroke:#000000;stroke-width:2.0;" width="570.5" x="689" y="472.1035"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="17" x="704" y="485.6719">alt</text><text fill="#000000" font-family="sans-serif" font-size="11" font-weight="bold" lengthAdjust="spacing" textLength="121" x="766" y="484.7383">[method == "global"]</text><polygon fill="#A80036" points="1022.5,534.6904,1032.5,538.6904,1022.5,542.6904,1026.5,538.6904" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="747.5" x2="1028.5" y1="538.6904" y2="538.6904"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="268" x="754.5" y="533.9482">global_search_streaming(config, query, ...)</text><path d="M1049,494.4141 L1049,565.4141 L1233,565.4141 L1233,504.4141 L1223,494.4141 L1049,494.4141 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M1223,494.4141 L1223,504.4141 L1233,504.4141 L1223,494.4141 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="98" x="1055" y="511.9824">Other methods:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="160" x="1055" y="527.293">- local_search_streaming</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="157" x="1055" y="542.6035">- drift_search_streaming</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="163" x="1055" y="557.9141">- basic_search_streaming</text><line style="stroke:#000000;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="689" x2="1259.5" y1="575.6563" y2="575.6563"/><text fill="#000000" font-family="sans-serif" font-size="11" font-weight="bold" lengthAdjust="spacing" textLength="113" x="694" y="586.291">[method == "local"]</text><polygon fill="#A80036" points="1022.5,627.2324,1032.5,631.2324,1022.5,635.2324,1026.5,631.2324" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="747.5" x2="1028.5" y1="631.2324" y2="631.2324"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="259" x="754.5" y="626.4902">local_search_streaming(config, query, ...)</text><path d="M1049,594.6113 L1049,649.6113 L1245,649.6113 L1245,604.6113 L1235,594.6113 L1049,594.6113 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M1235,594.6113 L1235,604.6113 L1245,604.6113 L1235,594.6113 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="175" x="1055" y="612.1797">Uses entities, relationships,</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="158" x="1055" y="627.4902">communities, text_units,</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="64" x="1055" y="642.8008">covariates</text><line style="stroke:#000000;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="689" x2="1259.5" y1="660.543" y2="660.543"/><text fill="#000000" font-family="sans-serif" font-size="11" font-weight="bold" lengthAdjust="spacing" textLength="111" x="694" y="671.1777">[method == "drift"]</text><polygon fill="#A80036" points="1022.5,704.4639,1032.5,708.4639,1022.5,712.4639,1026.5,708.4639" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="747.5" x2="1028.5" y1="708.4639" y2="708.4639"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="256" x="754.5" y="703.7217">drift_search_streaming(config, query, ...)</text><path d="M1049,679.498 L1049,719.498 L1224,719.498 L1224,689.498 L1214,679.498 L1049,679.498 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M1214,679.498 L1214,689.498 L1224,689.498 L1214,679.498 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="154" x="1055" y="697.0664">Combines global + local</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="154" x="1055" y="712.377">with iterative refinement</text><line style="stroke:#000000;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="689" x2="1259.5" y1="730.1191" y2="730.1191"/><text fill="#000000" font-family="sans-serif" font-size="11" font-weight="bold" lengthAdjust="spacing" textLength="115" x="694" y="740.7539">[method == "basic"]</text><polygon fill="#A80036" points="1022.5,774.04,1032.5,778.04,1022.5,782.04,1026.5,778.04" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="747.5" x2="1028.5" y1="778.04" y2="778.04"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="262" x="754.5" y="773.2979">basic_search_streaming(config, query, ...)</text><path d="M1049,749.0742 L1049,789.0742 L1200,789.0742 L1200,759.0742 L1190,749.0742 L1049,749.0742 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M1190,749.0742 L1190,759.0742 L1200,759.0742 L1190,749.0742 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="130" x="1055" y="766.6426">Simple vector search</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="95" x="1055" y="781.9531">over text_units</text><rect fill="#EEEEEE" filter="url(#f126s3j6dqjqs7)" height="3" style="stroke:#EEEEEE;stroke-width:1.0;" width="2602" x="0" y="826.3506"/><line style="stroke:#000000;stroke-width:1.0;" x1="0" x2="2602" y1="826.3506" y2="826.3506"/><line style="stroke:#000000;stroke-width:1.0;" x1="0" x2="2602" y1="829.3506" y2="829.3506"/><rect fill="#EEEEEE" filter="url(#f126s3j6dqjqs7)" height="23.3105" style="stroke:#000000;stroke-width:2.0;" width="146" x="1228" y="815.6953"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="128" x="1234" y="832.2637">Initialization Phase</text><line style="stroke:#A80036;stroke-width:1.0;" x1="1044.5" x2="1086.5" y1="870.3164" y2="870.3164"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1086.5" x2="1086.5" y1="870.3164" y2="883.3164"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1045.5" x2="1086.5" y1="883.3164" y2="883.3164"/><polygon fill="#A80036" points="1055.5,879.3164,1045.5,883.3164,1055.5,887.3164,1051.5,883.3164" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="105" x="1051.5" y="865.5742">Initialize loggers</text><line style="stroke:#A80036;stroke-width:1.0;" x1="1044.5" x2="1086.5" y1="912.627" y2="912.627"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1086.5" x2="1086.5" y1="912.627" y2="925.627"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1045.5" x2="1086.5" y1="925.627" y2="925.627"/><polygon fill="#A80036" points="1055.5,921.627,1045.5,925.627,1055.5,929.627,1051.5,925.627" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="252" x="1051.5" y="907.8848">Load prompts (map, reduce, knowledge)</text><path d="M972,940.627 L1039,940.627 L1039,947.627 L1029,957.627 L972,957.627 L972,940.627 " fill="#EEEEEE" style="stroke:#000000;stroke-width:1.0;"/><rect fill="none" height="75.9316" style="stroke:#000000;stroke-width:2.0;" width="1268" x="972" y="940.627"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="22" x="987" y="954.1953">opt</text><text fill="#000000" font-family="sans-serif" font-size="11" font-weight="bold" lengthAdjust="spacing" textLength="227" x="1054" y="953.2617">[dynamic_community_selection enabled]</text><polygon fill="#A80036" points="2164,975.248,2174,979.248,2164,983.248,2168,979.248" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1044.5" x2="2170" y1="979.248" y2="979.248"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="144" x="1051.5" y="974.5059">get_embedding_store()</text><polygon fill="#A80036" points="1055.5,1004.5586,1045.5,1008.5586,1055.5,1012.5586,1051.5,1008.5586" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="1049.5" x2="2180" y1="1008.5586" y2="1008.5586"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="192" x="1061.5" y="1003.8164">Entity description embeddings</text><polygon fill="#A80036" points="1443.5,1040.8691,1453.5,1044.8691,1443.5,1048.8691,1447.5,1044.8691" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1044.5" x2="1449.5" y1="1044.8691" y2="1044.8691"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="392" x="1051.5" y="1040.127">get_global_search_engine(config, data, prompts, embeddings)</text><line style="stroke:#A80036;stroke-width:1.0;" x1="1465.5" x2="1507.5" y1="1074.1797" y2="1074.1797"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1507.5" x2="1507.5" y1="1074.1797" y2="1087.1797"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1466.5" x2="1507.5" y1="1087.1797" y2="1087.1797"/><polygon fill="#A80036" points="1476.5,1083.1797,1466.5,1087.1797,1476.5,1091.1797,1472.5,1087.1797" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="158" x="1472.5" y="1069.4375">Create completion model</text><path d="M1642,1059.3691 L1642,1084.3691 L1873,1084.3691 L1873,1069.3691 L1863,1059.3691 L1642,1059.3691 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M1863,1059.3691 L1863,1069.3691 L1873,1069.3691 L1863,1059.3691 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="210" x="1648" y="1076.9375">create_completion(model_config)</text><line style="stroke:#A80036;stroke-width:1.0;" x1="1465.5" x2="1507.5" y1="1145.6113" y2="1145.6113"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1507.5" x2="1507.5" y1="1145.6113" y2="1158.6113"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1466.5" x2="1507.5" y1="1158.6113" y2="1158.6113"/><polygon fill="#A80036" points="1476.5,1154.6113,1466.5,1158.6113,1476.5,1162.6113,1472.5,1158.6113" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="140" x="1472.5" y="1140.8691">Create context builder</text><path d="M1624,1100.1797 L1624,1186.1797 L1835,1186.1797 L1835,1110.1797 L1825,1100.1797 L1624,1100.1797 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M1825,1100.1797 L1825,1110.1797 L1835,1110.1797 L1825,1100.1797 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="167" x="1630" y="1117.748">GlobalCommunityContext(</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="182" x="1638" y="1133.0586">reports=community_reports,</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="108" x="1638" y="1148.3691">entities=entities,</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="162" x="1638" y="1163.6797">token_encoder=tokenizer</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="4" x="1630" y="1178.9902">)</text><polygon fill="#A80036" points="1055.5,1213.043,1045.5,1217.043,1055.5,1221.043,1051.5,1217.043" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="1049.5" x2="1459.5" y1="1217.043" y2="1217.043"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="138" x="1061.5" y="1212.3008">GlobalSearch instance</text><rect fill="#EEEEEE" filter="url(#f126s3j6dqjqs7)" height="3" style="stroke:#EEEEEE;stroke-width:1.0;" width="2602" x="0" y="1245.6982"/><line style="stroke:#000000;stroke-width:1.0;" x1="0" x2="2602" y1="1245.6982" y2="1245.6982"/><line style="stroke:#000000;stroke-width:1.0;" x1="0" x2="2602" y1="1248.6982" y2="1248.6982"/><rect fill="#EEEEEE" filter="url(#f126s3j6dqjqs7)" height="23.3105" style="stroke:#000000;stroke-width:2.0;" width="174" x="1214" y="1235.043"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="156" x="1220" y="1251.6113">Query Execution Phase</text><polygon fill="#A80036" points="1625.5,1285.6641,1635.5,1289.6641,1625.5,1293.6641,1629.5,1289.6641" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1044.5" x2="1631.5" y1="1289.6641" y2="1289.6641"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="134" x="1051.5" y="1284.9219">stream_search(query)</text><polygon fill="#A80036" points="1811.5,1314.9746,1821.5,1318.9746,1811.5,1322.9746,1815.5,1318.9746" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1647.5" x2="1817.5" y1="1318.9746" y2="1318.9746"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="130" x="1654.5" y="1314.2324">build_context(query)</text><path d="M1717,1333.9746 L1784,1333.9746 L1784,1340.9746 L1774,1350.9746 L1717,1350.9746 L1717,1333.9746 " fill="#EEEEEE" style="stroke:#000000;stroke-width:1.0;"/><rect fill="none" height="372.6816" style="stroke:#000000;stroke-width:2.0;" width="794" x="1717" y="1333.9746"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="22" x="1732" y="1347.543">opt</text><text fill="#000000" font-family="sans-serif" font-size="11" font-weight="bold" lengthAdjust="spacing" textLength="180" x="1799" y="1346.6094">[dynamic_community_selection]</text><line style="stroke:#A80036;stroke-width:1.0;" x1="1833.5" x2="1875.5" y1="1378.751" y2="1378.751"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1875.5" x2="1875.5" y1="1378.751" y2="1391.751"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1834.5" x2="1875.5" y1="1391.751" y2="1391.751"/><polygon fill="#A80036" points="1844.5,1387.751,1834.5,1391.751,1844.5,1395.751,1840.5,1391.751" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="234" x="1840.5" y="1374.0088">DynamicCommunitySelection.select()</text><path d="M2086,1356.2852 L2086,1396.2852 L2263,1396.2852 L2263,1366.2852 L2253,1356.2852 L2086,1356.2852 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M2253,1356.2852 L2253,1366.2852 L2263,1366.2852 L2253,1356.2852 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="156" x="2092" y="1373.8535">Filter community reports</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="148" x="2092" y="1389.1641">by LLM relevance rating</text><path d="M1727,1412.9063 L1801,1412.9063 L1801,1419.9063 L1791,1429.9063 L1727,1429.9063 L1727,1412.9063 " fill="#EEEEEE" style="stroke:#000000;stroke-width:1.0;"/><rect fill="none" height="101.2422" style="stroke:#000000;stroke-width:2.0;" width="774" x="1727" y="1412.9063"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="1742" y="1426.4746">loop</text><text fill="#000000" font-family="sans-serif" font-size="11" font-weight="bold" lengthAdjust="spacing" textLength="149" x="1816" y="1425.541">[For each batch of reports]</text><polygon fill="#A80036" points="2283,1460.1826,2293,1464.1826,2283,1468.1826,2287,1464.1826" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1833.5" x2="2289" y1="1464.1826" y2="1464.1826"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="134" x="1840.5" y="1459.4404">Rate relevance (0-10)</text><path d="M2310,1435.2168 L2310,1475.2168 L2492,1475.2168 L2492,1445.2168 L2482,1435.2168 L2310,1435.2168 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M2482,1435.2168 L2482,1445.2168 L2492,1445.2168 L2482,1435.2168 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="130" x="2316" y="1452.7852">"How relevant is this</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="161" x="2316" y="1468.0957">community to the query?"</text><polygon fill="#A80036" points="1844.5,1502.1484,1834.5,1506.1484,1844.5,1510.1484,1840.5,1506.1484" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="1838.5" x2="2299" y1="1506.1484" y2="1506.1484"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="113" x="1850.5" y="1501.4063">Ratings per report</text><line style="stroke:#A80036;stroke-width:1.0;" x1="1833.5" x2="1875.5" y1="1548.6143" y2="1548.6143"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1875.5" x2="1875.5" y1="1548.6143" y2="1561.6143"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1834.5" x2="1875.5" y1="1561.6143" y2="1561.6143"/><polygon fill="#A80036" points="1844.5,1557.6143,1834.5,1561.6143,1844.5,1565.6143,1840.5,1561.6143" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="115" x="1840.5" y="1543.8721">Filter by threshold</text><path d="M1967,1526.1484 L1967,1566.1484 L2185,1566.1484 L2185,1536.1484 L2175,1526.1484 L1967,1526.1484 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M2175,1526.1484 L2175,1536.1484 L2185,1536.1484 L2175,1526.1484 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="110" x="1973" y="1543.7168">Keep reports with</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="197" x="1973" y="1559.0273">rating &gt;= threshold (default: 7)</text><path d="M1727,1582.7695 L1794,1582.7695 L1794,1589.7695 L1784,1599.7695 L1727,1599.7695 L1727,1582.7695 " fill="#EEEEEE" style="stroke:#000000;stroke-width:1.0;"/><rect fill="none" height="59.6211" style="stroke:#000000;stroke-width:2.0;" width="301.5" x="1727" y="1582.7695"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="22" x="1742" y="1596.3379">opt</text><text fill="#000000" font-family="sans-serif" font-size="11" font-weight="bold" lengthAdjust="spacing" textLength="122" x="1809" y="1595.4043">[keep_parent enabled]</text><line style="stroke:#A80036;stroke-width:1.0;" x1="1833.5" x2="1875.5" y1="1621.3906" y2="1621.3906"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1875.5" x2="1875.5" y1="1621.3906" y2="1634.3906"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1834.5" x2="1875.5" y1="1634.3906" y2="1634.3906"/><polygon fill="#A80036" points="1844.5,1630.3906,1834.5,1634.3906,1844.5,1638.3906,1840.5,1634.3906" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="176" x="1840.5" y="1616.6484">Include parent communities</text><line style="stroke:#000000;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="1717" x2="2511" y1="1650.3906" y2="1650.3906"/><text fill="#000000" font-family="sans-serif" font-size="11" font-weight="bold" lengthAdjust="spacing" textLength="92" x="1722" y="1661.0254">[static selection]</text><line style="stroke:#A80036;stroke-width:1.0;" x1="1833.5" x2="1875.5" y1="1685.6563" y2="1685.6563"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1875.5" x2="1875.5" y1="1685.6563" y2="1698.6563"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1834.5" x2="1875.5" y1="1698.6563" y2="1698.6563"/><polygon fill="#A80036" points="1844.5,1694.6563,1834.5,1698.6563,1844.5,1702.6563,1840.5,1698.6563" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="232" x="1840.5" y="1680.9141">Select all reports at community_level</text><line style="stroke:#A80036;stroke-width:1.0;" x1="1833.5" x2="1875.5" y1="1741.1221" y2="1741.1221"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1875.5" x2="1875.5" y1="1741.1221" y2="1754.1221"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1834.5" x2="1875.5" y1="1754.1221" y2="1754.1221"/><polygon fill="#A80036" points="1844.5,1750.1221,1834.5,1754.1221,1844.5,1758.1221,1840.5,1754.1221" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="173" x="1840.5" y="1736.3799">build_community_context()</text><path d="M2025,1718.6563 L2025,1758.6563 L2257,1758.6563 L2257,1728.6563 L2247,1718.6563 L2025,1718.6563 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M2247,1718.6563 L2247,1728.6563 L2257,1728.6563 L2247,1718.6563 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="178" x="2031" y="1736.2246">Format reports as CSV table:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="211" x="2031" y="1751.5352">id,community,level,title,summary</text><polygon fill="#A80036" points="1658.5,1798.2432,1648.5,1802.2432,1658.5,1806.2432,1654.5,1802.2432" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="1652.5" x2="1827.5" y1="1802.2432" y2="1802.2432"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="132" x="1664.5" y="1797.501">ContextBuilderResult</text><path d="M1838,1773.2773 L1838,1813.2773 L2069,1813.2773 L2069,1783.2773 L2059,1773.2773 L1838,1773.2773 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M2059,1773.2773 L2059,1783.2773 L2069,1783.2773 L2059,1773.2773 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="199" x="1844" y="1790.8457">context_chunks: formatted CSV</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="210" x="1844" y="1806.1563">context_records: raw DataFrames</text><rect fill="#EEEEEE" filter="url(#f126s3j6dqjqs7)" height="3" style="stroke:#EEEEEE;stroke-width:1.0;" width="2602" x="0" y="1843.5537"/><line style="stroke:#000000;stroke-width:1.0;" x1="0" x2="2602" y1="1843.5537" y2="1843.5537"/><line style="stroke:#000000;stroke-width:1.0;" x1="0" x2="2602" y1="1846.5537" y2="1846.5537"/><rect fill="#EEEEEE" filter="url(#f126s3j6dqjqs7)" height="23.3105" style="stroke:#000000;stroke-width:2.0;" width="156" x="1223" y="1832.8984"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="138" x="1229" y="1849.4668">MAP Phase (Parallel)</text><line style="stroke:#A80036;stroke-width:1.0;" x1="1647.5" x2="1689.5" y1="1893.6748" y2="1893.6748"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1689.5" x2="1689.5" y1="1893.6748" y2="1906.6748"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1648.5" x2="1689.5" y1="1906.6748" y2="1906.6748"/><polygon fill="#A80036" points="1658.5,1902.6748,1648.5,1906.6748,1658.5,1910.6748,1654.5,1906.6748" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="162" x="1654.5" y="1888.9326">Split context into batches</text><path d="M1828,1871.209 L1828,1911.209 L2004,1911.209 L2004,1881.209 L1994,1871.209 L1828,1871.209 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M1994,1871.209 L1994,1881.209 L2004,1881.209 L1994,1871.209 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="124" x="1834" y="1888.7773">Batch size based on</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="155" x="1834" y="1904.0879">data_max_tokens config</text><path d="M1568.5,1927.8301 L1636.5,1927.8301 L1636.5,1934.8301 L1626.5,1944.8301 L1568.5,1944.8301 L1568.5,1927.8301 " fill="#EEEEEE" style="stroke:#000000;stroke-width:1.0;"/><rect fill="none" height="310.9688" style="stroke:#000000;stroke-width:2.0;" width="1023.5" x="1568.5" y="1927.8301"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="23" x="1583.5" y="1941.3984">par</text><text fill="#000000" font-family="sans-serif" font-size="11" font-weight="bold" lengthAdjust="spacing" textLength="294" x="1651.5" y="1940.4648">[Parallel MAP calls (asyncio.gather with semaphore)]</text><path d="M1578.5,1952.1406 L1652.5,1952.1406 L1652.5,1959.1406 L1642.5,1969.1406 L1578.5,1969.1406 L1578.5,1952.1406 " fill="#EEEEEE" style="stroke:#000000;stroke-width:1.0;"/><rect fill="none" height="279.6582" style="stroke:#000000;stroke-width:2.0;" width="1003.5" x="1578.5" y="1952.1406"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="1593.5" y="1965.709">loop</text><text fill="#000000" font-family="sans-serif" font-size="11" font-weight="bold" lengthAdjust="spacing" textLength="89" x="1667.5" y="1964.7754">[For each batch]</text><polygon fill="#A80036" points="2283,2014.7275,2293,2018.7275,2283,2022.7275,2287,2018.7275" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1647.5" x2="2289" y1="2018.7275" y2="2018.7275"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="193" x="1654.5" y="2013.9854">_map_response_single_batch()</text><path d="M2310,1974.4512 L2310,2045.4512 L2573,2045.4512 L2573,1984.4512 L2563,1974.4512 L2310,1974.4512 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M2563,1974.4512 L2563,1984.4512 L2573,1984.4512 L2563,1974.4512 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="242" x="2316" y="1992.0195">System Prompt: MAP_SYSTEM_PROMPT</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="216" x="2316" y="2007.3301">Context: Community reports (CSV)</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="132" x="2316" y="2022.6406">Query: User question</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="189" x="2316" y="2037.9512">Max Length: map_max_length</text><polygon fill="#A80036" points="1658.5,2145.9014,1648.5,2149.9014,1658.5,2153.9014,1654.5,2149.9014" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="1652.5" x2="2299" y1="2149.9014" y2="2149.9014"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="213" x="1664.5" y="2145.1592">JSON response with scored points</text><path d="M2310,2059.6934 L2310,2222.6934 L2470,2222.6934 L2470,2069.6934 L2460,2059.6934 L2310,2059.6934 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M2460,2059.6934 L2460,2069.6934 L2470,2069.6934 L2460,2059.6934 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="110" x="2316" y="2077.2617">Response format:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="4" x="2316" y="2092.5723">{</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="62" x="2324" y="2107.8828">"points": [</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="4" x="2332" y="2123.1934">{</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="115" x="2340" y="2138.5039">"description": "...",</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="68" x="2340" y="2153.8145">"score": 75</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="8" x="2332" y="2169.125">},</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="12" x="2332" y="2184.4355">...</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="4" x="2324" y="2199.7461">]</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="4" x="2316" y="2215.0566">}</text><line style="stroke:#A80036;stroke-width:1.0;" x1="1647.5" x2="1689.5" y1="2273.2646" y2="2273.2646"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1689.5" x2="1689.5" y1="2273.2646" y2="2286.2646"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1648.5" x2="1689.5" y1="2286.2646" y2="2286.2646"/><polygon fill="#A80036" points="1658.5,2282.2646,1648.5,2286.2646,1658.5,2290.2646,1654.5,2286.2646" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="142" x="1654.5" y="2268.5225">Aggregate MAP results</text><path d="M1808,2250.7988 L1808,2290.7988 L1977,2290.7988 L1977,2260.7988 L1967,2250.7988 L1808,2250.7988 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M1967,2250.7988 L1967,2260.7988 L1977,2260.7988 L1967,2250.7988 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="133" x="1814" y="2268.3672">Collect all key points</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="148" x="1814" y="2283.6777">from parallel responses</text><polygon fill="#A80036" points="758.5,2322.7305,748.5,2326.7305,758.5,2330.7305,754.5,2326.7305" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="752.5" x2="1636.5" y1="2326.7305" y2="2326.7305"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="229" x="764.5" y="2321.9883">on_map_response_end(map_results)</text><path d="M1652,2305.4199 L1652,2330.4199 L1805,2330.4199 L1805,2315.4199 L1795,2305.4199 L1652,2305.4199 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M1795,2305.4199 L1795,2315.4199 L1805,2315.4199 L1795,2305.4199 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="132" x="1658" y="2322.9883">Callback for tracking</text><rect fill="#EEEEEE" filter="url(#f126s3j6dqjqs7)" height="3" style="stroke:#EEEEEE;stroke-width:1.0;" width="2602" x="0" y="2360.3857"/><line style="stroke:#000000;stroke-width:1.0;" x1="0" x2="2602" y1="2360.3857" y2="2360.3857"/><line style="stroke:#000000;stroke-width:1.0;" x1="0" x2="2602" y1="2363.3857" y2="2363.3857"/><rect fill="#EEEEEE" filter="url(#f126s3j6dqjqs7)" height="23.3105" style="stroke:#000000;stroke-width:2.0;" width="116" x="1243" y="2349.7305"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="98" x="1249" y="2366.2988">REDUCE Phase</text><polygon fill="#A80036" points="2283,2428.3174,2293,2432.3174,2283,2436.3174,2287,2432.3174" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1647.5" x2="2289" y1="2432.3174" y2="2432.3174"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="121" x="1654.5" y="2427.5752">_reduce_response()</text><path d="M2310,2388.041 L2310,2459.041 L2596,2459.041 L2596,2398.041 L2586,2388.041 L2310,2388.041 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M2586,2388.041 L2586,2398.041 L2596,2398.041 L2586,2388.041 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="265" x="2316" y="2405.6094">System Prompt: REDUCE_SYSTEM_PROMPT</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="174" x="2316" y="2420.9199">Context: All MAP responses</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="132" x="2316" y="2436.2305">Query: User question</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="204" x="2316" y="2451.541">Max Length: reduce_max_length</text><path d="M10,2475.2832 L72,2475.2832 L72,2482.2832 L62,2492.2832 L10,2492.2832 L10,2475.2832 " fill="#EEEEEE" style="stroke:#000000;stroke-width:1.0;"/><rect fill="none" height="210.1289" style="stroke:#000000;stroke-width:2.0;" width="2370" x="10" y="2475.2832"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="17" x="25" y="2488.8516">alt</text><text fill="#000000" font-family="sans-serif" font-size="11" font-weight="bold" lengthAdjust="spacing" textLength="111" x="87" y="2487.918">[Streaming enabled]</text><path d="M20,2499.5938 L94,2499.5938 L94,2506.5938 L84,2516.5938 L20,2516.5938 L20,2499.5938 " fill="#EEEEEE" style="stroke:#000000;stroke-width:1.0;"/><rect fill="none" height="134.5527" style="stroke:#000000;stroke-width:2.0;" width="2350" x="20" y="2499.5938"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="29" x="35" y="2513.1621">loop</text><text fill="#000000" font-family="sans-serif" font-size="11" font-weight="bold" lengthAdjust="spacing" textLength="90" x="109" y="2512.2285">[For each token]</text><polygon fill="#A80036" points="1658.5,2534.2148,1648.5,2538.2148,1658.5,2542.2148,1654.5,2538.2148" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="1652.5" x2="2294" y1="2538.2148" y2="2538.2148"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="82" x="1664.5" y="2533.4727">Token chunk</text><polygon fill="#A80036" points="1055.5,2563.5254,1045.5,2567.5254,1055.5,2571.5254,1051.5,2567.5254" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1049.5" x2="1636.5" y1="2567.5254" y2="2567.5254"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="71" x="1061.5" y="2562.7832">Yield token</text><polygon fill="#A80036" points="758.5,2592.8359,748.5,2596.8359,758.5,2600.8359,754.5,2596.8359" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="752.5" x2="1033.5" y1="2596.8359" y2="2596.8359"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="71" x="764.5" y="2592.0938">Yield token</text><polygon fill="#A80036" points="59.5,2622.1465,49.5,2626.1465,59.5,2630.1465,55.5,2626.1465" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;" x1="53.5" x2="736.5" y1="2626.1465" y2="2626.1465"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="140" x="65.5" y="2621.4043">Print token (real-time)</text><line style="stroke:#000000;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="10" x2="2380" y1="2642.1465" y2="2642.1465"/><text fill="#000000" font-family="sans-serif" font-size="11" font-weight="bold" lengthAdjust="spacing" textLength="93" x="15" y="2652.7813">[Non-streaming]</text><polygon fill="#A80036" points="1658.5,2673.4121,1648.5,2677.4121,1658.5,2681.4121,1654.5,2677.4121" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="1652.5" x2="2294" y1="2677.4121" y2="2677.4121"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="121" x="1664.5" y="2672.6699">Complete response</text><line style="stroke:#A80036;stroke-width:1.0;" x1="1647.5" x2="1689.5" y1="2735.1885" y2="2735.1885"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1689.5" x2="1689.5" y1="2735.1885" y2="2748.1885"/><line style="stroke:#A80036;stroke-width:1.0;" x1="1648.5" x2="1689.5" y1="2748.1885" y2="2748.1885"/><polygon fill="#A80036" points="1658.5,2744.1885,1648.5,2748.1885,1658.5,2752.1885,1654.5,2748.1885" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="120" x="1654.5" y="2730.4463">Calculate statistics</text><path d="M1786,2697.4121 L1786,2768.4121 L1924,2768.4121 L1924,2707.4121 L1914,2697.4121 L1786,2697.4121 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M1914,2697.4121 L1914,2707.4121 L1924,2707.4121 L1914,2697.4121 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="106" x="1792" y="2714.9805">- Total LLM calls</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="104" x="1792" y="2730.291">- Prompt tokens</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="103" x="1792" y="2745.6016">- Output tokens</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="117" x="1792" y="2760.9121">- Completion time</text><polygon fill="#A80036" points="1055.5,2794.9648,1045.5,2798.9648,1055.5,2802.9648,1051.5,2798.9648" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="1049.5" x2="1641.5" y1="2798.9648" y2="2798.9648"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="80" x="1061.5" y="2794.2227">SearchResult</text><path d="M1049,2811.9648 L1049,2958.9648 L1307,2958.9648 L1307,2821.9648 L1297,2811.9648 L1049,2811.9648 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M1297,2811.9648 L1297,2821.9648 L1307,2821.9648 L1297,2811.9648 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="142" x="1055" y="2829.5332">SearchResult contains:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="155" x="1055" y="2844.8438">- response: Final answer</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="178" x="1055" y="2860.1543">- context_data: Raw records</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="216" x="1055" y="2875.4648">- context_text: Formatted context</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="141" x="1055" y="2890.7754">- llm_calls: Total calls</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="232" x="1055" y="2906.0859">- prompt_tokens: Total input tokens</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="237" x="1055" y="2921.3965">- output_tokens: Total output tokens</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="181" x="1055" y="2936.707">- completion_time: Duration</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="173" x="1055" y="2952.0176">- Per-category breakdowns</text><polygon fill="#A80036" points="758.5,2986.0703,748.5,2990.0703,758.5,2994.0703,754.5,2990.0703" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="752.5" x2="1038.5" y1="2990.0703" y2="2990.0703"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="220" x="764.5" y="2985.3281">Stream complete with SearchResult</text><line style="stroke:#A80036;stroke-width:1.0;" x1="747.5" x2="789.5" y1="3019.3809" y2="3019.3809"/><line style="stroke:#A80036;stroke-width:1.0;" x1="789.5" x2="789.5" y1="3019.3809" y2="3032.3809"/><line style="stroke:#A80036;stroke-width:1.0;" x1="748.5" x2="789.5" y1="3032.3809" y2="3032.3809"/><polygon fill="#A80036" points="758.5,3028.3809,748.5,3032.3809,758.5,3036.3809,754.5,3032.3809" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="127" x="754.5" y="3014.6387">Display final answer</text><line style="stroke:#A80036;stroke-width:1.0;" x1="747.5" x2="789.5" y1="3067.8467" y2="3067.8467"/><line style="stroke:#A80036;stroke-width:1.0;" x1="789.5" x2="789.5" y1="3067.8467" y2="3080.8467"/><line style="stroke:#A80036;stroke-width:1.0;" x1="748.5" x2="789.5" y1="3080.8467" y2="3080.8467"/><polygon fill="#A80036" points="758.5,3076.8467,748.5,3080.8467,758.5,3084.8467,754.5,3080.8467" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="183" x="754.5" y="3063.1045">Display statistics (if verbose)</text><path d="M949,3045.3809 L949,3085.3809 L1088,3085.3809 L1088,3055.3809 L1078,3045.3809 L949,3045.3809 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M1078,3045.3809 L1078,3055.3809 L1088,3055.3809 L1078,3045.3809 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="118" x="955" y="3062.9492">Show token usage,</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="107" x="955" y="3078.2598">LLM calls, timing</text><polygon fill="#A80036" points="476.5,3112.3125,466.5,3116.3125,476.5,3120.3125,472.5,3116.3125" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="470.5" x2="741.5" y1="3116.3125" y2="3116.3125"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="50" x="482.5" y="3111.5703">Success</text><polygon fill="#A80036" points="59.5,3141.623,49.5,3145.623,59.5,3149.623,55.5,3145.623" style="stroke:#A80036;stroke-width:1.0;"/><line style="stroke:#A80036;stroke-width:1.0;stroke-dasharray:2.0,2.0;" x1="53.5" x2="459.5" y1="3145.623" y2="3145.623"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="24" x="65.5" y="3140.8809">Exit</text><path d="M11,3158.623 L11,3474.623 L2336,3474.623 L2336,3168.623 L2326,3158.623 L11,3158.623 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M2326,3158.623 L2326,3168.623 L2336,3168.623 L2326,3158.623 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="186" x="964" y="3176.1914">Alternative Query Methods:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="968" y="3191.502"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="106" x="964" y="3206.8125">LOCAL SEARCH:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="252" x="964" y="3222.123">1. Vector search to find relevant entities</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="208" x="964" y="3237.4336">2. Traverse entity neighborhoods</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="406" x="964" y="3252.7441">3. Gather entities, relationships, communities, text units, claims</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="220" x="964" y="3268.0547">4. Single LLM call with rich context</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="105" x="964" y="3283.3652">5. Return answer</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="968" y="3298.6758"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="99" x="964" y="3313.9863">DRIFT SEARCH:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="348" x="964" y="3329.2969">1. PRIMER: Global MAP to generate follow-up questions</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="283" x="964" y="3344.6074">2. LOCAL: Run local search for each question</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="249" x="964" y="3359.918">3. REDUCE: Synthesize all local answers</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="204" x="964" y="3375.2285">4. Return comprehensive answer</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="968" y="3390.5391"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="98" x="964" y="3405.8496">BASIC SEARCH:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="295" x="964" y="3421.1602">1. Vector search on text_unit_text embeddings</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="172" x="964" y="3436.4707">2. Retrieve top-k text units</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="221" x="964" y="3451.7813">3. Single LLM call with text context</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="105" x="964" y="3467.0918">4. Return answer</text><path d="M1931,3488.834 L1931,3865.834 L2237,3865.834 L2237,3498.834 L2227,3488.834 L1931,3488.834 " fill="#FBFB77" filter="url(#f126s3j6dqjqs7)" style="stroke:#A80036;stroke-width:1.0;"/><path d="M2227,3488.834 L2227,3498.834 L2237,3498.834 L2227,3488.834 " fill="#FBFB77" style="stroke:#A80036;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="141" x="1937" y="3506.4023">Required Index Files:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="1941" y="3521.7129"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="95" x="1937" y="3537.0234">Global Search:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="111" x="1937" y="3552.334">- entities.parquet</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="146" x="1937" y="3567.6445">- communities.parquet</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="187" x="1937" y="3582.9551">- community_reports.parquet</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="285" x="1937" y="3598.2656">- entity_description embeddings (if dynamic)</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="1941" y="3613.5762"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="87" x="1937" y="3628.8867">Local Search:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="111" x="1937" y="3644.1973">- entities.parquet</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="146" x="1937" y="3659.5078">- relationships.parquet</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="146" x="1937" y="3674.8184">- communities.parquet</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="187" x="1937" y="3690.1289">- community_reports.parquet</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="128" x="1937" y="3705.4395">- text_units.parquet</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="192" x="1937" y="3720.75">- covariates.parquet (optional)</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="207" x="1937" y="3736.0605">- entity_description embeddings</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="182" x="1937" y="3751.3711">- text_unit_text embeddings</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="1941" y="3766.6816"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="91" x="1937" y="3781.9922">DRIFT Search:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="185" x="1937" y="3797.3027">- All files from global + local</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="0" x="1941" y="3812.6133"/><text fill="#000000" font-family="sans-serif" font-size="13" font-weight="bold" lengthAdjust="spacing" textLength="86" x="1937" y="3827.9238">Basic Search:</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="128" x="1937" y="3843.2344">- text_units.parquet</text><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="182" x="1937" y="3858.5449">- text_unit_text embeddings</text><!--MD5=[a02c043454fbd05320309a38ab1729db]
+@startuml GraphRAG Query Operation Sequence
+' PlantUML v1.2017.15 compatible syntax
+title GraphRAG Query Operation - Global Search Method
+
+actor User
+participant "CLI\n(main.py)" as CLI
+participant "QueryCLI\n(query.py)" as QueryCLI
+participant "API\n(api/query.py)" as API
+participant "Factory\n(factory.py)" as Factory
+participant "GlobalSearch\n(search.py)" as GlobalSearch
+participant "ContextBuilder\n(community_context.py)" as ContextBuilder
+participant "Storage" as Storage
+participant "VectorStore" as VectorStore
+participant "LLM\n(graphrag_llm)" as LLM
+
+User -> CLI: graphrag query "What are the main themes?" - -method global
+activate CLI
+
+CLI -> QueryCLI: _query_cli(query, method, root, options)
+activate QueryCLI
+
+QueryCLI -> QueryCLI: Load configuration
+note right: Load settings.yaml\nfrom root directory
+
+QueryCLI -> QueryCLI: _resolve_output_files(config, data_dir)
+activate Storage
+QueryCLI -> Storage: Read entities.parquet
+Storage - -> QueryCLI: entities DataFrame
+QueryCLI -> Storage: Read communities.parquet
+Storage - -> QueryCLI: communities DataFrame
+QueryCLI -> Storage: Read community_reports.parquet
+Storage - -> QueryCLI: community_reports DataFrame
+deactivate Storage
+
+alt method == "global"
+    QueryCLI -> API: global_search_streaming(config, query, ...)
+    note right: Other methods:\n- local_search_streaming\n- drift_search_streaming\n- basic_search_streaming
+else method == "local"
+    QueryCLI -> API: local_search_streaming(config, query, ...)
+    note right: Uses entities, relationships,\ncommunities, text_units,\ncovariates
+else method == "drift"
+    QueryCLI -> API: drift_search_streaming(config, query, ...)
+    note right: Combines global + local\nwith iterative refinement
+else method == "basic"
+    QueryCLI -> API: basic_search_streaming(config, query, ...)
+    note right: Simple vector search\nover text_units
+end
+
+activate API
+
+== Initialization Phase ==
+
+API -> API: Initialize loggers
+API -> API: Load prompts (map, reduce, knowledge)
+
+opt dynamic_community_selection enabled
+    API -> VectorStore: get_embedding_store()
+    activate VectorStore
+    VectorStore - -> API: Entity description embeddings
+    deactivate VectorStore
+end
+
+API -> Factory: get_global_search_engine(config, data, prompts, embeddings)
+activate Factory
+
+Factory -> Factory: Create completion model
+note right: create_completion(model_config)
+
+Factory -> Factory: Create context builder
+note right: GlobalCommunityContext(\n  reports=community_reports,\n  entities=entities,\n  token_encoder=tokenizer\n)
+
+Factory - -> API: GlobalSearch instance
+deactivate Factory
+
+== Query Execution Phase ==
+
+API -> GlobalSearch: stream_search(query)
+activate GlobalSearch
+
+GlobalSearch -> ContextBuilder: build_context(query)
+activate ContextBuilder
+
+opt dynamic_community_selection
+    ContextBuilder -> ContextBuilder: DynamicCommunitySelection.select()
+    note right: Filter community reports\nby LLM relevance rating
+
+    loop For each batch of reports
+        ContextBuilder -> LLM: Rate relevance (0-10)
+        activate LLM
+        note right: "How relevant is this\ncommunity to the query?"
+        LLM - -> ContextBuilder: Ratings per report
+        deactivate LLM
+    end
+
+    ContextBuilder -> ContextBuilder: Filter by threshold
+    note right: Keep reports with\nrating >= threshold (default: 7)
+
+    opt keep_parent enabled
+        ContextBuilder -> ContextBuilder: Include parent communities
+    end
+else static selection
+    ContextBuilder -> ContextBuilder: Select all reports at community_level
+end
+
+ContextBuilder -> ContextBuilder: build_community_context()
+note right: Format reports as CSV table:\nid,community,level,title,summary
+
+ContextBuilder - -> GlobalSearch: ContextBuilderResult
+deactivate ContextBuilder
+note right: context_chunks: formatted CSV\ncontext_records: raw DataFrames
+
+== MAP Phase (Parallel) ==
+
+GlobalSearch -> GlobalSearch: Split context into batches
+note right: Batch size based on\ndata_max_tokens config
+
+par Parallel MAP calls (asyncio.gather with semaphore)
+    loop For each batch
+        GlobalSearch -> LLM: _map_response_single_batch()
+        activate LLM
+        note right: System Prompt: MAP_SYSTEM_PROMPT\nContext: Community reports (CSV)\nQuery: User question\nMax Length: map_max_length
+
+        LLM - -> GlobalSearch: JSON response with scored points
+        deactivate LLM
+        note right: Response format:\n{\n  "points": [\n    {\n      "description": "...",\n      "score": 75\n    },\n    ...\n  ]\n}
+    end
+end
+
+GlobalSearch -> GlobalSearch: Aggregate MAP results
+note right: Collect all key points\nfrom parallel responses
+
+GlobalSearch -> QueryCLI: on_map_response_end(map_results)
+note right: Callback for tracking
+
+== REDUCE Phase ==
+
+GlobalSearch -> LLM: _reduce_response()
+activate LLM
+note right: System Prompt: REDUCE_SYSTEM_PROMPT\nContext: All MAP responses\nQuery: User question\nMax Length: reduce_max_length
+
+alt Streaming enabled
+    loop For each token
+        LLM - -> GlobalSearch: Token chunk
+        GlobalSearch -> API: Yield token
+        API -> QueryCLI: Yield token
+        QueryCLI -> User: Print token (real-time)
+    end
+else Non-streaming
+    LLM - -> GlobalSearch: Complete response
+end
+
+deactivate LLM
+
+GlobalSearch -> GlobalSearch: Calculate statistics
+note right: - Total LLM calls\n- Prompt tokens\n- Output tokens\n- Completion time
+
+GlobalSearch - -> API: SearchResult
+deactivate GlobalSearch
+
+note right of API
+  SearchResult contains:
+  - response: Final answer
+  - context_data: Raw records
+  - context_text: Formatted context
+  - llm_calls: Total calls
+  - prompt_tokens: Total input tokens
+  - output_tokens: Total output tokens
+  - completion_time: Duration
+  - Per-category breakdowns
+end note
+
+API - -> QueryCLI: Stream complete with SearchResult
+deactivate API
+
+QueryCLI -> QueryCLI: Display final answer
+QueryCLI -> QueryCLI: Display statistics (if verbose)
+note right: Show token usage,\nLLM calls, timing
+
+QueryCLI - -> CLI: Success
+deactivate QueryCLI
+
+CLI - -> User: Exit
+deactivate CLI
+
+note over User, LLM
+  **Alternative Query Methods:**
+
+  **LOCAL SEARCH:**
+  1. Vector search to find relevant entities
+  2. Traverse entity neighborhoods
+  3. Gather entities, relationships, communities, text units, claims
+  4. Single LLM call with rich context
+  5. Return answer
+
+  **DRIFT SEARCH:**
+  1. PRIMER: Global MAP to generate follow-up questions
+  2. LOCAL: Run local search for each question
+  3. REDUCE: Synthesize all local answers
+  4. Return comprehensive answer
+
+  **BASIC SEARCH:**
+  1. Vector search on text_unit_text embeddings
+  2. Retrieve top-k text units
+  3. Single LLM call with text context
+  4. Return answer
+end note
+
+note over Storage
+  **Required Index Files:**
+
+  **Global Search:**
+  - entities.parquet
+  - communities.parquet
+  - community_reports.parquet
+  - entity_description embeddings (if dynamic)
+
+  **Local Search:**
+  - entities.parquet
+  - relationships.parquet
+  - communities.parquet
+  - community_reports.parquet
+  - text_units.parquet
+  - covariates.parquet (optional)
+  - entity_description embeddings
+  - text_unit_text embeddings
+
+  **DRIFT Search:**
+  - All files from global + local
+
+  **Basic Search:**
+  - text_units.parquet
+  - text_unit_text embeddings
+end note
+
+@enduml
+
+@startuml GraphRAG Query Operation Sequence
+title GraphRAG Query Operation - Global Search Method
+
+actor User
+participant "CLI\n(main.py)" as CLI
+participant "QueryCLI\n(query.py)" as QueryCLI
+participant "API\n(api/query.py)" as API
+participant "Factory\n(factory.py)" as Factory
+participant "GlobalSearch\n(search.py)" as GlobalSearch
+participant "ContextBuilder\n(community_context.py)" as ContextBuilder
+participant "Storage" as Storage
+participant "VectorStore" as VectorStore
+participant "LLM\n(graphrag_llm)" as LLM
+
+User -> CLI: graphrag query "What are the main themes?" - -method global
+activate CLI
+
+CLI -> QueryCLI: _query_cli(query, method, root, options)
+activate QueryCLI
+
+QueryCLI -> QueryCLI: Load configuration
+note right: Load settings.yaml\nfrom root directory
+
+QueryCLI -> QueryCLI: _resolve_output_files(config, data_dir)
+activate Storage
+QueryCLI -> Storage: Read entities.parquet
+Storage - -> QueryCLI: entities DataFrame
+QueryCLI -> Storage: Read communities.parquet
+Storage - -> QueryCLI: communities DataFrame
+QueryCLI -> Storage: Read community_reports.parquet
+Storage - -> QueryCLI: community_reports DataFrame
+deactivate Storage
+
+alt method == "global"
+    QueryCLI -> API: global_search_streaming(config, query, ...)
+    note right: Other methods:\n- local_search_streaming\n- drift_search_streaming\n- basic_search_streaming
+else method == "local"
+    QueryCLI -> API: local_search_streaming(config, query, ...)
+    note right: Uses entities, relationships,\ncommunities, text_units,\ncovariates
+else method == "drift"
+    QueryCLI -> API: drift_search_streaming(config, query, ...)
+    note right: Combines global + local\nwith iterative refinement
+else method == "basic"
+    QueryCLI -> API: basic_search_streaming(config, query, ...)
+    note right: Simple vector search\nover text_units
+end
+
+activate API
+
+== Initialization Phase ==
+
+API -> API: Initialize loggers
+API -> API: Load prompts (map, reduce, knowledge)
+
+opt dynamic_community_selection enabled
+    API -> VectorStore: get_embedding_store()
+    activate VectorStore
+    VectorStore - -> API: Entity description embeddings
+    deactivate VectorStore
+end
+
+API -> Factory: get_global_search_engine(config, data, prompts, embeddings)
+activate Factory
+
+Factory -> Factory: Create completion model
+note right: create_completion(model_config)
+
+Factory -> Factory: Create context builder
+note right: GlobalCommunityContext(\n  reports=community_reports,\n  entities=entities,\n  token_encoder=tokenizer\n)
+
+Factory - -> API: GlobalSearch instance
+deactivate Factory
+
+== Query Execution Phase ==
+
+API -> GlobalSearch: stream_search(query)
+activate GlobalSearch
+
+GlobalSearch -> ContextBuilder: build_context(query)
+activate ContextBuilder
+
+opt dynamic_community_selection
+    ContextBuilder -> ContextBuilder: DynamicCommunitySelection.select()
+    note right: Filter community reports\nby LLM relevance rating
+
+    loop For each batch of reports
+        ContextBuilder -> LLM: Rate relevance (0-10)
+        activate LLM
+        note right: "How relevant is this\ncommunity to the query?"
+        LLM - -> ContextBuilder: Ratings per report
+        deactivate LLM
+    end
+
+    ContextBuilder -> ContextBuilder: Filter by threshold
+    note right: Keep reports with\nrating >= threshold (default: 7)
+
+    opt keep_parent enabled
+        ContextBuilder -> ContextBuilder: Include parent communities
+    end
+else static selection
+    ContextBuilder -> ContextBuilder: Select all reports at community_level
+end
+
+ContextBuilder -> ContextBuilder: build_community_context()
+note right: Format reports as CSV table:\nid,community,level,title,summary
+
+ContextBuilder - -> GlobalSearch: ContextBuilderResult
+deactivate ContextBuilder
+note right: context_chunks: formatted CSV\ncontext_records: raw DataFrames
+
+== MAP Phase (Parallel) ==
+
+GlobalSearch -> GlobalSearch: Split context into batches
+note right: Batch size based on\ndata_max_tokens config
+
+par Parallel MAP calls (asyncio.gather with semaphore)
+    loop For each batch
+        GlobalSearch -> LLM: _map_response_single_batch()
+        activate LLM
+        note right: System Prompt: MAP_SYSTEM_PROMPT\nContext: Community reports (CSV)\nQuery: User question\nMax Length: map_max_length
+
+        LLM - -> GlobalSearch: JSON response with scored points
+        deactivate LLM
+        note right: Response format:\n{\n  "points": [\n    {\n      "description": "...",\n      "score": 75\n    },\n    ...\n  ]\n}
+    end
+end
+
+GlobalSearch -> GlobalSearch: Aggregate MAP results
+note right: Collect all key points\nfrom parallel responses
+
+GlobalSearch -> QueryCLI: on_map_response_end(map_results)
+note right: Callback for tracking
+
+== REDUCE Phase ==
+
+GlobalSearch -> LLM: _reduce_response()
+activate LLM
+note right: System Prompt: REDUCE_SYSTEM_PROMPT\nContext: All MAP responses\nQuery: User question\nMax Length: reduce_max_length
+
+alt Streaming enabled
+    loop For each token
+        LLM - -> GlobalSearch: Token chunk
+        GlobalSearch -> API: Yield token
+        API -> QueryCLI: Yield token
+        QueryCLI -> User: Print token (real-time)
+    end
+else Non-streaming
+    LLM - -> GlobalSearch: Complete response
+end
+
+deactivate LLM
+
+GlobalSearch -> GlobalSearch: Calculate statistics
+note right: - Total LLM calls\n- Prompt tokens\n- Output tokens\n- Completion time
+
+GlobalSearch - -> API: SearchResult
+deactivate GlobalSearch
+
+note right of API
+  SearchResult contains:
+  - response: Final answer
+  - context_data: Raw records
+  - context_text: Formatted context
+  - llm_calls: Total calls
+  - prompt_tokens: Total input tokens
+  - output_tokens: Total output tokens
+  - completion_time: Duration
+  - Per-category breakdowns
+end note
+
+API - -> QueryCLI: Stream complete with SearchResult
+deactivate API
+
+QueryCLI -> QueryCLI: Display final answer
+QueryCLI -> QueryCLI: Display statistics (if verbose)
+note right: Show token usage,\nLLM calls, timing
+
+QueryCLI - -> CLI: Success
+deactivate QueryCLI
+
+CLI - -> User: Exit
+deactivate CLI
+
+note over User, LLM
+  **Alternative Query Methods:**
+
+  **LOCAL SEARCH:**
+  1. Vector search to find relevant entities
+  2. Traverse entity neighborhoods
+  3. Gather entities, relationships, communities, text units, claims
+  4. Single LLM call with rich context
+  5. Return answer
+
+  **DRIFT SEARCH:**
+  1. PRIMER: Global MAP to generate follow-up questions
+  2. LOCAL: Run local search for each question
+  3. REDUCE: Synthesize all local answers
+  4. Return comprehensive answer
+
+  **BASIC SEARCH:**
+  1. Vector search on text_unit_text embeddings
+  2. Retrieve top-k text units
+  3. Single LLM call with text context
+  4. Return answer
+end note
+
+note over Storage
+  **Required Index Files:**
+
+  **Global Search:**
+  - entities.parquet
+  - communities.parquet
+  - community_reports.parquet
+  - entity_description embeddings (if dynamic)
+
+  **Local Search:**
+  - entities.parquet
+  - relationships.parquet
+  - communities.parquet
+  - community_reports.parquet
+  - text_units.parquet
+  - covariates.parquet (optional)
+  - entity_description embeddings
+  - text_unit_text embeddings
+
+  **DRIFT Search:**
+  - All files from global + local
+
+  **Basic Search:**
+  - text_units.parquet
+  - text_unit_text embeddings
+end note
+
+@enduml
+
+PlantUML version 1.2021.00(Sun Jan 10 18:25:05 SGT 2021)
+(MIT source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: SG
+--></g></svg>
