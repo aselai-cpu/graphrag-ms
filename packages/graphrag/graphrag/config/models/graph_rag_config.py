@@ -23,6 +23,7 @@ from graphrag.config.models.cluster_graph_config import ClusterGraphConfig
 from graphrag.config.models.community_reports_config import CommunityReportsConfig
 from graphrag.config.models.dark_mode_config import DarkModeConfig
 from graphrag.config.models.drift_search_config import DRIFTSearchConfig
+from graphrag.config.models.neo4j_config import Neo4jConfig
 from graphrag.config.models.embed_text_config import EmbedTextConfig
 from graphrag.config.models.extract_claims_config import ExtractClaimsConfig
 from graphrag.config.models.extract_graph_config import ExtractGraphConfig
@@ -210,6 +211,12 @@ class GraphRagConfig(BaseModel):
         default=DarkModeConfig(),
     )
     """The dark mode execution configuration to use."""
+
+    neo4j: Neo4jConfig | None = Field(
+        description="Neo4j backend configuration (required when using Neo4j backend).",
+        default=None,
+    )
+    """Neo4j backend configuration."""
 
     extract_claims: ExtractClaimsConfig = Field(
         description="The claim extraction configuration to use.",

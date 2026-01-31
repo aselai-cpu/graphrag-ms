@@ -13,6 +13,7 @@ import pandas as pd
 
 from graphrag.config.models.graph_rag_config import GraphRagConfig
 from graphrag.data_model.schemas import COMMUNITIES_FINAL_COLUMNS
+from graphrag.index.graph import create_graph_backend_with_dark_mode
 from graphrag.index.operations.cluster_graph import cluster_graph
 from graphrag.index.operations.create_graph import create_graph
 from graphrag.index.typing.context import PipelineRunContext
@@ -37,18 +38,108 @@ async def run_workflow(
     use_lcc = config.cluster_graph.use_lcc
     seed = config.cluster_graph.seed
 
-    output = create_communities(
-        entities,
-        relationships,
-        max_cluster_size=max_cluster_size,
-        use_lcc=use_lcc,
-        seed=seed,
-    )
+    # Check if dark mode is enabled
+    if config.dark_mode.enabled:
+        logger.info("Dark mode enabled - using graph backend abstraction")
+        output = create_communities_with_backend(
+            config=config,
+            entities=entities,
+            relationships=relationships,
+            max_cluster_size=max_cluster_size,
+            use_lcc=use_lcc,
+            seed=seed,
+        )
+    else:
+        logger.info("Dark mode disabled - using legacy NetworkX implementation")
+        output = create_communities(
+            entities,
+            relationships,
+            max_cluster_size=max_cluster_size,
+            use_lcc=use_lcc,
+            seed=seed,
+        )
 
     await write_table_to_storage(output, "communities", context.output_storage)
 
     logger.info("Workflow completed: create_communities")
     return WorkflowFunctionOutput(result=output)
+
+
+def create_communities_with_backend(
+    config: GraphRagConfig,
+    entities: pd.DataFrame,
+    relationships: pd.DataFrame,
+    max_cluster_size: int,
+    use_lcc: bool,
+    seed: int | None = None,
+) -> pd.DataFrame:
+    """Create communities using graph backend abstraction (supports dark mode).
+
+    This function uses the graph backend factory which enables dark mode
+    for parallel validation of NetworkX (primary) and Neo4j (shadow) backends.
+    """
+    # Prepare backend-specific kwargs
+    shadow_backend_kwargs = {}
+
+    # Add Neo4j configuration if shadow backend is neo4j
+    if config.dark_mode.shadow_backend == "neo4j":
+        if config.neo4j is None:
+            logger.error(
+                "Dark mode configured with Neo4j shadow backend, but neo4j configuration is missing. "
+                "Please add neo4j configuration to settings.yaml or disable dark mode."
+            )
+            raise ValueError(
+                "Neo4j configuration required when dark_mode.shadow_backend = 'neo4j'. "
+                "Add neo4j configuration to settings.yaml."
+            )
+
+        # Convert Neo4j config to kwargs
+        shadow_backend_kwargs = {
+            "uri": config.neo4j.uri,
+            "username": config.neo4j.username,
+            "password": config.neo4j.password,
+            "database": config.neo4j.database,
+            "gds_library": config.neo4j.gds_library,
+        }
+        logger.info("Using Neo4j shadow backend: %s (database: %s)",
+                   config.neo4j.uri, config.neo4j.database)
+
+    # Create graph backend with dark mode support
+    backend = create_graph_backend_with_dark_mode(
+        dark_mode_config=config.dark_mode,
+        shadow_backend_kwargs=shadow_backend_kwargs,
+    )
+
+    # Load graph into backend
+    logger.info("Loading graph into backend (entities: %d, relationships: %d)",
+                len(entities), len(relationships))
+    backend.load_graph(
+        entities=entities,
+        relationships=relationships,
+        edge_attributes=["weight"],
+    )
+
+    # Detect communities using backend
+    logger.info("Detecting communities (max_cluster_size: %d, use_lcc: %s, seed: %s)",
+                max_cluster_size, use_lcc, seed)
+    communities = backend.detect_communities(
+        max_cluster_size=max_cluster_size,
+        use_lcc=use_lcc,
+        seed=seed,
+    )
+
+    # Convert CommunityResult objects to tuples for compatibility
+    # Format: (level, cluster_id, parent_cluster_id, node_ids)
+    clusters = [
+        (comm.level, comm.cluster_id, comm.parent_cluster_id, comm.node_ids)
+        for comm in communities
+    ]
+
+    logger.info("Communities detected: %d communities across %d levels",
+                len(clusters), len(set(c[0] for c in clusters)))
+
+    # Continue with standard community processing
+    return _process_communities(entities, relationships, clusters)
 
 
 def create_communities(
@@ -58,7 +149,7 @@ def create_communities(
     use_lcc: bool,
     seed: int | None = None,
 ) -> pd.DataFrame:
-    """All the steps to transform final communities."""
+    """All the steps to transform final communities (legacy NetworkX implementation)."""
     graph = create_graph(relationships, edge_attr=["weight"])
 
     clusters = cluster_graph(
@@ -67,6 +158,19 @@ def create_communities(
         use_lcc,
         seed=seed,
     )
+
+    return _process_communities(entities, relationships, clusters)
+
+
+def _process_communities(
+    entities: pd.DataFrame,
+    relationships: pd.DataFrame,
+    clusters: list[tuple[int, int, int, list[str]]],
+) -> pd.DataFrame:
+    """Process community clusters into final communities DataFrame.
+
+    Shared logic between backend-based and legacy implementations.
+    """
 
     communities = pd.DataFrame(
         clusters, columns=pd.Index(["level", "community", "parent", "title"])

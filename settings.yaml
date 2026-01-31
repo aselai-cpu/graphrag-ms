@@ -126,13 +126,12 @@ dark_mode:
     max_latency_ratio: 2.0      # Shadow can be up to 2x slower
 
 # Neo4j Configuration (required when dark_mode.shadow_backend: neo4j)
-# Uncomment and configure when using Neo4j
-# neo4j:
-#   uri: bolt://localhost:7687
-#   username: neo4j
-#   password: ${NEO4J_PASSWORD}
-#   database: graphrag
-#   gds_library: true  # Use Graph Data Science library for community detection
+neo4j:
+  uri: bolt://localhost:7687
+  username: neo4j
+  password: ${NEO4J_PASSWORD}  # Set environment variable: export NEO4J_PASSWORD=your_password
+  database: neo4j  # Default database name
+  gds_library: true  # Use Graph Data Science library for community detection
 
 extract_claims:
   enabled: false
