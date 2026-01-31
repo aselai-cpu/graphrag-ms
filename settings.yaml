@@ -95,6 +95,45 @@ extract_graph_nlp:
 cluster_graph:
   max_cluster_size: 10
 
+### Dark Mode Configuration ###
+## Enable parallel execution of NetworkX (primary) and Neo4j (shadow) for validation
+## See docs/dark-mode-guide.md for complete documentation
+
+dark_mode:
+  # Enable dark mode for safe Neo4j validation
+  enabled: true
+
+  # Primary backend (serves production traffic)
+  primary_backend: networkx
+
+  # Shadow backend (validation only, does not affect results)
+  shadow_backend: neo4j
+
+  # Path to write metrics log file (JSON lines format)
+  log_path: output/dark_mode_metrics.jsonl
+
+  # Comparison thresholds for validating shadow results
+  comparison:
+    entity_match_threshold: 0.99      # 99% entity F1 score required
+    community_match_threshold: 0.95   # 95% clustering similarity required
+    degree_tolerance: 0.1             # 10% degree difference allowed
+
+  # Cutover criteria - when is shadow ready for production?
+  cutover_criteria:
+    min_operations: 1000        # Minimum operations to validate
+    max_error_rate: 0.01        # Maximum 1% shadow error rate
+    min_pass_rate: 0.95         # Minimum 95% comparison pass rate
+    max_latency_ratio: 2.0      # Shadow can be up to 2x slower
+
+# Neo4j Configuration (required when dark_mode.shadow_backend: neo4j)
+# Uncomment and configure when using Neo4j
+# neo4j:
+#   uri: bolt://localhost:7687
+#   username: neo4j
+#   password: ${NEO4J_PASSWORD}
+#   database: graphrag
+#   gds_library: true  # Use Graph Data Science library for community detection
+
 extract_claims:
   enabled: false
   completion_model_id: default_completion_model  # Use fast Haiku for claims
