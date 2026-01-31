@@ -338,6 +338,27 @@ class VectorStoreDefaults:
 
 
 @dataclass
+class DarkModeDefaults:
+    """Default values for dark mode execution."""
+
+    enabled: bool = False
+    primary_backend: str = "networkx"
+    shadow_backend: str = "neo4j"
+    log_path: str | None = None
+
+    # Comparison thresholds
+    entity_match_threshold: float = 0.99
+    community_match_threshold: float = 0.95
+    degree_tolerance: float = 0.1
+
+    # Cutover criteria
+    min_operations: int = 1000
+    max_error_rate: float = 0.01
+    min_pass_rate: float = 0.95
+    max_latency_ratio: float = 2.0
+
+
+@dataclass
 class GraphRagConfigDefaults:
     """Default values for GraphRAG."""
 
@@ -378,6 +399,7 @@ class GraphRagConfigDefaults:
     vector_store: VectorStoreDefaults = field(
         default_factory=lambda: VectorStoreDefaults()
     )
+    dark_mode: DarkModeDefaults = field(default_factory=DarkModeDefaults)
     workflows: None = None
 
 

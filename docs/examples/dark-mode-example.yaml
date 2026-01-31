@@ -1,0 +1,75 @@
+# Dark Mode Configuration Example
+# Enables parallel execution of NetworkX (primary) and Neo4j (shadow) backends
+# to validate Neo4j implementation before production cutover
+
+# Dark mode allows you to:
+# 1. Run both graph backends in parallel (NetworkX primary, Neo4j shadow)
+# 2. Compare results automatically to ensure correctness
+# 3. Collect metrics to determine readiness for production cutover
+# 4. Fail safely - shadow errors never affect primary results
+
+dark_mode:
+  # Enable dark mode execution
+  enabled: true
+
+  # Primary backend (serves production traffic)
+  primary_backend: networkx
+
+  # Shadow backend (validation only, does not affect results)
+  shadow_backend: neo4j
+
+  # Path to write metrics log file (JSON lines format)
+  # Useful for analyzing dark mode execution and determining cutover readiness
+  log_path: output/dark_mode_metrics.jsonl
+
+  # Comparison thresholds for validating shadow results
+  comparison:
+    # Minimum entity F1 score to pass comparison (0.0-1.0)
+    # Default: 0.99 (99% match required)
+    entity_match_threshold: 0.99
+
+    # Minimum community assignment match rate (0.0-1.0)
+    # Default: 0.95 (95% clustering similarity required)
+    community_match_threshold: 0.95
+
+    # Maximum relative difference in node degrees (0.0-1.0)
+    # Default: 0.1 (10% difference allowed)
+    degree_tolerance: 0.1
+
+  # Cutover criteria - when is shadow ready for production?
+  cutover_criteria:
+    # Minimum number of operations to validate before cutover
+    # Default: 1000
+    min_operations: 1000
+
+    # Maximum shadow error rate allowed for cutover (0.0-1.0)
+    # Default: 0.01 (1% error rate)
+    max_error_rate: 0.01
+
+    # Minimum comparison pass rate required for cutover (0.0-1.0)
+    # Default: 0.95 (95% of comparisons must pass)
+    min_pass_rate: 0.95
+
+    # Maximum shadow/primary latency ratio allowed for cutover
+    # Default: 2.0 (shadow can be 2x slower than primary)
+    max_latency_ratio: 2.0
+
+# Neo4j configuration (required when shadow_backend: neo4j)
+# Note: This configuration is only used in dark mode for the shadow backend
+# neo4j:
+#   uri: bolt://localhost:7687
+#   username: neo4j
+#   password: ${NEO4J_PASSWORD}
+#   database: graphrag
+#   gds_library: true  # Use Graph Data Science library for community detection
+
+# Usage:
+# 1. Run your GraphRAG pipeline with this config
+# 2. Check dark mode metrics log: output/dark_mode_metrics.jsonl
+# 3. Use metrics to verify cutover readiness:
+#    - Are comparison pass rates high enough?
+#    - Are shadow error rates low enough?
+#    - Is shadow performance acceptable?
+# 4. Once validated, switch to Neo4j-only:
+#    Set dark_mode.enabled: false
+#    Set dark_mode.primary_backend: neo4j

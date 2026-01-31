@@ -8,7 +8,10 @@ from graphrag.index.graph.graph_backend import (
     CommunityResult,
     GraphBackend,
 )
-from graphrag.index.graph.graph_factory import create_graph_backend
+from graphrag.index.graph.graph_factory import (
+    create_graph_backend,
+    create_graph_backend_with_dark_mode,
+)
 from graphrag.index.graph.networkx_backend import NetworkXBackend
 
 __all__ = [
@@ -17,4 +20,5 @@ __all__ = [
     "GraphBackend",
     "NetworkXBackend",
     "create_graph_backend",
+    "create_graph_backend_with_dark_mode",
 ]

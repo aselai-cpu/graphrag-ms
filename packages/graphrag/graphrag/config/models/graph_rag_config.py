@@ -21,6 +21,7 @@ from graphrag.config.enums import AsyncType, ReportingType
 from graphrag.config.models.basic_search_config import BasicSearchConfig
 from graphrag.config.models.cluster_graph_config import ClusterGraphConfig
 from graphrag.config.models.community_reports_config import CommunityReportsConfig
+from graphrag.config.models.dark_mode_config import DarkModeConfig
 from graphrag.config.models.drift_search_config import DRIFTSearchConfig
 from graphrag.config.models.embed_text_config import EmbedTextConfig
 from graphrag.config.models.extract_claims_config import ExtractClaimsConfig
@@ -203,6 +204,12 @@ class GraphRagConfig(BaseModel):
         default=ClusterGraphConfig(),
     )
     """The cluster graph configuration to use."""
+
+    dark_mode: DarkModeConfig = Field(
+        description="The dark mode execution configuration to use.",
+        default=DarkModeConfig(),
+    )
+    """The dark mode execution configuration to use."""
 
     extract_claims: ExtractClaimsConfig = Field(
         description="The claim extraction configuration to use.",
