@@ -43,6 +43,7 @@ class Neo4jBackend(GraphBackend):
         batch_size: int = 1000,
         node_label: str = "Entity",
         relationship_type: str = "RELATED_TO",
+        gds_library: bool = True,
         **kwargs: Any,
     ):
         """Initialize Neo4j backend.
@@ -63,23 +64,32 @@ class Neo4jBackend(GraphBackend):
             Label for entity nodes, by default "Entity"
         relationship_type : str, optional
             Type for relationships, by default "RELATED_TO"
+        gds_library : bool, optional
+            Whether to use Neo4j GDS library for community detection, by default True
         **kwargs : Any
-            Additional Neo4j driver configuration
+            Additional Neo4j driver configuration (e.g., max_connection_pool_size)
         """
         self.uri = uri
         self.database = database
         self.batch_size = batch_size
         self.node_label = node_label
         self.relationship_type = relationship_type
+        self.gds_library = gds_library
         self.driver = None  # Initialize to None for safe cleanup
 
         try:
             # Create Neo4j driver
             logger.info("Connecting to Neo4j at %s (database: %s)", uri, database)
+            # Only pass valid driver config to neo4j.GraphDatabase.driver()
+            # Filter out our custom parameters
+            driver_kwargs = {
+                k: v for k, v in kwargs.items()
+                if k not in ["gds_library"]  # Our custom params that shouldn't go to driver
+            }
             self.driver = neo4j.GraphDatabase.driver(
                 uri,
                 auth=(username, password),
-                **kwargs,
+                **driver_kwargs,
             )
 
             # Verify connectivity
