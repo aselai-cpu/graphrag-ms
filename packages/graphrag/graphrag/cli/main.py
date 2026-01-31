@@ -479,3 +479,9 @@ def _query_cli(
             )
         case _:
             raise ValueError(INVALID_METHOD_ERROR)
+
+
+# Register dark mode command group
+from graphrag.cli.dark_mode import app as dark_mode_app
+
+app.add_typer(dark_mode_app, name="dark-mode")

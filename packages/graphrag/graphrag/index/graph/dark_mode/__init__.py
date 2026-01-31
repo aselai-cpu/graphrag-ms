@@ -8,6 +8,10 @@ from graphrag.index.graph.dark_mode.comparison_framework import (
     ComparisonResult,
 )
 from graphrag.index.graph.dark_mode.dark_mode_orchestrator import DarkModeOrchestrator
+from graphrag.index.graph.dark_mode.metrics_analyzer import (
+    MetricsAnalysis,
+    MetricsAnalyzer,
+)
 from graphrag.index.graph.dark_mode.metrics_collector import (
     MetricsCollector,
     OperationMetrics,
@@ -17,6 +21,8 @@ __all__ = [
     "ComparisonFramework",
     "ComparisonResult",
     "DarkModeOrchestrator",
+    "MetricsAnalysis",
+    "MetricsAnalyzer",
     "MetricsCollector",
     "OperationMetrics",
 ]
