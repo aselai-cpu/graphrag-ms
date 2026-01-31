@@ -1,47 +1,169 @@
 # Neo4j Integration Architecture Design
+## Dark Mode Parallel Execution Strategy
 
 **Document**: 03 - Architecture Design
-**Date**: 2026-01-29
-**Status**: In Progress
+**Date**: 2026-01-31
+**Status**: Replanned for Dark Mode
 
 ---
 
 ## Purpose
 
-This document designs the integration architecture for Neo4j as GraphRAG's unified graph and vector storage system. It defines the schema, data flow, integration points, and backward compatibility strategy.
+This document designs the integration architecture for Neo4j as GraphRAG's unified graph and vector storage system using a **dark mode parallel execution strategy**. It defines:
+- Three execution modes: networkx_only, dark_mode, neo4j_only
+- Dark mode orchestrator architecture
+- Comparison framework for validation
+- Schema, data flow, and integration points
+- Safe cutover strategy
 
 ---
 
 ## Design Principles
 
-### 1. **Minimal Disruption**
+### 1. **Zero Production Risk (Dark Mode First)**
+- Production system (NetworkX) remains authoritative during validation
+- Shadow system (Neo4j) runs in parallel but doesn't affect results
+- Failures in Neo4j don't impact users
+- Full validation before cutover
+
+### 2. **Configuration-Based Execution Modes**
+- `networkx_only`: Current implementation
+- `dark_mode`: Both run in parallel, NetworkX results returned
+- `neo4j_only`: Neo4j only (target state)
+- Single config change to switch modes
+
+### 3. **Comprehensive Comparison**
+- Log all operations (indexing + queries)
+- Compare results: entities, relationships, communities, query results
+- Track metrics: latency, accuracy, error rates
+- Build confidence with real data
+
+### 4. **Minimal Disruption**
 - Preserve existing workflow structure
 - Maintain current API interfaces where possible
 - Support gradual migration
 
-### 2. **Unified Storage**
+### 5. **Unified Storage (Neo4j Target)**
 - Single source of truth for graph and vectors
 - Eliminate data duplication between systems
 - Enable hybrid queries
 
-### 3. **Backward Compatibility**
-- Continue supporting Parquet output
+### 6. **Backward Compatibility**
+- Continue supporting NetworkX mode
 - Allow users to choose storage backend
 - Provide migration tools
+- Easy rollback
 
-### 4. **Performance**
+### 7. **Performance**
 - Batch operations for efficiency
 - Use native Neo4j operations where possible
 - Minimize network round-trips
-
-### 5. **Flexibility**
-- Abstract behind storage interface
-- Support both Neo4j Community and Enterprise
-- Allow configuration of connection parameters
+- Dark mode overhead acceptable (temporary)
 
 ---
 
-## Overall Architecture
+## Overall Architecture - Three Execution Modes
+
+### Mode 1: NetworkX Only (Current State)
+
+```
+┌───────────────────────────────────────┐
+│   GraphRAG Indexing Pipeline          │
+└───────────────────────────────────────┘
+                  ↓
+┌───────────────────────────────────────┐
+│   NetworkX + LanceDB                  │
+│   (In-memory graph + vector store)    │
+└───────────────────────────────────────┘
+                  ↓
+┌───────────────────────────────────────┐
+│   User Results ✅                      │
+│   (Entities, Communities, Queries)    │
+└───────────────────────────────────────┘
+```
+
+**Configuration**:
+```yaml
+storage:
+  type: networkx_only
+```
+
+### Mode 2: Dark Mode (Parallel Validation)
+
+```
+┌───────────────────────────────────────────────────────────┐
+│          GraphRAG Indexing Pipeline                        │
+└───────────────────────────────────────────────────────────┘
+                           ↓
+          ┌────────────────────────────────┐
+          │   DarkModeOrchestrator         │
+          └────────────────────────────────┘
+                    ↓          ↓
+        ┌───────────┘          └───────────┐
+        ↓ PRIMARY                   SHADOW ↓
+┌──────────────────┐          ┌──────────────────┐
+│ NetworkX         │          │ Neo4j            │
+│ + LanceDB        │          │ (parallel exec)  │
+└──────────────────┘          └──────────────────┘
+        ↓                              ↓
+        │                              │
+        ↓                              ↓
+┌──────────────────┐          ┌──────────────────┐
+│ User Results ✅  │          │ Comparison Logs  │
+│ (Production)     │          │ (Validation) 📊  │
+└──────────────────┘          └──────────────────┘
+```
+
+**Configuration**:
+```yaml
+storage:
+  type: dark_mode
+  primary: networkx
+  shadow: neo4j
+  comparison:
+    enabled: true
+    log_differences: true
+    metrics: [entity_count, community_match, query_f1, latency]
+```
+
+**Key Features**:
+- Both systems execute identical operations
+- NetworkX results returned to user
+- Neo4j results logged for comparison
+- Neo4j failures don't affect production
+- Comparison metrics collected for validation
+
+### Mode 3: Neo4j Only (Target State)
+
+```
+┌───────────────────────────────────────┐
+│   GraphRAG Indexing Pipeline          │
+└───────────────────────────────────────┘
+                  ↓
+┌───────────────────────────────────────┐
+│   Neo4j Unified Storage               │
+│   (Graph + Vector index)              │
+└───────────────────────────────────────┘
+                  ↓
+┌───────────────────────────────────────┐
+│   User Results ✅                      │
+│   (Entities, Communities, Queries)    │
+└───────────────────────────────────────┘
+```
+
+**Configuration**:
+```yaml
+storage:
+  type: neo4j_only
+  neo4j:
+    uri: bolt://localhost:7687
+    username: neo4j
+    password: password
+```
+
+---
+
+## Detailed Architecture
 
 ### Current Architecture (NetworkX + Parquet)
 
@@ -104,6 +226,394 @@ This document designs the integration architecture for Neo4j as GraphRAG's unifi
 2. Use Neo4j GDS for graph operations
 3. Store embeddings in Neo4j Vector Index
 4. Optional Parquet output for backward compatibility
+
+---
+
+## Dark Mode Orchestrator Architecture
+
+### Overview
+
+The `DarkModeOrchestrator` is the core component that enables parallel execution of NetworkX and Neo4j operations without affecting production.
+
+### Component Diagram
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   DarkModeOrchestrator                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                               │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │  Execution   │  │  Comparison  │  │   Metrics    │      │
+│  │  Coordinator │  │  Framework   │  │  Collector   │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+│         │                  │                  │              │
+│         └──────────────────┴──────────────────┘              │
+│                           │                                  │
+└───────────────────────────┼──────────────────────────────────┘
+                            │
+            ┌───────────────┴───────────────┐
+            │                               │
+            ↓                               ↓
+  ┌───────────────────┐          ┌───────────────────┐
+  │  Primary Backend  │          │  Shadow Backend   │
+  │  (NetworkX)       │          │  (Neo4j)          │
+  └───────────────────┘          └───────────────────┘
+```
+
+### Execution Coordinator
+
+Responsible for dispatching operations to both backends:
+
+```python
+class ExecutionCoordinator:
+    """Coordinates parallel execution across primary and shadow backends."""
+
+    def __init__(
+        self,
+        primary: GraphStorage,  # NetworkX
+        shadow: GraphStorage,   # Neo4j
+        mode: ExecutionMode
+    ):
+        self.primary = primary
+        self.shadow = shadow
+        self.mode = mode
+
+    async def execute_operation(
+        self,
+        operation: str,
+        *args,
+        **kwargs
+    ) -> tuple[Any, OperationMetrics]:
+        """
+        Execute operation on primary backend, optionally on shadow.
+
+        Returns:
+            (primary_result, metrics)
+        """
+
+        # Always execute on primary
+        primary_start = time.time()
+        try:
+            primary_result = await self._execute_on_backend(
+                self.primary, operation, *args, **kwargs
+            )
+            primary_latency = time.time() - primary_start
+            primary_error = None
+        except Exception as e:
+            primary_result = None
+            primary_latency = time.time() - primary_start
+            primary_error = str(e)
+            # Primary failure is fatal - propagate
+            raise
+
+        # Execute on shadow only in dark_mode
+        shadow_result = None
+        shadow_latency = None
+        shadow_error = None
+
+        if self.mode == ExecutionMode.DARK_MODE:
+            shadow_start = time.time()
+            try:
+                shadow_result = await self._execute_on_backend(
+                    self.shadow, operation, *args, **kwargs
+                )
+                shadow_latency = time.time() - shadow_start
+            except Exception as e:
+                # Shadow failure is NOT fatal - just log
+                shadow_latency = time.time() - shadow_start
+                shadow_error = str(e)
+                logger.warning(f"Shadow operation failed: {operation}: {e}")
+
+        # Collect metrics
+        metrics = OperationMetrics(
+            operation=operation,
+            primary_latency=primary_latency,
+            shadow_latency=shadow_latency,
+            primary_error=primary_error,
+            shadow_error=shadow_error,
+            timestamp=datetime.now()
+        )
+
+        # Compare results if shadow succeeded
+        if shadow_result is not None:
+            comparison = self._compare_results(
+                operation, primary_result, shadow_result
+            )
+            metrics.comparison = comparison
+
+        return primary_result, metrics
+
+    async def _execute_on_backend(
+        self, backend: GraphStorage, operation: str, *args, **kwargs
+    ):
+        """Execute operation on specific backend."""
+        method = getattr(backend, operation)
+        return await method(*args, **kwargs)
+
+    def _compare_results(
+        self, operation: str, primary_result: Any, shadow_result: Any
+    ) -> ComparisonResult:
+        """Compare results from primary and shadow backends."""
+        # Comparison logic depends on operation type
+        # See Comparison Framework section below
+        pass
+```
+
+### Comparison Framework
+
+Compares results between NetworkX and Neo4j:
+
+```python
+class ComparisonFramework:
+    """Compares results between primary and shadow backends."""
+
+    def compare_entities(
+        self,
+        primary_entities: pd.DataFrame,
+        shadow_entities: pd.DataFrame
+    ) -> EntityComparison:
+        """Compare entity DataFrames."""
+
+        # Count comparison
+        count_match = len(primary_entities) == len(shadow_entities)
+
+        # ID overlap
+        primary_ids = set(primary_entities['id'])
+        shadow_ids = set(shadow_entities['id'])
+
+        overlap = primary_ids & shadow_ids
+        precision = len(overlap) / len(shadow_ids) if shadow_ids else 0
+        recall = len(overlap) / len(primary_ids) if primary_ids else 0
+        f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
+
+        # Missing entities
+        missing_in_shadow = primary_ids - shadow_ids
+        extra_in_shadow = shadow_ids - primary_ids
+
+        return EntityComparison(
+            count_match=count_match,
+            primary_count=len(primary_entities),
+            shadow_count=len(shadow_entities),
+            precision=precision,
+            recall=recall,
+            f1=f1,
+            missing_in_shadow=list(missing_in_shadow)[:10],  # Sample
+            extra_in_shadow=list(extra_in_shadow)[:10]
+        )
+
+    def compare_communities(
+        self,
+        primary_communities: pd.DataFrame,
+        shadow_communities: pd.DataFrame
+    ) -> CommunityComparison:
+        """Compare community assignments."""
+
+        # Merge on entity ID
+        merged = pd.merge(
+            primary_communities[['entity_id', 'community']],
+            shadow_communities[['entity_id', 'community']],
+            on='entity_id',
+            suffixes=('_primary', '_shadow'),
+            how='outer'
+        )
+
+        # Exact match rate
+        exact_matches = (
+            merged['community_primary'] == merged['community_shadow']
+        ).sum()
+        match_rate = exact_matches / len(merged) if len(merged) > 0 else 0
+
+        # NOTE: Louvain is non-deterministic, so < 100% match is expected
+        # But should be > 95% for same algorithm
+
+        return CommunityComparison(
+            match_rate=match_rate,
+            exact_matches=exact_matches,
+            total_entities=len(merged),
+            primary_levels=primary_communities['level'].nunique(),
+            shadow_levels=shadow_communities['level'].nunique()
+        )
+
+    def compare_query_results(
+        self,
+        primary_results: List[Dict],
+        shadow_results: List[Dict]
+    ) -> QueryComparison:
+        """Compare query results."""
+
+        # Extract entity IDs from results
+        primary_ids = [r['id'] for r in primary_results]
+        shadow_ids = [r['id'] for r in shadow_results]
+
+        # Set overlap (unordered)
+        overlap = set(primary_ids) & set(shadow_ids)
+        precision = len(overlap) / len(shadow_ids) if shadow_ids else 0
+        recall = len(overlap) / len(primary_ids) if primary_ids else 0
+        f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
+
+        # Ranking correlation (ordered)
+        # Use rank correlation for entities that appear in both
+        ranking_correlation = self._calculate_rank_correlation(
+            primary_ids, shadow_ids
+        )
+
+        return QueryComparison(
+            f1=f1,
+            precision=precision,
+            recall=recall,
+            ranking_correlation=ranking_correlation,
+            primary_count=len(primary_results),
+            shadow_count=len(shadow_results)
+        )
+
+    def _calculate_rank_correlation(
+        self, primary_ids: List[str], shadow_ids: List[str]
+    ) -> float:
+        """Calculate Spearman rank correlation."""
+        # Implementation using scipy.stats.spearmanr
+        # Only for entities that appear in both lists
+        pass
+```
+
+### Metrics Collector
+
+Collects and logs comparison metrics:
+
+```python
+class MetricsCollector:
+    """Collects and logs dark mode comparison metrics."""
+
+    def __init__(self, log_path: str):
+        self.log_path = log_path
+        self.metrics_buffer = []
+        self.flush_interval = 10  # seconds
+
+    async def log_operation(self, metrics: OperationMetrics):
+        """Log operation metrics."""
+        self.metrics_buffer.append(metrics)
+
+        # Flush to disk periodically
+        if len(self.metrics_buffer) >= 100:
+            await self._flush_metrics()
+
+    async def _flush_metrics(self):
+        """Write metrics buffer to disk."""
+        if not self.metrics_buffer:
+            return
+
+        # Write to JSONL file
+        log_file = Path(self.log_path) / "comparison_metrics.jsonl"
+        with open(log_file, 'a') as f:
+            for metric in self.metrics_buffer:
+                f.write(json.dumps(metric.to_dict()) + '\n')
+
+        # Also update aggregated metrics
+        self._update_aggregated_metrics()
+
+        self.metrics_buffer.clear()
+
+    def _update_aggregated_metrics(self):
+        """Update aggregated metrics file."""
+        # Calculate rolling averages, percentiles, etc.
+        # Write to separate aggregated metrics file
+        pass
+
+    def generate_report(self) -> DarkModeReport:
+        """Generate dark mode validation report."""
+        # Read all metrics from log files
+        # Calculate summary statistics
+        # Check against cutover criteria
+        # Return comprehensive report
+        pass
+```
+
+### Data Models
+
+```python
+from dataclasses import dataclass
+from typing import Optional, Dict, Any, List
+from datetime import datetime
+from enum import Enum
+
+class ExecutionMode(Enum):
+    NETWORKX_ONLY = "networkx_only"
+    DARK_MODE = "dark_mode"
+    NEO4J_ONLY = "neo4j_only"
+
+@dataclass
+class OperationMetrics:
+    operation: str
+    primary_latency: float
+    shadow_latency: Optional[float]
+    primary_error: Optional[str]
+    shadow_error: Optional[str]
+    comparison: Optional['ComparisonResult']
+    timestamp: datetime
+
+@dataclass
+class EntityComparison:
+    count_match: bool
+    primary_count: int
+    shadow_count: int
+    precision: float
+    recall: float
+    f1: float
+    missing_in_shadow: List[str]
+    extra_in_shadow: List[str]
+
+@dataclass
+class CommunityComparison:
+    match_rate: float
+    exact_matches: int
+    total_entities: int
+    primary_levels: int
+    shadow_levels: int
+
+@dataclass
+class QueryComparison:
+    f1: float
+    precision: float
+    recall: float
+    ranking_correlation: float
+    primary_count: int
+    shadow_count: int
+
+@dataclass
+class ComparisonResult:
+    entities: Optional[EntityComparison] = None
+    communities: Optional[CommunityComparison] = None
+    queries: Optional[QueryComparison] = None
+
+@dataclass
+class DarkModeReport:
+    """Summary report for dark mode validation."""
+    validation_period: str
+    total_operations: int
+    operation_breakdown: Dict[str, int]
+
+    # Entity metrics
+    entity_match_rate: float  # Should be > 99%
+    avg_entity_f1: float
+
+    # Community metrics
+    community_match_rate: float  # Should be > 95%
+
+    # Query metrics
+    avg_query_f1: float  # Should be > 95%
+    avg_ranking_correlation: float  # Should be > 0.90
+
+    # Latency metrics
+    avg_latency_ratio: float  # Should be < 2.0
+    p95_latency_ratio: float
+
+    # Error metrics
+    shadow_error_rate: float  # Should be < 1%
+    shadow_error_types: Dict[str, int]
+
+    # Cutover readiness
+    meets_cutover_criteria: bool
+    blocking_issues: List[str]
+```
 
 ---
 
@@ -1371,20 +1881,26 @@ async def hybrid_search_neo4j(
 
 ## Configuration
 
-### New Configuration Schema
+### New Configuration Schema (Dark Mode)
 
 ```yaml
 # settings.yaml
 
 storage:
-  type: neo4j  # Options: parquet, neo4j, hybrid
+  # Execution mode: networkx_only, dark_mode, neo4j_only
+  type: dark_mode
 
-  # Parquet configuration (if type=parquet or type=hybrid)
-  parquet:
-    base_dir: "./output"
+  # NetworkX configuration (for networkx_only and dark_mode)
+  networkx:
+    enabled: true
+    cache_dir: "./cache"
+    vector_store:
+      type: lancedb
+      uri: "./output/lancedb"
 
-  # Neo4j configuration (if type=neo4j or type=hybrid)
+  # Neo4j configuration (for neo4j_only and dark_mode)
   neo4j:
+    enabled: true
     uri: "bolt://localhost:7687"
     username: "neo4j"
     password: "password"
@@ -1408,13 +1924,99 @@ storage:
       dimensions: 1536
       similarity_function: cosine  # Options: cosine, euclidean
 
-# Vector store configuration (deprecated if using Neo4j)
-vector_store:
-  type: neo4j  # Options: lancedb, neo4j, qdrant, etc.
+  # Dark mode specific configuration
+  dark_mode:
+    enabled: true  # Only used when type=dark_mode
+    primary_backend: networkx  # Always networkx
+    shadow_backend: neo4j      # Always neo4j
 
-  # Only used if type != neo4j
-  lancedb:
-    uri: "./lancedb"
+    # Comparison settings
+    comparison:
+      enabled: true
+      log_path: "./dark_mode_logs"
+      log_format: jsonl
+      flush_interval_seconds: 10
+
+      # What to compare
+      compare_indexing: true
+      compare_queries: true
+
+      # Metrics to collect
+      metrics:
+        - entity_count
+        - relationship_count
+        - community_match_rate
+        - query_f1
+        - query_ranking_correlation
+        - latency_ratio
+        - error_rates
+
+      # Sampling (to reduce overhead)
+      sample_rate: 1.0  # 1.0 = 100% of operations
+
+    # Error handling
+    error_handling:
+      shadow_failure_action: log  # Options: log, alert, fail
+      continue_on_shadow_error: true
+
+    # Cutover criteria
+    cutover_criteria:
+      validation_period_days: 14
+      min_operations: 1000
+      entity_match_rate_threshold: 0.99
+      community_match_rate_threshold: 0.95
+      query_f1_threshold: 0.95
+      query_ranking_correlation_threshold: 0.90
+      latency_ratio_threshold: 2.0
+      shadow_error_rate_threshold: 0.01
+```
+
+### Configuration Examples
+
+**Mode 1: NetworkX Only (Current)**
+```yaml
+storage:
+  type: networkx_only
+  networkx:
+    enabled: true
+    cache_dir: "./cache"
+    vector_store:
+      type: lancedb
+      uri: "./output/lancedb"
+```
+
+**Mode 2: Dark Mode (Validation)**
+```yaml
+storage:
+  type: dark_mode
+  networkx:
+    enabled: true
+    cache_dir: "./cache"
+    vector_store:
+      type: lancedb
+      uri: "./output/lancedb"
+  neo4j:
+    enabled: true
+    uri: "bolt://localhost:7687"
+    username: "neo4j"
+    password: "password"
+  dark_mode:
+    enabled: true
+    comparison:
+      enabled: true
+      log_path: "./dark_mode_logs"
+```
+
+**Mode 3: Neo4j Only (Target)**
+```yaml
+storage:
+  type: neo4j_only
+  neo4j:
+    enabled: true
+    uri: "bolt://localhost:7687"
+    username: "neo4j"
+    password: "password"
+    database: "neo4j"
 ```
 
 ### Configuration Class
@@ -1477,59 +2079,117 @@ class StorageConfig(BaseModel):
 
 ---
 
-## Backward Compatibility Strategy
+## Backward Compatibility Strategy (Dark Mode)
 
-### Dual-Mode Support
+### Three-Mode Architecture
 
-Support both Parquet and Neo4j simultaneously:
+Support three execution modes with easy transitions:
 
 ```python
-class HybridGraphStorage(GraphStorage):
-    """Writes to both Parquet and Neo4j for backward compatibility."""
+class DarkModeGraphStorage(GraphStorage):
+    """
+    Orchestrates execution across NetworkX and Neo4j backends.
 
-    def __init__(self, parquet: ParquetGraphStorage, neo4j: Neo4jGraphStorage):
-        self.parquet = parquet
-        self.neo4j = neo4j
+    Modes:
+    - networkx_only: Only NetworkX, no Neo4j
+    - dark_mode: Both run, NetworkX results returned, Neo4j validated
+    - neo4j_only: Only Neo4j
+    """
+
+    def __init__(
+        self,
+        mode: ExecutionMode,
+        networkx_backend: Optional[NetworkXGraphStorage] = None,
+        neo4j_backend: Optional[Neo4jGraphStorage] = None,
+        orchestrator: Optional[DarkModeOrchestrator] = None
+    ):
+        self.mode = mode
+        self.networkx = networkx_backend
+        self.neo4j = neo4j_backend
+        self.orchestrator = orchestrator
 
     async def write_entities(self, entities: pd.DataFrame) -> None:
-        # Write to both
-        await self.parquet.write_entities(entities)
-        await self.neo4j.write_entities(entities)
+        """Write entities according to current mode."""
+
+        if self.mode == ExecutionMode.NETWORKX_ONLY:
+            # Only NetworkX
+            await self.networkx.write_entities(entities)
+
+        elif self.mode == ExecutionMode.DARK_MODE:
+            # Both backends, orchestrator coordinates
+            result, metrics = await self.orchestrator.execute_operation(
+                "write_entities",
+                entities
+            )
+            # Return NetworkX result, log comparison
+
+        elif self.mode == ExecutionMode.NEO4J_ONLY:
+            # Only Neo4j
+            await self.neo4j.write_entities(entities)
 
     async def read_entities(self) -> pd.DataFrame:
-        # Read from Neo4j (source of truth in hybrid mode)
-        return await self.neo4j.read_entities()
+        """Read entities according to current mode."""
+
+        if self.mode == ExecutionMode.NETWORKX_ONLY:
+            return await self.networkx.read_entities()
+
+        elif self.mode == ExecutionMode.DARK_MODE:
+            # Read from primary (NetworkX) in dark mode
+            return await self.networkx.read_entities()
+
+        elif self.mode == ExecutionMode.NEO4J_ONLY:
+            return await self.neo4j.read_entities()
 
     # ... similar for all methods
 ```
 
-### Migration Path
+### Migration Path (Safe Transitions)
 
-**Phase 1: Parquet Only (Current)**
+**Phase 1: NetworkX Only (Current)**
 ```yaml
 storage:
-  type: parquet
+  type: networkx_only
 ```
+- No changes to current behavior
+- No Neo4j required
 
-**Phase 2: Hybrid Mode (Transition)**
+**Phase 2: Dark Mode Validation (2-4 weeks)**
 ```yaml
 storage:
-  type: hybrid  # Write to both, read from Neo4j
+  type: dark_mode
+  networkx:
+    enabled: true
   neo4j:
-    uri: "bolt://localhost:7687"
-    username: "neo4j"
-    password: "password"
+    enabled: true
+  dark_mode:
+    comparison:
+      enabled: true
 ```
+- Both systems run in parallel
+- NetworkX results returned to users (zero production impact)
+- Neo4j results compared and logged
+- Build confidence with real traffic
+- Collect metrics for go/no-go decision
 
-**Phase 3: Neo4j Only (Target)**
+**Phase 3: Neo4j Only (After Validation)**
 ```yaml
 storage:
-  type: neo4j
+  type: neo4j_only
   neo4j:
-    uri: "bolt://localhost:7687"
-    username: "neo4j"
-    password: "password"
+    enabled: true
 ```
+- Switch to Neo4j only when metrics pass
+- NetworkX no longer needed
+- Can revert instantly if issues found
+
+**Emergency Rollback (Any Time)**
+```yaml
+storage:
+  type: networkx_only  # Instant revert
+```
+- One line change
+- No data loss (NetworkX maintained in parallel during dark mode)
+- Can rollback from dark_mode or neo4j_only
 
 ### Export Utility
 
@@ -1576,48 +2236,79 @@ async def export_neo4j_to_parquet(
 
 ---
 
-## Summary: Architecture Design
+## Summary: Architecture Design (Dark Mode)
 
 ### Key Design Decisions
 
-1. **Schema**: Neo4j property graph with Entity, Community, TextUnit, Document, and Covariate nodes
-2. **Integration**: Abstract storage interface with Parquet and Neo4j implementations
-3. **Data Flow**: Batch writes to Neo4j during indexing, use GDS for graph operations
-4. **Backward Compatibility**: Hybrid mode writes to both Parquet and Neo4j
-5. **Query Changes**: Use Neo4j vector index and Cypher for unified graph+vector queries
+1. **Three Execution Modes**: networkx_only, dark_mode, neo4j_only with easy transitions
+2. **Dark Mode Orchestrator**: Coordinates parallel execution, comparison, metrics collection
+3. **Zero Production Risk**: NetworkX remains authoritative during validation
+4. **Comprehensive Comparison**: Entity counts, community matches, query F1, latency ratios
+5. **Schema**: Neo4j property graph with Entity, Community, TextUnit, Document, and Covariate nodes
+6. **Integration**: Abstract storage interface with NetworkX and Neo4j implementations
+7. **Data Flow**: Batch writes to backends, use GDS for graph operations in Neo4j
+8. **Query Changes**: Use Neo4j vector index and Cypher for unified graph+vector queries
 
-### Changes to Codebase
+### Changes to Codebase (Updated for Dark Mode)
 
 | Component | Changes Required | Complexity |
 |-----------|------------------|------------|
-| **Storage Interface** | Add abstract `GraphStorage` class | Medium |
+| **Storage Interface** | Add abstract `GraphStorage` class with mode support | Medium |
+| **NetworkX Adapter** | Refactor existing code into adapter | Medium |
 | **Neo4j Adapter** | Implement `Neo4jGraphStorage` | High |
-| **Indexing Workflows** | Use `GraphStorage` abstraction | Medium |
-| **Query Operations** | Add Neo4j query methods | Medium |
-| **Configuration** | Add Neo4j config schema | Low |
-| **CLI** | Add export/import commands | Low |
-| **Tests** | Add Neo4j integration tests | High |
-| **Documentation** | Update guides and examples | Medium |
+| **Dark Mode Orchestrator** | NEW: Parallel execution coordinator | High |
+| **Comparison Framework** | NEW: Result comparison logic | High |
+| **Metrics Collector** | NEW: Logging and reporting | Medium |
+| **Indexing Workflows** | Use `DarkModeGraphStorage` abstraction | Medium |
+| **Query Operations** | Add Neo4j query methods + dark mode support | High |
+| **Configuration** | Add three-mode config schema | Medium |
+| **CLI** | Add export/import/dark-mode-report commands | Medium |
+| **Tests** | Add Neo4j integration tests + dark mode tests | Very High |
+| **Documentation** | Update guides and examples for dark mode | High |
 
-### Implementation Complexity
+### Implementation Complexity (Updated)
 
-- **Total Estimated Effort**: 6-8 weeks for Phase 2 (Core Integration)
-- **High-Risk Areas**: Community detection (Louvain vs Leiden), embedding migration, performance optimization
+- **Total Estimated Effort**: 8-10 weeks for Phases 2-3 (Core Integration + Dark Mode Framework)
+  - Core Neo4j Implementation: 6 weeks
+  - Dark Mode Infrastructure: 4 weeks
+- **High-Risk Areas**: Dark mode orchestration, comparison accuracy, performance overhead
+- **Medium-Risk Areas**: Community detection comparison (Louvain variance), embedding migration
 - **Dependencies**: Neo4j 5.17+, GDS 2.6+, Python neo4j driver
+
+### Dark Mode Advantages
+
+1. **Risk Mitigation**: Validates with 100% of real traffic before cutover
+2. **Confidence Building**: Weeks of comparison data builds team confidence
+3. **Early Issue Detection**: Find discrepancies before they affect users
+4. **Performance Validation**: Measure actual latency in production environment
+5. **Easy Rollback**: Instant revert with zero data loss
+
+### Dark Mode Costs
+
+1. **Development**: +20% implementation time (4 extra weeks)
+2. **Runtime**: 2x compute during dark mode period (2-4 weeks)
+3. **Storage**: Temporary duplication during validation
+4. **Complexity**: More code to maintain (orchestrator, comparison)
+
+**Trade-off**: +20% development cost → 80% risk reduction
 
 ### Next Steps
 
 With architecture design complete, we can now:
 
 1. ✅ Defined Neo4j schema for GraphRAG
-2. ✅ Designed storage abstraction layer
-3. ✅ Mapped indexing pipeline to Neo4j operations
-4. ✅ Planned backward compatibility strategy
-5. ⏳ Create proof-of-concept implementation
-6. ⏳ Run performance benchmarks
-7. ⏳ Finalize benefits/trade-offs analysis
+2. ✅ Designed storage abstraction layer with dark mode support
+3. ✅ Designed dark mode orchestrator architecture
+4. ✅ Designed comparison framework and metrics collection
+5. ✅ Mapped indexing pipeline to Neo4j operations
+6. ✅ Planned safe migration path via dark mode
+7. ⏳ Create proof-of-concept implementation
+8. ⏳ Run performance benchmarks
+9. ⏳ Implement dark mode framework
+10. ⏳ Finalize benefits/trade-offs analysis
 
 ---
 
-**Status**: ✅ Complete
-**Next Document**: `04_performance_benchmarks.md` - Performance comparison with real data
+**Status**: ✅ Complete (Replanned for Dark Mode)
+**Next Document**: `04_performance_benchmarks.md` - Performance comparison with real data (POC required)
+**Date Updated**: 2026-01-31

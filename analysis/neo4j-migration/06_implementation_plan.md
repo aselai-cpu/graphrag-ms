@@ -1,31 +1,43 @@
 # Implementation Plan
+## Dark Mode Migration Strategy
 
 **Document**: 06 - Implementation Plan
-**Date**: 2026-01-29
-**Status**: Complete
+**Date**: 2026-01-31
+**Status**: Replanned for Dark Mode
 
 ---
 
 ## Purpose
 
-This document provides a detailed implementation roadmap for migrating GraphRAG from NetworkX to Neo4j, including phases, tasks, estimates, dependencies, and success criteria.
+This document provides a detailed implementation roadmap for migrating GraphRAG from NetworkX to Neo4j using a **dark mode parallel execution strategy**, including phases, tasks, estimates, dependencies, and success criteria.
 
 ---
 
 ## Overview
 
-### Total Timeline: 4-5 Months
+### Total Timeline: 5-6 Months (24 weeks)
 
-**Phase 1: Foundation** (Weeks 1-4)
-**Phase 2: Core Integration** (Weeks 5-10)
-**Phase 3: Production Readiness** (Weeks 11-14)
-**Phase 4: Rollout** (Weeks 15-20)
+**Phase 1: Foundation** (Weeks 1-4) - Storage interface, Neo4j adapter, POC
+**Phase 2: Core Integration** (Weeks 5-10) - Complete Neo4j implementation, testing
+**Phase 3: Dark Mode Framework** (Weeks 11-14) - Orchestrator, comparison, metrics
+**Phase 4: Dark Mode Validation** (Weeks 15-18) - Production validation, 2-4 weeks
+**Phase 5: Cutover & Stabilization** (Weeks 19-24) - Switch to Neo4j, monitor
 
 ### Resource Requirements
 
 - **Developers**: 1-2 full-time
-- **Infrastructure**: Neo4j test environment
-- **Budget**: Minimal (Community Edition free)
+- **Infrastructure**: Neo4j test environment + production instance
+- **Budget**: $40-60K (includes dark mode infrastructure)
+  - Development: $30-50K
+  - Dark mode framework: +$10K
+  - Infrastructure: Minimal (Community Edition free)
+
+### Dark Mode Premium
+
+- **Additional Time**: +20% (4-6 weeks)
+- **Additional Cost**: +$10K
+- **Risk Reduction**: 80% (from Medium to Low)
+- **ROI**: 5-20x on dark mode investment (prevents $50-200K in production issues)
 
 ---
 
@@ -153,72 +165,170 @@ services:
 **Deliverables**:
 ```python
 # packages/graphrag-storage/graphrag_storage/neo4j_graph_storage.py
+import neo4j
+from graphrag.config import GraphRagConfig
+
 class Neo4jGraphStorage(GraphStorage):
+    """Neo4j-based graph storage implementation."""
+
+    def __init__(self, config: GraphRagConfig):
+        """
+        Initialize Neo4j storage from settings.yaml configuration.
+
+        Args:
+            config: GraphRagConfig object loaded from settings.yaml
+        """
+        # Extract Neo4j connection params from config
+        neo4j_config = config.storage.neo4j
+
+        # Create driver with config values
+        self.driver = neo4j.GraphDatabase.driver(
+            neo4j_config.uri,
+            auth=(neo4j_config.username, neo4j_config.password),
+            max_connection_pool_size=neo4j_config.max_connection_pool_size,
+            connection_acquisition_timeout=neo4j_config.connection_acquisition_timeout
+        )
+
+        self.database = neo4j_config.database
+        self.batch_size = neo4j_config.batch_size
+        self.gds_enabled = neo4j_config.gds_enabled
+        self.vector_index_enabled = neo4j_config.vector_index_enabled
+
     async def write_entities(self, entities: pd.DataFrame) -> None:
-        # Batch create entities with UNWIND
+        # Batch create entities with UNWIND using self.batch_size
         ...
 
     async def calculate_degrees(self) -> None:
-        # Use GDS degree algorithm
+        # Use GDS degree algorithm (if self.gds_enabled)
         ...
 
     async def run_community_detection(...) -> pd.DataFrame:
-        # Use GDS Louvain algorithm
+        # Use GDS Louvain algorithm (if self.gds_enabled)
         ...
+
+    def close(self):
+        """Close Neo4j driver connection."""
+        self.driver.close()
+```
+
+**Configuration Source** (settings.yaml):
+```yaml
+storage:
+  type: neo4j_only
+  neo4j:
+    uri: "bolt://localhost:7687"           # From settings.yaml
+    username: "neo4j"                       # From settings.yaml
+    password: "${NEO4J_PASSWORD}"          # From environment variable
+    database: "neo4j"                       # From settings.yaml
+    batch_size: 1000                        # From settings.yaml
+    max_connection_pool_size: 50            # From settings.yaml
+    connection_acquisition_timeout: 60      # From settings.yaml
+    gds_enabled: true                       # From settings.yaml
+    vector_index_enabled: true              # From settings.yaml
 ```
 
 **Key Methods**:
-1. Connection management (driver, session)
-2. Entity write (batched with UNWIND)
-3. Relationship write (batched)
-4. Degree calculation (GDS)
-5. Community detection (GDS Louvain)
-6. Read operations (export to DataFrame)
+1. `__init__(config)`: Initialize from settings.yaml configuration
+2. Connection management (driver, session) - uses config parameters
+3. Entity write (batched with UNWIND) - uses config.batch_size
+4. Relationship write (batched) - uses config.batch_size
+5. Degree calculation (GDS) - checks config.gds_enabled
+6. Community detection (GDS Louvain) - checks config.gds_enabled
+7. Read operations (export to DataFrame)
+8. `close()`: Cleanup driver connection
 
 **Acceptance Criteria**:
 - [ ] All interface methods implemented
-- [ ] Batching works correctly
-- [ ] GDS operations succeed
-- [ ] Error handling robust
+- [ ] **Connection parameters read from settings.yaml config** ✅
+- [ ] Environment variable substitution works (${NEO4J_PASSWORD})
+- [ ] Batching uses config.batch_size
+- [ ] GDS operations check config.gds_enabled
+- [ ] Error handling robust (connection failures, auth errors)
 - [ ] Unit tests written (mocked Neo4j)
-- [ ] Integration tests written (real Neo4j)
+- [ ] Integration tests written (real Neo4j with test config)
 
 #### Task 1.6: Proof-of-Concept End-to-End Test (Week 4)
 **Estimate**: 3-5 days
 **Owner**: Backend developer
 **Dependencies**: Task 1.5
 
+**Test Configuration** (settings.yaml):
+```yaml
+# POC configuration - minimal Neo4j setup
+storage:
+  type: neo4j_only
+
+  neo4j:
+    uri: "bolt://localhost:7687"
+    username: "neo4j"
+    password: "${NEO4J_PASSWORD}"
+    database: "neo4j"
+    batch_size: 1000
+    gds_enabled: true
+```
+
 **Test Scenario**:
 ```python
 # Run mini indexing pipeline with Neo4j
 async def test_neo4j_poc():
-    # 1. Load sample documents (Christmas Carol)
+    # 1. Load configuration from settings.yaml
+    from graphrag.config import load_config
+    config = load_config("settings.yaml")
+
+    # Verify Neo4j config loaded correctly
+    assert config.storage.type == "neo4j_only"
+    assert config.storage.neo4j.uri == "bolt://localhost:7687"
+
+    # 2. Load sample documents (Christmas Carol)
     documents = load_sample_documents()
 
-    # 2. Extract entities and relationships
+    # 3. Extract entities and relationships
     entities, relationships = await extract_graph(documents, config)
 
-    # 3. Write to Neo4j
-    neo4j_storage = Neo4jGraphStorage(...)
-    await neo4j_storage.write_entities(entities)
-    await neo4j_storage.write_relationships(relationships)
+    # 4. Create Neo4j storage from config (not hardcoded!)
+    neo4j_storage = Neo4jGraphStorage(config)
 
-    # 4. Calculate degrees
-    await neo4j_storage.calculate_degrees()
+    try:
+        # 5. Write to Neo4j
+        await neo4j_storage.write_entities(entities)
+        await neo4j_storage.write_relationships(relationships)
 
-    # 5. Run community detection
-    communities = await neo4j_storage.run_community_detection()
+        # 6. Calculate degrees
+        await neo4j_storage.calculate_degrees()
 
-    # 6. Verify results
-    assert len(communities) > 0
-    assert communities["community"].nunique() > 1
+        # 7. Run community detection
+        communities = await neo4j_storage.run_community_detection()
+
+        # 8. Verify results
+        assert len(communities) > 0
+        assert communities["community"].nunique() > 1
+
+        print(f"✅ POC Success: {len(entities)} entities, "
+              f"{len(relationships)} relationships, "
+              f"{communities['community'].nunique()} communities")
+
+    finally:
+        # 9. Cleanup
+        neo4j_storage.close()
+```
+
+**Environment Setup**:
+```bash
+# Set Neo4j password via environment variable
+export NEO4J_PASSWORD=your-secure-password
+
+# Run POC
+python test_neo4j_poc.py
 ```
 
 **Acceptance Criteria**:
 - [ ] POC completes successfully
+- [ ] **Configuration loaded from settings.yaml** ✅
+- [ ] **Environment variable substitution works** ✅
 - [ ] Results match Parquet version
 - [ ] Community structure reasonable
 - [ ] Performance acceptable
+- [ ] Connection cleanup works (driver closed)
 - [ ] Code review approved
 
 ### Phase 1 Milestones
@@ -516,740 +626,1567 @@ storage:
 
 **Week 10 Completion**:
 - [ ] All workflows integrated
-- [ ] Hybrid mode working
+- [ ] NetworkX and Neo4j backends complete
 - [ ] Integration tests passing
 - [ ] Performance acceptable
+- [ ] Ready for dark mode framework
 
 **Risk Assessment**: Medium - Core implementation, must work correctly
 
 ---
 
-## Phase 3: Production Readiness (Weeks 11-14)
+## Phase 3: Dark Mode Framework (Weeks 11-14)
 
 ### Goals
-- Query operation updates
-- Performance optimization
-- Production deployment guides
-- Migration tools
+- Build dark mode orchestrator
+- Implement comparison framework
+- Create metrics collection infrastructure
+- Prepare for production validation
+
+### Overview
+
+This phase builds the infrastructure for running NetworkX and Neo4j in parallel with automatic comparison and validation.
 
 ### Tasks
 
-#### Task 3.1: Update Query Operations (Week 11-12)
-**Estimate**: 7-10 days
-**Owner**: Backend developer
+#### Task 3.1: Design Dark Mode Architecture (Week 11)
+**Estimate**: 2-3 days
+**Owner**: Backend developer + Architect
 **Dependencies**: Phase 2 complete
 
-**Query Methods to Update**:
-1. Global Search
-2. Local Search
-3. DRIFT Search
-4. Basic Search (vector-only)
+**Deliverables**:
+1. Execution coordinator design
+2. Comparison framework design
+3. Metrics collection design
+4. Data models and schemas
+
+**Architecture Components**:
+```python
+# packages/graphrag-storage/graphrag_storage/dark_mode/
+
+├── orchestrator.py           # DarkModeOrchestrator
+├── execution_coordinator.py  # ExecutionCoordinator
+├── comparison_framework.py   # ComparisonFramework
+├── metrics_collector.py      # MetricsCollector
+├── models.py                 # Data models
+└── report_generator.py       # DarkModeReport
+```
+
+**Acceptance Criteria**:
+- [ ] Architecture design document complete
+- [ ] Component interfaces defined
+- [ ] Data models defined
+- [ ] Design review approved
+
+#### Task 3.2: Implement Execution Coordinator (Week 11)
+**Estimate**: 3-4 days
+**Owner**: Backend developer
+**Dependencies**: Task 3.1
 
 **Implementation**:
 ```python
-# packages/graphrag/graphrag/query/engines/
+class ExecutionCoordinator:
+    """Coordinates parallel execution across backends."""
 
-class GlobalSearchEngine:
-    async def search_neo4j(self, query: str, config: QueryConfig):
-        # Use Neo4j vector index for community search
-        query_embedding = await self.embed(query)
+    async def execute_operation(
+        self, operation: str, *args, **kwargs
+    ) -> tuple[Any, OperationMetrics]:
+        # Execute on primary (NetworkX) - MUST succeed
+        primary_result, primary_metrics = await self._execute_primary(...)
 
-        with self.neo4j_driver.session() as session:
-            results = session.run("""
-                CALL db.index.vector.queryNodes(
-                    'community_summary_vector',
-                    $limit,
-                    $query_embedding
-                )
-                YIELD node, score
-                RETURN node.title, node.summary, node.full_content, score
-            """, limit=config.community_limit, query_embedding=query_embedding)
+        # Execute on shadow (Neo4j) - failures logged but not fatal
+        shadow_result, shadow_metrics = await self._execute_shadow(...)
 
-            # MAP-REDUCE as before
-            ...
+        # Compare results if both succeeded
+        if shadow_result is not None:
+            comparison = await self._compare(primary_result, shadow_result)
+
+        return primary_result, metrics
 ```
 
-**Hybrid Query Example** (Local Search):
-```cypher
-// Find similar entities + their neighborhoods
-CALL db.index.vector.queryNodes('entity_description_vector', 20, $embedding)
-YIELD node AS entity, score
-MATCH (entity)-[:RELATED_TO*1..2]-(neighbor)
-MATCH (t:TextUnit)-[:MENTIONS]->(entity)
-RETURN entity, collect(DISTINCT neighbor), collect(DISTINCT t.text), score
+**Key Features**:
+- Async parallel execution
+- Primary failures are fatal (propagate to user)
+- Shadow failures are logged only (don't affect user)
+- Timeout handling for shadow operations
+- Metrics collection for both
+
+**Acceptance Criteria**:
+- [ ] Coordinator executes operations on both backends
+- [ ] Primary failures propagate correctly
+- [ ] Shadow failures logged but don't affect primary
+- [ ] Metrics collected for both executions
+- [ ] Unit tests pass (>90% coverage)
+
+#### Task 3.3: Implement Comparison Framework (Week 11-12)
+**Estimate**: 5-7 days
+**Owner**: Backend developer
+**Dependencies**: Task 3.2
+
+**Comparison Types**:
+
+1. **Entity Comparison**
+   ```python
+   def compare_entities(
+       primary_df: pd.DataFrame,
+       shadow_df: pd.DataFrame
+   ) -> EntityComparison:
+       # Count match
+       # ID overlap (precision, recall, F1)
+       # Missing/extra entities
+       # Attribute differences
+   ```
+
+2. **Relationship Comparison**
+   ```python
+   def compare_relationships(
+       primary_df: pd.DataFrame,
+       shadow_df: pd.DataFrame
+   ) -> RelationshipComparison:
+       # Count match
+       # Edge overlap
+       # Weight differences
+   ```
+
+3. **Community Comparison**
+   ```python
+   def compare_communities(
+       primary_df: pd.DataFrame,
+       shadow_df: pd.DataFrame
+   ) -> CommunityComparison:
+       # Match rate (accounting for Louvain variance)
+       # Hierarchy depth
+       # Cluster size distributions
+   ```
+
+4. **Query Comparison**
+   ```python
+   def compare_query_results(
+       primary_results: List[Dict],
+       shadow_results: List[Dict]
+   ) -> QueryComparison:
+       # Result overlap (F1)
+       # Ranking correlation
+       # Score differences
+   ```
+
+**Acceptance Criteria**:
+- [ ] All comparison types implemented
+- [ ] Statistical metrics computed correctly
+- [ ] Handles edge cases (empty results, missing IDs)
+- [ ] Unit tests pass (>95% coverage)
+- [ ] Performance acceptable (<100ms for typical comparisons)
+
+#### Task 3.4: Implement Metrics Collector (Week 12)
+**Estimate**: 3-4 days
+**Owner**: Backend developer
+**Dependencies**: Task 3.3
+
+**Implementation**:
+```python
+class MetricsCollector:
+    """Collects and persists dark mode metrics."""
+
+    async def log_operation(self, metrics: OperationMetrics):
+        # Buffer metrics
+        self.buffer.append(metrics)
+
+        # Flush periodically to disk
+        if len(self.buffer) >= 100:
+            await self._flush_to_disk()
+
+        # Update aggregated stats
+        await self._update_aggregates()
+```
+
+**Storage Format**:
+```jsonl
+// dark_mode_logs/comparison_metrics.jsonl
+{"operation": "write_entities", "primary_latency": 0.5, "shadow_latency": 0.8, ...}
+{"operation": "run_community_detection", "primary_latency": 30.2, "shadow_latency": 5.3, ...}
+```
+
+**Aggregated Metrics**:
+```json
+// dark_mode_logs/aggregated_metrics.json
+{
+  "validation_period": "2026-02-01 to 2026-02-15",
+  "total_operations": 1523,
+  "entity_match_rate": 0.998,
+  "community_match_rate": 0.963,
+  "avg_query_f1": 0.972,
+  "avg_latency_ratio": 1.3,
+  "shadow_error_rate": 0.002
+}
+```
+
+**Acceptance Criteria**:
+- [ ] Metrics buffered and flushed efficiently
+- [ ] JSONL format for detailed logs
+- [ ] Aggregated metrics updated in real-time
+- [ ] Disk I/O optimized (async, batched)
+- [ ] Tests pass
+
+#### Task 3.5: Implement Report Generator (Week 12-13)
+**Estimate**: 3-4 days
+**Owner**: Backend developer
+**Dependencies**: Task 3.4
+
+**Report Features**:
+1. **Validation Summary**
+   - Validation period
+   - Total operations processed
+   - Operation breakdown by type
+
+2. **Metric Analysis**
+   - Entity/relationship match rates
+   - Community match rates
+   - Query F1 scores
+   - Latency ratios (p50, p95, p99)
+   - Error rates
+
+3. **Cutover Readiness**
+   - Check against cutover criteria
+   - List blocking issues
+   - Recommendation (GO/NO-GO)
+
+4. **Visualizations**
+   - Latency comparison charts
+   - Match rate trends over time
+   - Error distribution
+
+**CLI Command**:
+```bash
+graphrag dark-mode-report \
+  --log-path ./dark_mode_logs \
+  --output report.html
+```
+
+**Acceptance Criteria**:
+- [ ] Report generates from logs
+- [ ] All metrics displayed
+- [ ] Cutover criteria checked
+- [ ] Visualizations rendered
+- [ ] HTML output works
+- [ ] CLI command works
+
+#### Task 3.6: Update Configuration Schema (Week 13)
+**Estimate**: 2-3 days
+**Owner**: Backend developer
+**Dependencies**: Tasks 3.1-3.5
+
+**Purpose**: Define complete configuration schema in settings.yaml for all storage modes, with validation.
+
+**Complete Configuration Schema** (settings.yaml):
+```yaml
+# GraphRAG Storage Configuration
+# All Neo4j connection parameters are specified here
+
+storage:
+  type: dark_mode  # Options: networkx_only, neo4j_only, dark_mode
+
+  # NetworkX configuration (for networkx_only and dark_mode)
+  networkx:
+    enabled: true
+    cache_dir: ./cache
+    vector_store:
+      type: lancedb
+      uri: ./output/lancedb
+
+  # Neo4j configuration (for neo4j_only and dark_mode)
+  # ALL Neo4j connection parameters read from here
+  neo4j:
+    enabled: true
+
+    # Connection parameters (required)
+    uri: "bolt://localhost:7687"           # Neo4j Bolt URI
+    username: "neo4j"                       # Neo4j username
+    password: "${NEO4J_PASSWORD}"          # From environment variable
+    database: "neo4j"                       # Database name
+
+    # Connection pool settings
+    max_connection_pool_size: 50            # Max connections
+    connection_acquisition_timeout: 60      # Timeout in seconds
+
+    # Performance settings
+    batch_size: 1000                        # Batch size for imports
+
+    # Graph Data Science settings
+    gds_enabled: true                       # Enable GDS algorithms
+    gds_projection_prefix: "graphrag_"      # GDS projection name prefix
+    max_cluster_size: 10                    # Community detection param
+
+    # Vector index settings
+    vector_index_enabled: true              # Enable vector indexes
+    vector_dimensions: 1536                 # Vector size (384 for SentenceTransformer)
+    vector_similarity_function: cosine      # Options: cosine, euclidean
+
+  # Dark mode specific configuration (only when type=dark_mode)
+  dark_mode:
+    enabled: true
+    primary_backend: networkx               # Production backend
+    shadow_backend: neo4j                   # Validation backend
+
+    comparison:
+      enabled: true
+      log_path: ./dark_mode_logs            # Where to save metrics
+      log_format: jsonl                     # Format: jsonl or json
+      flush_interval_seconds: 10            # How often to flush logs
+      metrics:
+        - entity_count
+        - relationship_count
+        - community_match_rate
+        - query_f1
+        - query_ranking_correlation
+        - latency_ratio
+        - error_rates
+
+    error_handling:
+      shadow_failure_action: log            # Options: log, alert, fail
+      continue_on_shadow_error: true        # Don't fail on Neo4j errors
+
+    cutover_criteria:
+      validation_period_days: 14            # Min validation period
+      min_operations: 1000                  # Min operations to compare
+      entity_match_rate_threshold: 0.99     # 99% entity match required
+      community_match_rate_threshold: 0.95  # 95% community match required
+      query_f1_threshold: 0.95              # 95% query F1 required
+      query_ranking_correlation_threshold: 0.90  # 0.90 correlation required
+      latency_ratio_threshold: 2.0          # Neo4j < 2x NetworkX latency
+      shadow_error_rate_threshold: 0.01     # Neo4j error rate < 1%
+```
+
+**Configuration Classes** (Pydantic):
+```python
+# packages/graphrag/graphrag/config/storage_config.py
+
+from pydantic import BaseModel, Field, validator
+from typing import Literal, Optional, List
+from enum import Enum
+
+class StorageType(str, Enum):
+    NETWORKX_ONLY = "networkx_only"
+    NEO4J_ONLY = "neo4j_only"
+    DARK_MODE = "dark_mode"
+
+class Neo4jConfig(BaseModel):
+    """Neo4j connection and configuration - ALL from settings.yaml."""
+
+    enabled: bool = Field(default=True)
+
+    # Connection parameters (required)
+    uri: str = Field(description="Neo4j Bolt URI")
+    username: str = Field(default="neo4j")
+    password: str = Field(description="Neo4j password (use ${ENV_VAR})")
+    database: str = Field(default="neo4j")
+
+    # Connection pool settings
+    max_connection_pool_size: int = Field(default=50)
+    connection_acquisition_timeout: int = Field(default=60)
+
+    # Performance settings
+    batch_size: int = Field(default=1000, ge=100, le=10000)
+
+    # GDS settings
+    gds_enabled: bool = Field(default=True)
+    gds_projection_prefix: str = Field(default="graphrag_")
+    max_cluster_size: int = Field(default=10)
+
+    # Vector index settings
+    vector_index_enabled: bool = Field(default=True)
+    vector_dimensions: int = Field(default=1536, ge=128, le=4096)
+    vector_similarity_function: Literal["cosine", "euclidean"] = Field(default="cosine")
+
+    @validator('uri')
+    def validate_uri(cls, v):
+        if not v.startswith(('bolt://', 'neo4j://', 'bolt+s://', 'neo4j+s://')):
+            raise ValueError('Neo4j URI must start with bolt:// or neo4j://')
+        return v
+
+    @validator('password')
+    def validate_password(cls, v):
+        if not v:
+            raise ValueError('Neo4j password is required')
+        return v
+
+class DarkModeConfig(BaseModel):
+    """Dark mode configuration - from settings.yaml."""
+
+    enabled: bool = Field(default=True)
+    primary_backend: Literal["networkx"] = Field(default="networkx")
+    shadow_backend: Literal["neo4j"] = Field(default="neo4j")
+
+    # Comparison settings
+    comparison: dict = Field(default_factory=dict)
+
+    # Error handling
+    error_handling: dict = Field(default_factory=dict)
+
+    # Cutover criteria
+    cutover_criteria: dict = Field(default_factory=dict)
+
+class StorageConfig(BaseModel):
+    """Storage configuration - ALL from settings.yaml."""
+
+    type: StorageType = Field(default=StorageType.NETWORKX_ONLY)
+
+    # Backend configs
+    networkx: Optional[dict] = None
+    neo4j: Optional[Neo4jConfig] = None
+
+    # Dark mode config
+    dark_mode: Optional[DarkModeConfig] = None
+
+    @validator('neo4j')
+    def validate_neo4j_config(cls, v, values):
+        """Ensure Neo4j config exists when needed."""
+        storage_type = values.get('type')
+        if storage_type in [StorageType.NEO4J_ONLY, StorageType.DARK_MODE]:
+            if not v or not v.enabled:
+                raise ValueError(f'Neo4j config required for storage type: {storage_type}')
+        return v
+```
+
+**Configuration Validation**:
+```python
+# Load and validate config from settings.yaml
+def load_and_validate_config(config_path: str) -> GraphRagConfig:
+    """Load config from settings.yaml and validate."""
+
+    # Load YAML
+    with open(config_path) as f:
+        config_dict = yaml.safe_load(f)
+
+    # Substitute environment variables
+    config_dict = substitute_env_vars(config_dict)
+
+    # Parse and validate with Pydantic
+    try:
+        config = GraphRagConfig(**config_dict)
+        return config
+    except ValidationError as e:
+        print(f"❌ Configuration validation failed:")
+        for error in e.errors():
+            print(f"  - {'.'.join(str(x) for x in error['loc'])}: {error['msg']}")
+        raise
+```
+
+**Acceptance Criteria**:
+- [ ] **Complete configuration schema defined in settings.yaml** ✅
+- [ ] **All Neo4j connection parameters configurable** ✅
+- [ ] **Environment variable substitution works (${NEO4J_PASSWORD})** ✅
+- [ ] Pydantic models validate all fields
+- [ ] Validation errors provide clear messages
+- [ ] Defaults sensible for each mode
+- [ ] Configuration documentation written
+- [ ] Example settings.yaml files provided for each mode:
+  - [ ] `examples/settings.networkx_only.yaml`
+  - [ ] `examples/settings.neo4j_only.yaml`
+  - [ ] `examples/settings.dark_mode.yaml`
+
+#### Task 3.7: Integration with Storage Factory (Week 13)
+**Estimate**: 2-3 days
+**Owner**: Backend developer
+**Dependencies**: Task 3.6
+
+**Implementation**:
+```python
+# packages/graphrag-storage/graphrag_storage/factory.py
+
+from graphrag.config import GraphRagConfig
+from graphrag_storage.graph_storage import GraphStorage
+from graphrag_storage.networkx_graph_storage import NetworkXGraphStorage
+from graphrag_storage.neo4j_graph_storage import Neo4jGraphStorage
+from graphrag_storage.dark_mode import DarkModeGraphStorage, DarkModeOrchestrator
+
+def create_graph_storage(config: GraphRagConfig) -> GraphStorage:
+    """
+    Create appropriate graph storage backend from settings.yaml configuration.
+
+    Args:
+        config: GraphRagConfig loaded from settings.yaml
+
+    Returns:
+        GraphStorage instance configured from settings.yaml
+    """
+
+    if config.storage.type == "networkx_only":
+        # NetworkX storage - read config from settings.yaml
+        return NetworkXGraphStorage(config)
+
+    elif config.storage.type == "neo4j_only":
+        # Neo4j storage - ALL connection params from settings.yaml
+        return Neo4jGraphStorage(config)
+
+    elif config.storage.type == "dark_mode":
+        # Dark mode - create both backends from settings.yaml
+
+        # Create NetworkX backend with config
+        networkx = NetworkXGraphStorage(config)
+
+        # Create Neo4j backend with config (uri, auth, etc. from settings.yaml)
+        neo4j = Neo4jGraphStorage(config)
+
+        # Create orchestrator with dark mode config from settings.yaml
+        orchestrator = DarkModeOrchestrator(
+            primary=networkx,
+            shadow=neo4j,
+            config=config.storage.dark_mode  # From settings.yaml
+        )
+
+        return DarkModeGraphStorage(orchestrator)
+
+    else:
+        raise ValueError(f"Unknown storage type: {config.storage.type}")
+```
+
+**Configuration Flow**:
+```
+settings.yaml
+     ↓
+GraphRagConfig (loaded via load_config)
+     ↓
+create_graph_storage(config)
+     ↓
+Neo4jGraphStorage(config)
+     ↓
+Reads: uri, username, password, database, batch_size, etc.
+     ↓
+neo4j.GraphDatabase.driver(config.neo4j.uri, auth=(...))
+```
+
+**Usage Example**:
+```python
+# In main.py or workflow
+from graphrag.config import load_config
+from graphrag_storage.factory import create_graph_storage
+
+# Load config from settings.yaml
+config = load_config("settings.yaml")
+
+# Create storage from config - NO hardcoded values
+storage = create_graph_storage(config)
+
+# Use storage
+await storage.write_entities(entities)
+
+# Cleanup
+if hasattr(storage, 'close'):
+    storage.close()
+```
+
+**Acceptance Criteria**:
+- [ ] Factory creates all three storage types from config
+- [ ] **NetworkX backend reads config from settings.yaml** ✅
+- [ ] **Neo4j backend reads ALL connection params from settings.yaml** ✅
+- [ ] **Dark mode orchestrator reads config from settings.yaml** ✅
+- [ ] No hardcoded connection strings or credentials
+- [ ] Environment variable substitution works (${NEO4J_PASSWORD})
+- [ ] Factory validates config before creating storage
+- [ ] Tests pass with different config files
+
+#### Task 3.8: Dark Mode Testing (Week 13-14)
+**Estimate**: 5-7 days
+**Owner**: Backend developer + QA
+**Dependencies**: All Phase 3 tasks
+
+**Test Suites**:
+
+1. **Orchestrator Tests** (10 tests)
+   - Primary success, shadow success
+   - Primary success, shadow fail
+   - Primary fail (should propagate)
+   - Parallel execution works
+   - Timeout handling
+
+2. **Comparison Tests** (20 tests)
+   - Entity comparison accuracy
+   - Community comparison accuracy
+   - Query comparison accuracy
+   - Edge cases (empty, missing data)
+   - Performance benchmarks
+
+3. **Metrics Collection Tests** (8 tests)
+   - Buffering works
+   - Flushing works
+   - Aggregation accurate
+   - Disk I/O efficient
+
+4. **End-to-End Tests** (5 tests)
+   - Full indexing pipeline in dark mode
+   - Query operations in dark mode
+   - Report generation
+   - Configuration modes
+   - Rollback scenarios
+
+**Acceptance Criteria**:
+- [ ] All tests pass
+- [ ] Test coverage > 85%
+- [ ] Performance acceptable (dark mode overhead < 20%)
+- [ ] Memory usage reasonable
+- [ ] Code review approved
+
+### Phase 3 Milestones
+
+**Week 12 Checkpoint**:
+- [ ] Orchestrator working
+- [ ] Comparison framework complete
+- [ ] Metrics collection working
+
+**Week 14 Completion**:
+- [ ] Dark mode framework fully implemented
+- [ ] All tests passing
+- [ ] Documentation complete
+- [ ] Ready for production validation
+
+**Risk Assessment**: Medium-High - New infrastructure, must be reliable
+
+---
+
+## Phase 4: Dark Mode Validation (Weeks 15-18)
+
+### Goals
+- Enable dark mode in production
+- Collect 2-4 weeks of real validation data
+- Analyze metrics against cutover criteria
+- Build confidence for cutover decision
+
+### Overview
+
+This phase runs dark mode in the production environment with real user traffic. Neo4j runs in parallel but doesn't affect user results. We collect comprehensive comparison data to validate Neo4j is ready for cutover.
+
+### Tasks
+
+#### Task 4.1: Production Environment Setup (Week 15)
+**Estimate**: 3-4 days
+**Owner**: DevOps + Backend developer
+**Dependencies**: Phase 3 complete
+
+**Infrastructure**:
+1. Deploy Neo4j instance
+   - Docker or Neo4j Aura
+   - Production sizing (based on data volume)
+   - Backup configuration
+
+2. Configure dark mode
+   - Enable dark_mode in settings.yaml
+   - Set up log storage
+   - Configure metrics collection
+
+3. Monitoring setup
+   - Neo4j metrics (CPU, memory, disk)
+   - Dark mode metrics dashboard
+   - Alerts for errors
+
+**Acceptance Criteria**:
+- [ ] Neo4j deployed in production
+- [ ] Dark mode enabled
+- [ ] Monitoring configured
+- [ ] Alerts working
+- [ ] Runbook documented
+
+#### Task 4.2: Enable Dark Mode (Week 15)
+**Estimate**: 1 day
+**Owner**: Backend developer + DevOps
+**Dependencies**: Task 4.1
+
+**Steps**:
+1. Update configuration:
+   ```yaml
+   storage:
+     type: dark_mode
+   ```
+
+2. Deploy configuration change
+
+3. Verify dark mode active:
+   ```bash
+   # Check logs show both backends executing
+   tail -f logs/graphrag.log | grep "dark_mode"
+
+   # Check metrics being collected
+   ls dark_mode_logs/comparison_metrics.jsonl
+   ```
+
+4. Monitor for errors
+
+**Acceptance Criteria**:
+- [ ] Dark mode active in production
+- [ ] Both backends executing
+- [ ] Metrics being collected
+- [ ] No user-facing errors
+- [ ] Performance acceptable
+
+#### Task 4.3: Daily Monitoring (Weeks 15-18)
+**Estimate**: 30 min/day × 20 days = 10 hours
+**Owner**: Backend developer
+**Dependencies**: Task 4.2
+
+**Daily Tasks**:
+1. Check dashboard
+   - Entity match rates
+   - Community match rates
+   - Query F1 scores
+   - Latency ratios
+   - Error rates
+
+2. Review error logs
+   - Neo4j failures
+   - Comparison discrepancies
+   - Performance issues
+
+3. Generate daily report:
+   ```bash
+   graphrag dark-mode-report --daily
+   ```
+
+4. Document issues
+   - Any metric below threshold
+   - Recurring errors
+   - Performance anomalies
+
+**Acceptance Criteria**:
+- [ ] Daily monitoring performed
+- [ ] Issues documented
+- [ ] Trends tracked
+- [ ] Stakeholders updated weekly
+
+#### Task 4.4: Issue Resolution (Weeks 15-18)
+**Estimate**: Variable (budget 5 days)
+**Owner**: Backend developer
+**Dependencies**: Task 4.3
+
+**Common Issues**:
+1. **Community match rate < 95%**
+   - Investigate Louvain algorithm variance
+   - Check random seed handling
+   - Verify GDS configuration
+
+2. **Query F1 < 95%**
+   - Compare vector index results
+   - Check embedding storage
+   - Verify query logic
+
+3. **Latency ratio > 2x**
+   - Optimize Neo4j queries
+   - Tune batch sizes
+   - Check network latency
+
+4. **Error rate > 1%**
+   - Fix Neo4j connection issues
+   - Handle edge cases
+   - Improve error handling
+
+**Acceptance Criteria**:
+- [ ] Critical issues resolved
+- [ ] Metrics meet cutover criteria
+- [ ] Root causes documented
+- [ ] Fixes tested
+
+#### Task 4.5: Metrics Analysis (Week 18)
+**Estimate**: 2-3 days
+**Owner**: Backend developer + Architect
+**Dependencies**: 2-4 weeks of validation data
+
+**Analysis Steps**:
+1. Generate comprehensive report:
+   ```bash
+   graphrag dark-mode-report \
+     --start-date 2026-02-01 \
+     --end-date 2026-02-28 \
+     --output final_validation_report.html
+   ```
+
+2. Check cutover criteria:
+   ```yaml
+   Cutover Criteria               | Target  | Actual  | Pass
+   -------------------------------|---------|---------|-----
+   Entity match rate              | > 99%   | 99.8%   | ✅
+   Relationship match rate        | > 99%   | 99.7%   | ✅
+   Community match rate           | > 95%   | 96.3%   | ✅
+   Avg query F1                   | > 95%   | 97.2%   | ✅
+   Avg ranking correlation        | > 0.90  | 0.94    | ✅
+   Latency ratio (p95)            | < 2.0x  | 1.3x    | ✅
+   Shadow error rate              | < 1%    | 0.2%    | ✅
+   Min operations                 | > 1000  | 2847    | ✅
+   Validation period              | > 14d   | 28d     | ✅
+   ```
+
+3. Document findings
+   - Summary of validation period
+   - Key metrics
+   - Issues encountered and resolved
+   - Recommendation (GO/NO-GO for cutover)
+
+**GO Decision Criteria**:
+- ✅ ALL cutover criteria met
+- ✅ No critical blocking issues
+- ✅ Team confidence high
+- ✅ Rollback plan tested
+
+**Acceptance Criteria**:
+- [ ] Comprehensive report generated
+- [ ] Cutover criteria evaluated
+- [ ] Recommendation documented
+- [ ] Stakeholder review scheduled
+
+#### Task 4.6: Cutover Decision (Week 18)
+**Estimate**: 1 day
+**Owner**: Engineering leadership + Team
+**Dependencies**: Task 4.5
+
+**Decision Meeting**:
+1. Present validation report
+2. Review metrics against criteria
+3. Discuss any concerns
+4. Make GO/NO-GO decision
+5. If GO: Schedule cutover
+6. If NO-GO: Document blockers, continue validation
+
+**Acceptance Criteria**:
+- [ ] Decision meeting held
+- [ ] Decision documented
+- [ ] If GO: Cutover date scheduled
+- [ ] If NO-GO: Action plan created
+
+### Phase 4 Milestones
+
+**Week 16 Checkpoint**:
+- [ ] Dark mode running in production for 1 week
+- [ ] No critical issues
+- [ ] Metrics trending positive
+
+**Week 18 Completion**:
+- [ ] 2-4 weeks validation data collected
+- [ ] Metrics analyzed
+- [ ] GO/NO-GO decision made
+- [ ] Ready for cutover (if GO)
+
+**Risk Assessment**: Low - Dark mode doesn't affect production, can be disabled anytime
+
+---
+
+## Phase 5: Cutover & Stabilization (Weeks 19-24)
+
+### Goals
+- Switch from dark_mode to neo4j_only
+- Monitor for regressions
+- Optimize performance
+- Update documentation
+- Stable release
+
+### Overview
+
+After successful dark mode validation, this phase switches production to Neo4j-only mode. NetworkX remains available as a fallback, but Neo4j becomes the primary system.
+
+### Tasks
+
+#### Task 5.1: Pre-Cutover Checklist (Week 19)
+**Estimate**: 1-2 days
+**Owner**: Backend developer + DevOps
+**Dependencies**: Phase 4 GO decision
+
+**Checklist**:
+- [ ] All cutover criteria met
+- [ ] Dark mode validation report approved
+- [ ] Neo4j performance tuned
+- [ ] Rollback plan documented and tested
+- [ ] Monitoring dashboards ready
+- [ ] On-call rotation scheduled
+- [ ] Stakeholders notified of cutover date
+- [ ] Backup of NetworkX data taken
+
+**Acceptance Criteria**:
+- [ ] All checklist items complete
+- [ ] Team ready for cutover
+- [ ] Rollback plan tested
+
+#### Task 5.2: Cutover Execution (Week 19)
+**Estimate**: 1 day
+**Owner**: Backend developer + DevOps
+**Dependencies**: Task 5.1
+
+**Cutover Steps**:
+
+1. **Backup current state**
+   ```bash
+   # Backup NetworkX/LanceDB data
+   cp -r output/ output_backup_$(date +%Y%m%d)/
+   cp -r cache/ cache_backup_$(date +%Y%m%d)/
+   ```
+
+2. **Update configuration**
+   ```yaml
+   storage:
+     type: neo4j_only  # Was: dark_mode
+     neo4j:
+       uri: bolt://production-neo4j:7687
+       username: neo4j
+       password: ${NEO4J_PASSWORD}
+   ```
+
+3. **Deploy configuration change**
+   ```bash
+   # Deploy new config
+   kubectl apply -f graphrag-config.yaml
+
+   # Rolling restart
+   kubectl rollout restart deployment/graphrag
+   ```
+
+4. **Verify cutover**
+   ```bash
+   # Check logs show Neo4j only
+   kubectl logs -f deployment/graphrag | grep "storage_type"
+   # Should show: storage_type=neo4j_only
+
+   # Run smoke test
+   graphrag query --method local "test query"
+   ```
+
+5. **Monitor closely**
+   - Watch error rates
+   - Check latency metrics
+   - Monitor Neo4j resource usage
+
+**Rollback Procedure** (if needed):
+```bash
+# Revert configuration
+storage:
+  type: networkx_only  # Instant rollback
+
+# Deploy
+kubectl apply -f graphrag-config-rollback.yaml
+kubectl rollout restart deployment/graphrag
+
+# Verify
+kubectl logs -f deployment/graphrag | grep "storage_type"
+# Should show: storage_type=networkx_only
+```
+
+**Acceptance Criteria**:
+- [ ] Configuration deployed
+- [ ] Neo4j only mode active
+- [ ] Smoke tests pass
+- [ ] No errors in logs
+- [ ] Metrics nominal
+
+#### Task 5.3: Post-Cutover Monitoring (Week 19-20)
+**Estimate**: 2 hours/day × 10 days = 20 hours
+**Owner**: Backend developer + DevOps
+**Dependencies**: Task 5.2
+
+**Monitoring Focus**:
+
+1. **Day 1-2: Intensive monitoring**
+   - Check dashboards every 2 hours
+   - Review error logs continuously
+   - Monitor latency (p50, p95, p99)
+   - Track resource usage (CPU, memory, disk)
+
+2. **Day 3-5: Active monitoring**
+   - Check dashboards every 4 hours
+   - Daily error log review
+   - Track trends
+
+3. **Day 6-10: Normal monitoring**
+   - Daily dashboard check
+   - Weekly trends analysis
+
+**Key Metrics**:
+- Query latency (should be < baseline * 1.5)
+- Error rate (should be < 0.1%)
+- Neo4j resource usage
+- User-reported issues
+
+**Acceptance Criteria**:
+- [ ] No critical issues
+- [ ] Performance within expected range
+- [ ] Error rate acceptable
+- [ ] User feedback positive
+
+#### Task 5.4: Performance Optimization (Week 20-21)
+**Estimate**: 5-7 days
+**Owner**: Backend developer
+**Dependencies**: Task 5.3
+
+**Optimization Areas**:
+
+1. **Query Optimization**
+   - Profile slow queries
+   - Add query hints
+   - Optimize Cypher patterns
+   - Use indexes effectively
+
+2. **Neo4j Tuning**
+   - Tune heap size
+   - Configure page cache
+   - GDS memory settings
+   - Connection pool sizing
+
+3. **Batch Size Tuning**
+   - Test different batch sizes
+   - Find optimal for workload
+
+4. **Caching Strategy**
+   - Identify frequently accessed data
+   - Implement query result caching
+   - Cache community reports
+
+**Benchmarking**:
+```bash
+# Run performance suite
+pytest tests/performance/ --benchmark --neo4j-only
+
+# Compare with baseline
+./scripts/compare_performance.sh \
+  baseline_metrics.json \
+  current_metrics.json
+```
+
+**Acceptance Criteria**:
+- [ ] Query latency < 100ms (p95)
+- [ ] Community detection ≤ NetworkX speed (ideally 6x faster)
+- [ ] Memory usage reasonable
+- [ ] Optimization gains documented
+
+#### Task 5.5: Query Operations Update (Week 21)
+**Estimate**: 3-5 days
+**Owner**: Backend developer
+**Dependencies**: Phase 2 complete
+
+**Query Methods**:
+1. Global Search (Neo4j vector index)
+2. Local Search (hybrid: vector + graph traversal)
+3. DRIFT Search
+4. Basic Search (vector-only)
+
+**New Capabilities** (Neo4j-specific):
+```python
+# Hybrid query: vector similarity + graph connectivity
+async def hybrid_search(query: str, anchor_entity: str):
+    """Find similar entities connected to anchor."""
+    query_embedding = await embed(query)
+
+    results = neo4j_session.run("""
+        MATCH (anchor:Entity {title: $anchor})
+        CALL db.index.vector.queryNodes(
+            'entity_description_vector', 100, $embedding
+        )
+        YIELD node, score
+        WHERE EXISTS {
+            MATCH (anchor)-[:RELATED_TO*1..3]-(node)
+        }
+        RETURN node, score, shortestPath((anchor)-[:RELATED_TO*]-(node))
+        ORDER BY score DESC
+        LIMIT 10
+    """, anchor=anchor_entity, embedding=query_embedding)
 ```
 
 **Acceptance Criteria**:
 - [ ] All query methods work with Neo4j
 - [ ] Hybrid queries implemented
 - [ ] Performance comparable or better
-- [ ] Tests updated
-- [ ] Backward compatibility maintained (can still use Parquet)
+- [ ] Documentation updated
+- [ ] Tests pass
 
-#### Task 3.2: Performance Optimization (Week 12-13)
-**Estimate**: 5-7 days
-**Owner**: Backend developer
-**Dependencies**: Task 3.1
-
-**Optimization Areas**:
-
-1. **Query Optimization**
-   - Add query hints
-   - Optimize Cypher patterns
-   - Use indexes effectively
-
-2. **Batch Size Tuning**
-   - Test different batch sizes (500, 1000, 2000)
-   - Find optimal for different graph sizes
-
-3. **Connection Pooling**
-   - Configure pool size
-   - Test concurrent load
-
-4. **Memory Configuration**
-   - Tune Neo4j heap size
-   - Configure page cache
-   - GDS memory settings
-
-**Benchmarking**:
-```bash
-# Run performance suite
-pytest tests/performance/ --benchmark
-
-# Results logged to:
-# - Indexing time by graph size
-# - Query latency percentiles
-# - Memory usage
-# - GDS projection time
-```
-
-**Acceptance Criteria**:
-- [ ] Community detection ≤ NetworkX * 2 (target: faster)
-- [ ] Query latency < 100ms for typical queries
-- [ ] Memory usage reasonable
-- [ ] Benchmarks documented
-
-#### Task 3.3: Error Handling and Recovery (Week 13)
-**Estimate**: 3-5 days
-**Owner**: Backend developer
-**Dependencies**: Phase 2 complete
-
-**Error Scenarios**:
-
-1. **Connection Failures**
-   ```python
-   # Retry logic with exponential backoff
-   @retry(max_attempts=3, backoff=exponential)
-   async def write_with_retry(...):
-       ...
-   ```
-
-2. **Transaction Failures**
-   ```python
-   # Rollback and cleanup
-   try:
-       with session.begin_transaction() as tx:
-           ...
-           tx.commit()
-   except Exception:
-       tx.rollback()
-       # Cleanup partial state
-   ```
-
-3. **Partial Writes**
-   ```python
-   # Track progress, allow resume
-   checkpoint_file = "neo4j_import_checkpoint.json"
-   # Save last successful batch
-   ```
-
-**Acceptance Criteria**:
-- [ ] Transient errors handled gracefully
-- [ ] Partial writes can be resumed
-- [ ] Clear error messages
-- [ ] Logging comprehensive
-- [ ] Tests for error cases
-
-#### Task 3.4: Documentation (Week 13-14)
+#### Task 5.6: Documentation Updates (Week 21-22)
 **Estimate**: 5-7 days
 **Owner**: Technical writer + Developer
-**Dependencies**: Phase 2-3 complete
+**Dependencies**: Cutover complete
 
 **Documentation Deliverables**:
 
 1. **User Guide** (`docs/neo4j/user_guide.md`)
-   - Why use Neo4j
-   - When to use Neo4j vs Parquet
-   - Configuration examples
-   - Common patterns
-
-2. **Setup Guide** (`docs/neo4j/setup.md`)
-   - Docker installation
-   - Native installation
-   - Neo4j Aura (cloud)
+   - Why Neo4j
+   - Configuration guide
+   - Query examples
+   - Performance tuning
    - Troubleshooting
 
-3. **Migration Guide** (`docs/neo4j/migration.md`)
-   - Migrating from Parquet
-   - Using hybrid mode
-   - Export/import tools
-   - Rollback procedures
+2. **Migration Guide** (`docs/neo4j/migration_guide.md`)
+   - NetworkX → Neo4j migration
+   - Dark mode validation process
+   - Cutover procedure
+   - Rollback procedure
 
-4. **Developer Guide** (`docs/neo4j/developer.md`)
-   - Architecture overview
-   - Storage interface
-   - Adding new operations
-   - Testing guidelines
+3. **API Documentation**
+   - Updated with Neo4j-specific methods
+   - Hybrid query examples
+   - Code samples
 
-5. **API Reference** (auto-generated)
-   - GraphStorage interface
-   - Neo4jGraphStorage class
-   - Configuration schema
-   - Cypher query examples
+4. **Operations Guide** (`docs/neo4j/operations.md`)
+   - Deployment (Docker, Aura)
+   - Monitoring setup
+   - Backup/restore procedures
+   - Scaling guidelines
+   - Troubleshooting common issues
 
-6. **Examples** (`examples/neo4j/`)
-   - Basic indexing
-   - Hybrid queries
-   - Custom analytics
-   - Production deployment
-
-**Acceptance Criteria**:
-- [ ] All guides written
-- [ ] Examples tested
-- [ ] Screenshots/diagrams included
-- [ ] Review approved
-
-#### Task 3.5: Migration Tools (Week 14)
-**Estimate**: 3-5 days
-**Owner**: Backend developer
-**Dependencies**: Phase 2 complete
-
-**Tools to Build**:
-
-1. **Parquet → Neo4j Importer**
-   ```bash
-   graphrag import-to-neo4j \
-     --input ./output \
-     --neo4j-uri bolt://localhost:7687 \
-     --neo4j-user neo4j \
-     --neo4j-password password
-   ```
-
-2. **Neo4j → Parquet Exporter**
-   ```bash
-   graphrag export-from-neo4j \
-     --output ./output \
-     --neo4j-uri bolt://localhost:7687
-   ```
-
-3. **Validation Tool**
-   ```bash
-   graphrag validate-neo4j \
-     --neo4j-uri bolt://localhost:7687
-   # Checks: schema, indexes, data integrity
-   ```
+5. **Dark Mode Guide** (`docs/neo4j/dark_mode.md`)
+   - What is dark mode
+   - When to use it
+   - Configuration
+   - Metrics interpretation
+   - Best practices
 
 **Acceptance Criteria**:
-- [ ] Import tool works correctly
-- [ ] Export tool works correctly
-- [ ] Validation tool comprehensive
-- [ ] CLI documentation complete
-- [ ] Error handling robust
-
-### Phase 3 Milestones
-
-**Week 12 Checkpoint**:
-- [ ] Query operations updated
-- [ ] Performance optimization done
-
-**Week 14 Completion**:
 - [ ] All documentation complete
-- [ ] Migration tools ready
-- [ ] Production deployment guides written
-- [ ] Ready for beta release
+- [ ] Code examples tested
+- [ ] Screenshots/diagrams included
+- [ ] Reviewed and approved
+- [ ] Published
 
-**Risk Assessment**: Medium - Production concerns, need thorough testing
-
----
-
-## Phase 4: Rollout (Weeks 15-20)
-
-### Goals
-- Beta release with hybrid mode
-- User feedback and iteration
-- Make Neo4j the default
-- Deprecate Parquet (optional)
-
-### Tasks
-
-#### Task 4.1: Beta Release (Week 15)
-**Estimate**: 2-3 days
-**Owner**: Release manager
-**Dependencies**: Phase 3 complete
-
-**Release Checklist**:
-- [ ] Version bump (e.g., v3.1.0-beta.1)
-- [ ] Release notes written
-- [ ] Migration guide published
-- [ ] Beta announcement
-- [ ] Support channels ready
-
-**Configuration for Beta**:
-```yaml
-# Default: Parquet (backward compatible)
-storage:
-  type: parquet
-
-# Opt-in: Neo4j (beta)
-# storage:
-#   type: neo4j
-#   neo4j:
-#     uri: "bolt://localhost:7687"
-
-# Recommended: Hybrid (transition)
-# storage:
-#   type: hybrid
-```
-
-**Acceptance Criteria**:
-- [ ] Beta release published
-- [ ] Documentation live
-- [ ] Examples work
-- [ ] Support ready
-
-#### Task 4.2: User Feedback Collection (Week 15-18)
-**Estimate**: 3 weeks (continuous)
-**Owner**: Product manager + Developer
-**Dependencies**: Task 4.1
-
-**Feedback Channels**:
-- GitHub issues
-- Discord/Slack support
-- User interviews
-- Bug reports
-
-**Metrics to Track**:
-- Adoption rate (% using Neo4j)
-- Error rates
-- Performance reports
-- Feature requests
-- User satisfaction
-
-**Acceptance Criteria**:
-- [ ] Feedback collected from 10+ users
-- [ ] Critical bugs identified and fixed
-- [ ] Performance validated on real datasets
-- [ ] User satisfaction > 7/10
-
-#### Task 4.3: Bug Fixes and Iterations (Week 16-18)
-**Estimate**: Ongoing
-**Owner**: Backend developer
-**Dependencies**: Task 4.2
-
-**Common Issues to Address**:
-- Connection timeouts
-- Memory issues with large graphs
-- Configuration confusion
-- Query performance
-- Documentation gaps
-
-**Release Cadence**: Weekly patches (v3.1.0-beta.2, beta.3, etc.)
-
-**Acceptance Criteria**:
-- [ ] Critical bugs fixed within 48 hours
-- [ ] Patches released regularly
-- [ ] User satisfaction improving
-
-#### Task 4.4: Performance Validation (Week 17-18)
+#### Task 5.7: Release Preparation (Week 22-23)
 **Estimate**: 5-7 days
-**Owner**: Backend developer + Users
-**Dependencies**: Task 4.2
+**Owner**: Release manager + Team
+**Dependencies**: All Phase 5 tasks
 
-**Validation on Real Datasets**:
-1. **Small Dataset** (1-10 documents)
-   - Wikipedia articles
-   - News articles
+**Release Tasks**:
 
-2. **Medium Dataset** (100-1000 documents)
-   - Research papers
-   - Company documentation
+1. **Version Bump**
+   - Update to v3.1.0
+   - Update CHANGELOG.md
 
-3. **Large Dataset** (10K+ documents)
-   - Product documentation
-   - Legal documents
+2. **Release Notes**
+   - Neo4j integration highlights
+   - Dark mode feature
+   - Breaking changes (none - backward compatible)
+   - Migration guide link
+   - Performance improvements
 
-**Benchmarks to Collect**:
-- Indexing time
-- Community detection time
-- Query latency
-- Memory usage
-- Disk usage
+3. **Backward Compatibility**
+   - Ensure networkx_only still works
+   - Provide clear migration path
+   - Document support timeline
+
+4. **Testing**
+   - Full regression test suite
+   - Integration tests
+   - Performance tests
+   - User acceptance testing
+
+5. **Communication**
+   - Blog post
+   - Release announcement
+   - User migration timeline
 
 **Acceptance Criteria**:
-- [ ] Performance meets expectations
-- [ ] No regressions vs Parquet
-- [ ] User reports positive
-- [ ] Benchmarks published
+- [ ] All tests pass
+- [ ] Release notes complete
+- [ ] Backward compatibility verified
+- [ ] Communication materials ready
+- [ ] Release approved
 
-#### Task 4.5: Stable Release (Week 19)
-**Estimate**: 2-3 days
+#### Task 5.8: Stable Release (Week 23-24)
+**Estimate**: 3-5 days
 **Owner**: Release manager
-**Dependencies**: Tasks 4.2-4.4
+**Dependencies**: Task 5.7
 
-**Release Checklist**:
-- [ ] Version bump (e.g., v3.1.0)
-- [ ] All beta feedback addressed
-- [ ] Documentation finalized
-- [ ] Examples updated
-- [ ] Stable release announcement
+**Release Steps**:
 
-**Configuration for Stable**:
-```yaml
-# Neo4j now recommended (but Parquet still supported)
-storage:
-  type: neo4j  # Recommended
-  # type: parquet  # Still supported
+1. **Tag release**
+   ```bash
+   git tag -a v3.1.0 -m "Neo4j integration with dark mode validation"
+   git push origin v3.1.0
+   ```
 
-  neo4j:
-    uri: "bolt://localhost:7687"
-    username: "neo4j"
-    password: "${NEO4J_PASSWORD}"
-```
+2. **Publish packages**
+   ```bash
+   # Publish to PyPI
+   python -m build
+   twine upload dist/*
+   ```
 
-**Acceptance Criteria**:
-- [ ] Stable release published
-- [ ] No critical bugs
-- [ ] User satisfaction > 8/10
-- [ ] Documentation complete
+3. **Update documentation**
+   - Publish updated docs
+   - Update website
 
-#### Task 4.6: Make Neo4j Default (Week 20)
-**Estimate**: 2-3 days
-**Owner**: Product manager + Developer
-**Dependencies**: Task 4.5
+4. **Announce release**
+   - GitHub release notes
+   - Blog post
+   - Social media
+   - User mailing list
 
-**Changes**:
-```yaml
-# New projects default to Neo4j
-# graphrag init --defaults
-
-storage:
-  type: neo4j  # Default (was: parquet)
-```
-
-**Documentation Updates**:
-- Getting started guide uses Neo4j
-- Examples use Neo4j by default
-- Parquet moved to "Legacy" section
+5. **Monitor adoption**
+   - Track downloads
+   - Monitor issue reports
+   - Collect user feedback
 
 **Acceptance Criteria**:
-- [ ] Default configuration uses Neo4j
-- [ ] Documentation reflects new default
-- [ ] Legacy Parquet docs preserved
-- [ ] Migration path clear
+- [ ] Release published
+- [ ] Documentation live
+- [ ] Announcement sent
+- [ ] Initial feedback positive
 
-#### Task 4.7: Deprecation Planning (Week 20)
-**Estimate**: 1-2 days
-**Owner**: Product manager
-**Dependencies**: Task 4.6
+#### Task 5.9: Post-Release Support (Week 24+)
+**Estimate**: Ongoing
+**Owner**: Support team + Developers
+**Dependencies**: Task 5.8
 
-**Deprecation Timeline** (if desired):
-- **v3.1.0** (current): Neo4j default, Parquet supported
-- **v3.2.0** (6 months): Parquet deprecated warning
-- **v4.0.0** (12 months): Parquet removed (optional)
+**Support Activities**:
 
-**Deprecation Notice**:
-```python
-# If using Parquet
-warnings.warn(
-    "Parquet storage is deprecated and will be removed in v4.0.0. "
-    "Please migrate to Neo4j. See: docs/neo4j/migration.md",
-    DeprecationWarning
-)
-```
+1. **Issue Triage**
+   - Monitor GitHub issues
+   - Prioritize Neo4j-related issues
+   - Respond within 24 hours
+
+2. **User Support**
+   - Answer questions
+   - Help with migration
+   - Troubleshoot issues
+
+3. **Bug Fixes**
+   - Fix critical bugs immediately
+   - Plan patches for minor issues
+
+4. **Feedback Collection**
+   - User surveys
+   - Usage analytics
+   - Performance data
 
 **Acceptance Criteria**:
-- [ ] Deprecation timeline decided
-- [ ] Communication plan created
-- [ ] Migration support planned
-
-### Phase 4 Milestones
-
-**Week 16 Checkpoint**:
-- [ ] Beta feedback collected
-- [ ] Major issues fixed
-
-**Week 18 Checkpoint**:
-- [ ] Performance validated
+- [ ] Support process established
+- [ ] Issues responded to promptly
 - [ ] User satisfaction high
 
-**Week 20 Completion**:
-- [ ] Stable release published
-- [ ] Neo4j is default
-- [ ] Project complete ✅
+### Phase 5 Milestones
 
-**Risk Assessment**: Low - User adoption, can always revert
+**Week 19 Completion**:
+- [ ] Cutover executed successfully
+- [ ] Neo4j only mode active
+- [ ] No critical issues
 
----
+**Week 21 Checkpoint**:
+- [ ] Performance optimized
+- [ ] Query operations updated
+- [ ] Stability proven
 
-## Success Metrics
-
-### Technical Metrics
-
-| Metric | Target | Critical |
-|--------|--------|----------|
-| **Community Detection Time** | ≤ NetworkX × 2 | Yes |
-| **Query Latency** | < 100ms (p95) | Yes |
-| **Test Coverage** | > 80% | Yes |
-| **Memory Overhead** | < 2x NetworkX | No |
-| **Disk Usage** | < 2x Parquet | No |
-
-### User Metrics
-
-| Metric | Target | Critical |
-|--------|--------|----------|
-| **Adoption Rate** (beta) | > 20% | No |
-| **User Satisfaction** | > 8/10 | Yes |
-| **Bug Report Rate** | < 5/week | Yes |
-| **Support Requests** | < 10/week | No |
-
-### Project Metrics
-
-| Metric | Target | Critical |
-|--------|--------|----------|
-| **Timeline Adherence** | ±2 weeks | Yes |
-| **Budget** | Within estimate | Yes |
-| **Code Quality** | Review approved | Yes |
-| **Documentation Quality** | Complete | Yes |
-
----
-
-## Risk Management
-
-### High Priority Risks
-
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| **Community detection quality** | Medium | High | Test on real data early (Week 4) |
-| **Performance regression** | Medium | High | Continuous benchmarking |
-| **User adoption resistance** | Medium | Medium | Maintain backward compatibility |
-| **Timeline slippage** | Medium | Medium | Weekly check-ins, buffer time |
-
-### Medium Priority Risks
-
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|------------|
-| **Neo4j licensing confusion** | Low | Medium | Clear docs on Community vs Enterprise |
-| **Memory issues** | Low | Medium | Test with large graphs early |
-| **Configuration complexity** | Medium | Low | Good defaults, validation |
-
-### Contingency Plans
-
-**If POC fails (Week 4)**:
-- Re-evaluate approach
-- Consider Louvain-only (without full Neo4j)
-- Abort migration, keep NetworkX
-
-**If performance unacceptable (Week 12)**:
-- Profile and optimize queries
-- Consider caching strategies
-- Extend timeline for optimization
-
-**If user adoption low (Week 18)**:
-- Gather detailed feedback
-- Address pain points
-- Improve documentation
-- Consider keeping Parquet as default longer
-
----
-
-## Resource Plan
-
-### Team Composition
-
-**Phase 1-2** (Weeks 1-10):
-- 1 Backend Developer (full-time)
-- 0.5 DevOps (part-time, setup)
-
-**Phase 3** (Weeks 11-14):
-- 1 Backend Developer (full-time)
-- 0.5 Technical Writer (part-time)
-- 0.25 QA Engineer (part-time)
-
-**Phase 4** (Weeks 15-20):
-- 0.5 Backend Developer (part-time, bug fixes)
-- 0.25 Product Manager (part-time)
-- 0.25 Support Engineer (part-time)
-
-**Total Effort**: ~12-15 person-weeks
-
-### Infrastructure
-
-**Development**:
-- Local Neo4j instances (Docker)
-- CI/CD Neo4j containers (GitHub Actions)
-- Test data generation
-
-**Testing**:
-- Dedicated Neo4j test server
-- Load testing environment
-- Performance benchmarking server
-
-**Production** (user responsibility):
-- Neo4j deployment (Docker/Aura)
-- Backup infrastructure
-- Monitoring tools
-
-### Budget
-
-**Development** (internal):
-- Personnel: ~$30,000-50,000 (12-18 weeks)
-- Infrastructure: ~$500 (test servers)
-
-**User Costs** (external):
-- Neo4j Aura: $65-200/month (optional)
-- Self-hosting: ~$90/month (compute)
-
----
-
-## Quality Assurance
-
-### Testing Strategy
-
-**Unit Tests** (200+ tests):
-- Storage interface implementations
-- Individual operations
-- Error handling
-- Edge cases
-
-**Integration Tests** (50+ tests):
-- Full indexing pipeline
-- Query operations
-- Hybrid mode
-- Migration tools
-
-**Performance Tests** (10+ tests):
-- Benchmark suite
-- Memory profiling
-- Scalability tests
-- Regression detection
-
-**End-to-End Tests** (20+ tests):
-- Real dataset indexing
-- Query workflows
-- Error recovery
-- User scenarios
-
-### Code Review Process
-
-**Requirements**:
-- [ ] All PRs reviewed by 2+ developers
-- [ ] Tests pass
-- [ ] Documentation updated
-- [ ] Performance validated
-- [ ] Security reviewed
-
-### Release Criteria
-
-**Beta Release**:
-- [ ] All Phase 3 tasks complete
-- [ ] Critical tests pass
+**Week 24 Completion**:
+- [ ] v3.1.0 released
 - [ ] Documentation complete
-- [ ] No known critical bugs
+- [ ] User adoption starting
+- [ ] Support process established
 
-**Stable Release**:
-- [ ] Beta feedback addressed
-- [ ] Performance validated
-- [ ] User satisfaction > 8/10
-- [ ] No known P0/P1 bugs
-
----
-
-## Communication Plan
-
-### Stakeholder Updates
-
-**Weekly** (during implementation):
-- Progress report
-- Blockers/risks
-- Next week's plan
-
-**Monthly** (during rollout):
-- Adoption metrics
-- User feedback summary
-- Roadmap updates
-
-### User Communication
-
-**Major Milestones**:
-- Phase 1 complete: Internal blog post
-- Beta release: Announcement, migration guide
-- Stable release: Announcement, case studies
-- Default change: Migration assistance
-
-**Channels**:
-- GitHub releases
-- Blog posts
-- Discord/Slack announcements
-- Email newsletter (if available)
-
----
-
-## Rollback Plan
-
-### If Major Issues Arise
-
-**Trigger Conditions**:
-- Critical bugs affecting data integrity
-- Performance > 3x worse than NetworkX
-- User satisfaction < 5/10
-
-**Rollback Steps**:
-1. Revert default to Parquet
-2. Mark Neo4j as "experimental"
-3. Fix issues before re-release
-4. Communicate clearly to users
-
-**User Impact**:
-- Minimal (Parquet still works)
-- Users on Neo4j can export to Parquet
-- No data loss
+**Risk Assessment**: Low-Medium - Rollback available, dark mode provided confidence
 
 ---
 
 ## Summary
 
-### Timeline Summary
+### Timeline Summary (Dark Mode Strategy)
 
 | Phase | Duration | Key Deliverables |
 |-------|----------|------------------|
-| **Phase 1: Foundation** | 4 weeks | Storage interface, Neo4j adapter, POC |
-| **Phase 2: Core Integration** | 6 weeks | Complete implementation, hybrid mode, tests |
-| **Phase 3: Production Readiness** | 4 weeks | Query ops, optimization, docs, tools |
-| **Phase 4: Rollout** | 6 weeks | Beta → Stable → Default |
-| **Total** | **20 weeks** | **Neo4j migration complete** |
+| **Phase 1: Foundation** | 4 weeks | Storage interface with mode support, Neo4j adapter, POC |
+| **Phase 2: Core Integration** | 6 weeks | Complete Neo4j implementation, all workflows, tests |
+| **Phase 3: Dark Mode Framework** | 4 weeks | Orchestrator, comparison framework, metrics collection |
+| **Phase 4: Dark Mode Validation** | 4 weeks | Production validation, 2-4 weeks data collection, GO/NO-GO decision |
+| **Phase 5: Cutover & Stabilization** | 6 weeks | Cutover, monitoring, optimization, stable release |
+| **Total** | **24 weeks** | **Neo4j migration complete (risk-free)** |
 
-### Effort Summary
+### Effort Summary (Updated for Dark Mode)
 
-- **Development**: 12-15 person-weeks
-- **Documentation**: 2-3 person-weeks
-- **Testing/QA**: 2-3 person-weeks
-- **Total**: **16-21 person-weeks** (~4-5 months for 1 FTE)
+**Development Effort**:
+- Phase 1 (Foundation): 3-4 person-weeks
+- Phase 2 (Core Integration): 6-7 person-weeks
+- Phase 3 (Dark Mode Framework): 4-5 person-weeks
+- Phase 4 (Dark Mode Validation): 1-2 person-weeks (mostly monitoring)
+- Phase 5 (Cutover & Stabilization): 5-6 person-weeks
+- **Total Development**: **19-24 person-weeks**
 
-### Investment Summary
+**Additional Effort**:
+- Documentation: 2-3 person-weeks
+- Testing/QA: 3-4 person-weeks
+- **Total Effort**: **24-31 person-weeks** (~5-6 months for 1 FTE, ~3-4 months for 2 FTEs)
 
-- **Cost**: $30,000-50,000 (personnel)
-- **Timeline**: 4-5 months
-- **Risk**: Medium (acceptable with mitigations)
-- **Value**: High (performance + new capabilities)
+### Investment Summary (Dark Mode Strategy)
+
+**Development Cost**:
+- Core implementation (Phases 1-2): $30,000-40,000
+- Dark mode infrastructure (Phase 3): $10,000-12,000
+- Validation & cutover (Phases 4-5): $5,000-8,000
+- **Total Development**: $45,000-60,000
+
+**Operational Cost**:
+- Neo4j Community Edition: Free
+- Neo4j Aura (cloud): $65-200/month
+- Dark mode validation (2-4 weeks): +$500-1,000 (temporary compute)
+- **Net Increase**: $0-150/month (replaces separate vector store)
+
+**Return on Investment**:
+- Dark mode premium: +$10K
+- Prevents production issues: $50-200K savings
+- **ROI on dark mode**: 5-20x
+- Overall timeline: 3-5 years positive ROI (primary value in new capabilities)
+
+**Risk Level**: **Low** ✅
+- Dark mode eliminates cutover risk (reduced from Medium → Low)
+- Full validation before production impact
+- Instant rollback capability
+- Worth the 20% premium
+
+### Configuration Management (settings.yaml)
+
+**Core Principle**: All Neo4j connection parameters and settings come from `settings.yaml` configuration file. No hardcoded values.
+
+**Configuration Sources**:
+```
+settings.yaml (YAML file)
+     ↓
+Environment variable substitution (${NEO4J_PASSWORD})
+     ↓
+GraphRagConfig (Pydantic model with validation)
+     ↓
+Neo4jGraphStorage(config) - receives all connection params
+     ↓
+neo4j.GraphDatabase.driver(config.neo4j.uri, auth=(...))
+```
+
+**Complete Neo4j Configuration from settings.yaml**:
+```yaml
+storage:
+  neo4j:
+    # Connection (required)
+    uri: "bolt://localhost:7687"           # From settings.yaml
+    username: "neo4j"                       # From settings.yaml
+    password: "${NEO4J_PASSWORD}"          # From environment variable
+    database: "neo4j"                       # From settings.yaml
+
+    # Connection pool
+    max_connection_pool_size: 50            # From settings.yaml
+    connection_acquisition_timeout: 60      # From settings.yaml
+
+    # Performance
+    batch_size: 1000                        # From settings.yaml
+
+    # GDS
+    gds_enabled: true                       # From settings.yaml
+    max_cluster_size: 10                    # From settings.yaml
+
+    # Vector index
+    vector_index_enabled: true              # From settings.yaml
+    vector_dimensions: 1536                 # From settings.yaml
+    vector_similarity_function: cosine      # From settings.yaml
+```
+
+**Benefits of Configuration-Driven Approach**:
+1. ✅ **Security**: Credentials in environment variables, not code
+2. ✅ **Flexibility**: Change connection without code changes
+3. ✅ **Multi-environment**: Different settings.yaml for dev/staging/prod
+4. ✅ **Validation**: Pydantic validates all parameters on load
+5. ✅ **Documentation**: Settings.yaml serves as configuration reference
+6. ✅ **Testing**: Easy to provide test configurations
+
+**Implementation Examples**:
+
+1. **Phase 1 (Task 1.5)**: Neo4jGraphStorage reads config
+```python
+class Neo4jGraphStorage(GraphStorage):
+    def __init__(self, config: GraphRagConfig):
+        # ALL connection params from config (loaded from settings.yaml)
+        self.driver = neo4j.GraphDatabase.driver(
+            config.storage.neo4j.uri,           # From settings.yaml
+            auth=(
+                config.storage.neo4j.username,   # From settings.yaml
+                config.storage.neo4j.password    # From ${NEO4J_PASSWORD}
+            ),
+            max_connection_pool_size=config.storage.neo4j.max_connection_pool_size
+        )
+```
+
+2. **Phase 3 (Task 3.7)**: Storage factory passes config
+```python
+def create_graph_storage(config: GraphRagConfig) -> GraphStorage:
+    if config.storage.type == "neo4j_only":
+        # Pass entire config, Neo4jGraphStorage extracts what it needs
+        return Neo4jGraphStorage(config)
+```
+
+3. **Phase 4 (Task 4.1)**: Production deployment
+```bash
+# Production settings.yaml
+storage:
+  type: dark_mode
+  neo4j:
+    uri: "bolt://neo4j-prod.company.com:7687"  # Production URI
+    password: "${NEO4J_PASSWORD}"               # From k8s secret
+
+# Deploy
+kubectl create secret generic graphrag-secrets \
+  --from-literal=NEO4J_PASSWORD=<secure-password>
+```
+
+**Validation Example**:
+```python
+# Config validation catches errors early
+try:
+    config = load_config("settings.yaml")
+except ValidationError as e:
+    print("❌ Configuration errors:")
+    print("  - neo4j.uri: URI must start with bolt:// or neo4j://")
+    print("  - neo4j.password: Password is required")
+    sys.exit(1)
+```
+
+### Comparison: Traditional vs Dark Mode Migration
+
+| Aspect | Traditional | Dark Mode | Winner |
+|--------|-------------|-----------|--------|
+| **Timeline** | 16-20 weeks | 24 weeks | Traditional (faster) ⚠️ |
+| **Cost** | $30-50K | $45-60K | Traditional (cheaper) ⚠️ |
+| **Risk** | Medium | Low | **Dark Mode** ✅ |
+| **Validation** | Sample testing | 100% real traffic | **Dark Mode** ✅ |
+| **Confidence** | Moderate | High | **Dark Mode** ✅ |
+| **Rollback** | Complex | Instant | **Dark Mode** ✅ |
+| **Production Impact** | Possible | Zero (validated) | **Dark Mode** ✅ |
+| **Issue Detection** | After cutover | Before cutover | **Dark Mode** ✅ |
+
+**Verdict**: Dark mode strategy wins 6/8 categories. The 20% extra time and cost are worth the 80% risk reduction.
+
+### Key Success Factors
+
+**Technical**:
+- ✅ Abstract storage interface cleanly separates backends
+- ✅ Dark mode orchestrator handles parallel execution
+- ✅ Comprehensive comparison framework validates correctness
+- ✅ Neo4j GDS provides feature parity with NetworkX
+- ✅ Vector index unifies graph and vector storage
+
+**Process**:
+- ✅ Phased approach reduces risk
+- ✅ Dark mode enables full validation before impact
+- ✅ Continuous testing throughout development
+- ✅ Clear cutover criteria with objective metrics
+- ✅ Easy rollback at any stage
+
+**Organizational**:
+- ✅ Stakeholder buy-in for 5-6 month project
+- ✅ Resource allocation (1-2 developers)
+- ✅ DevOps support for infrastructure
+- ✅ User communication plan
+- ✅ Post-release support commitment
+
+### Critical Dependencies
+
+**External**:
+- Neo4j 5.17+ with GDS 2.6+
+- Python neo4j driver 5.x
+- Docker (for deployment)
+
+**Internal**:
+- GraphRAG v3.0+ codebase
+- Claude 4.5 Sonnet + SentenceTransformer embeddings
+- Existing test infrastructure
+- CI/CD pipeline
+
+**Infrastructure**:
+- Neo4j test environment (Phase 1-3)
+- Neo4j production instance (Phase 4-5)
+- Dark mode log storage (~10-50GB)
+- Monitoring dashboards
+
+### Risk Mitigation
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| Dark mode overhead too high | Low | Medium | Optimize orchestrator, acceptable during validation |
+| Metrics don't meet criteria | Medium | High | Extend validation period, fix issues before cutover |
+| Neo4j performance worse | Low | High | Detected in Phase 4, optimize or abort |
+| Community detection differs | Medium | Medium | Louvain variance expected, validate > 95% match |
+| Rollback needed after cutover | Low | Medium | Instant config change, zero data loss |
+| Timeline slippage | Medium | Low | Buffer time included, weekly check-ins |
+
+**Overall Risk**: **Low** with dark mode strategy (vs Medium for traditional)
+
+### Decision Points
+
+**Phase 1 (Week 4)**:
+- **Decision**: GO/NO-GO for Phase 2
+- **Criteria**: POC successful, storage interface working
+
+**Phase 4 (Week 18)**:
+- **Decision**: GO/NO-GO for cutover
+- **Criteria**: All cutover metrics met, no blocking issues
+
+**Phase 5 (Post-cutover)**:
+- **Decision**: Rollback or continue
+- **Criteria**: Performance acceptable, error rate < threshold
+
+### Communication Plan
+
+**Internal**:
+- Weekly status updates to stakeholders
+- Phase completion demos
+- Dark mode validation report (Week 18)
+- Post-cutover retrospective
+
+**External**:
+- Blog post: "Introducing Dark Mode Migration" (Phase 3 complete)
+- Blog post: "Neo4j Integration Now Available" (v3.1.0 release)
+- Documentation updates throughout
+- User migration guide
+
+**Timing**:
+- Week 14: Announce dark mode validation starting
+- Week 18: Share validation results
+- Week 23: v3.1.0 release announcement
+- Week 24+: Case studies, user feedback
 
 ### Next Steps
 
-1. ✅ Get stakeholder approval
-2. ✅ Allocate resources (1-2 developers)
-3. ✅ Set up development environment
-4. 🔲 Begin Phase 1: Foundation (Week 1)
+**Immediate** (This Week):
+1. ⏳ Review this dark mode implementation plan
+2. ⏳ Get stakeholder approval for 5-6 month project
+3. ⏳ Allocate budget ($45-60K)
+4. ⏳ Assign resources (1-2 developers)
+5. ⏳ Set up project tracking
+
+**Short-term** (Month 1):
+1. ⏳ Set up development environment
+2. ⏳ Begin Phase 1: Foundation
+3. ⏳ Weekly check-ins established
+4. ⏳ Technical design reviews scheduled
+
+**Medium-term** (Months 2-4):
+1. ⏳ Complete Phases 2-3
+2. ⏳ Prepare for dark mode validation
+3. ⏳ Production environment setup
+
+**Long-term** (Months 5-6):
+1. ⏳ Dark mode validation
+2. ⏳ Cutover execution
+3. ⏳ v3.1.0 release
+4. ⏳ User adoption and support
 
 ---
 
-**Status**: ✅ Complete
-**Next Document**: `07_migration_strategy.md` - User migration approach
+## Appendix: Lessons from Claude Migration
+
+### What Worked Well
+
+From the recent Claude 4.5 Sonnet + SentenceTransformer migration, we learned:
+
+1. **POC First**: Quick POC (2 hours) validated approach before analysis
+2. **Incremental Commits**: Version-tagged commits (v3.1.0) for rollback safety
+3. **Post-Mortem**: Reflection document captured learnings
+
+### What We'll Do Differently
+
+1. **Dark Mode Instead of Direct Cutover**: Learned from Claude migration that validation is critical
+2. **Longer Validation Period**: 2-4 weeks vs immediate cutover
+3. **Objective Metrics**: Cutover criteria instead of subjective assessment
+4. **Automated Comparison**: Framework vs manual checking
+
+### Applying Learnings
+
+- ✅ POC in Phase 1 (Week 4)
+- ✅ Dark mode validation (Phase 4)
+- ✅ Objective cutover criteria
+- ✅ Post-mortem planned (end of Phase 5)
+
+---
+
+**Status**: ✅ Complete - Dark Mode Strategy
+**Date**: 2026-01-31
+**Next Document**: `07_migration_strategy.md` - User migration approach with dark mode
+

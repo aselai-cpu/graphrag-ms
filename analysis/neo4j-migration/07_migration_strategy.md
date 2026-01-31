@@ -1,14 +1,15 @@
 # Migration Strategy
+## Dark Mode Enabled Migration
 
 **Document**: 07 - Migration Strategy
-**Date**: 2026-01-29
-**Status**: Complete
+**Date**: 2026-01-31
+**Status**: Replanned for Dark Mode
 
 ---
 
 ## Purpose
 
-This document provides a comprehensive migration strategy for transitioning existing GraphRAG users from Parquet-based storage to Neo4j. It includes step-by-step guides, migration tools, rollback procedures, and support resources.
+This document provides a comprehensive migration strategy for transitioning existing GraphRAG users from NetworkX + LanceDB to Neo4j using a **dark mode validation approach**. It includes step-by-step guides, dark mode configuration, migration tools, rollback procedures, and support resources.
 
 ---
 
@@ -17,33 +18,46 @@ This document provides a comprehensive migration strategy for transitioning exis
 ### Migration Philosophy
 
 **Principles**:
-1. **Zero Forced Migration**: Users can continue using Parquet indefinitely
-2. **Gradual Transition**: Hybrid mode allows testing before full commitment
+1. **Zero Forced Migration**: Users can continue using NetworkX indefinitely
+2. **Dark Mode Validation**: Test Neo4j in parallel without production risk
 3. **Data Safety**: No data loss at any point
-4. **Easy Rollback**: Can revert to Parquet at any time
+4. **Easy Rollback**: Can revert at any time with one config change
 5. **Clear Communication**: Users understand benefits and trade-offs
+6. **Risk-Free Cutover**: Full validation before production impact
 
-### Migration Paths
+### Migration Paths (Dark Mode Strategy)
 
 ```
-Current State (Parquet Only)
+Current State (NetworkX + LanceDB)
         ↓
     [Choose Path]
         ↓
-   ┌────┴────┐
-   │         │
-Path A      Path B
-(Stay)     (Migrate)
-   │         │
-   │    Try Hybrid Mode
-   │         ↓
-   │    Validate Results
-   │         ↓
-   │    Switch to Neo4j
-   │         ↓
+   ┌────┴────────────┐
+   │                 │
+Path A           Path B
+(Stay)        (Validate & Migrate)
+   │                 │
+   │           Enable Dark Mode
+   │                 ↓
+   │           Run in Parallel (NetworkX + Neo4j)
+   │                 ↓
+   │           Collect Metrics (2-4 weeks)
+   │                 ↓
+   │           Review Comparison Report
+   │                 ↓
+   │           ┌─────┴─────┐
+   │           │           │
+   │        Metrics    Metrics
+   │         Pass       Fail
+   │           │           │
+   │      Switch to    Fix Issues
+   │      Neo4j Only    or Stay
+   │           ↓           │
    └────→ [End State] ←────┘
-        (User Choice)
+           (User Choice)
 ```
+
+**Key Insight**: Dark mode eliminates "hope and pray" migrations. Users validate with 100% of their real data before cutover.
 
 ---
 
@@ -57,15 +71,21 @@ Path A      Path B
 - Infrequent re-indexing
 - No real-time requirements
 
-**Recommendation**: ✅ **Stay on Parquet**
+**Recommendation**: ✅ **Stay on NetworkX**
+
+**Configuration**:
+```yaml
+storage:
+  type: networkx_only
+```
 
 **Reasoning**:
-- Parquet is simpler (no database setup)
+- NetworkX + LanceDB is simpler (no database setup)
 - Performance difference negligible for small datasets
 - File-based storage is portable
 
 **Messaging**:
-> "For small, local projects, Parquet remains the simplest option. Neo4j is available when you need its advanced features."
+> "For small, local projects, NetworkX + LanceDB remains the simplest option. Neo4j is available when you need its advanced features."
 
 ---
 
@@ -77,16 +97,36 @@ Path A      Path B
 - Regular re-indexing
 - Experimenting with features
 
-**Recommendation**: ⚠️ **Try Hybrid Mode**
+**Recommendation**: ⚠️ **Try Dark Mode**
+
+**Configuration**:
+```yaml
+storage:
+  type: dark_mode  # Run both, validate Neo4j
+  networkx:
+    enabled: true
+  neo4j:
+    enabled: true
+    uri: bolt://localhost:7687
+  dark_mode:
+    comparison:
+      enabled: true
+```
 
 **Reasoning**:
-- Benefit from faster community detection
+- Validate Neo4j with your actual data
+- See performance benefits (6x faster community detection)
 - Test hybrid queries
-- Keep Parquet as safety net
-- Evaluate if worth the complexity
+- Keep NetworkX as safety net (zero risk)
+- Generate comparison report to inform decision
 
 **Messaging**:
-> "Try Neo4j in hybrid mode to experience faster indexing and hybrid queries while keeping your Parquet output as backup."
+> "Try Neo4j in dark mode to validate it works with your data. NetworkX continues serving requests while Neo4j runs in parallel. Review the comparison report to decide if migration is worth it."
+
+**Duration**: Run dark mode for 1-2 weeks, then decide:
+- ✅ Switch to `neo4j_only` if metrics pass
+- ⏸️ Stay in `dark_mode` longer if needed
+- 🔄 Return to `networkx_only` if not worth it
 
 ---
 
@@ -98,106 +138,163 @@ Path A      Path B
 - Real-time or incremental updates
 - Production services
 
-**Recommendation**: ✅ **Migrate to Neo4j**
+**Recommendation**: ✅ **Migrate to Neo4j via Dark Mode**
+
+**Migration Steps**:
+1. **Week 1-2**: Enable dark mode in staging
+2. **Week 2-3**: Enable dark mode in production
+3. **Week 3-4**: Collect metrics, review comparison report
+4. **Week 5**: Cutover to `neo4j_only` (if metrics pass)
+
+**Configuration (Final State)**:
+```yaml
+storage:
+  type: neo4j_only
+  neo4j:
+    uri: bolt://production-neo4j:7687
+    username: neo4j
+    password: ${NEO4J_PASSWORD}
+```
 
 **Reasoning**:
-- 6x faster community detection
-- Concurrent access required
-- Incremental updates valuable
-- Production features (ACID, backup) needed
+- 6x faster community detection (critical at scale)
+- Concurrent access required for multi-user
+- Incremental updates valuable for real-time
+- Production features (ACID, backup, monitoring) needed
+- **Dark mode ensures safe migration** (validated before cutover)
 
 **Messaging**:
-> "Neo4j enables production-ready deployments with real-time updates, concurrent access, and enterprise features."
+> "Neo4j enables production-ready deployments at scale. Dark mode validation ensures your specific workload performs well before cutover. Zero risk."
+
+**Risk Mitigation**:
+- Dark mode validation period: 2-4 weeks
+- Comparison metrics: entity match > 99%, query F1 > 95%
+- Instant rollback to `networkx_only` if issues found
+- No data loss (both systems write data during dark mode)
 
 ---
 
 ## Migration Timeline (User Perspective)
 
-### Version Roadmap
+### Version Roadmap (Dark Mode Strategy)
 
-#### v3.1.0 (Beta) - Month 0
-**Status**: Neo4j available as opt-in
+#### v3.1.0 (Beta) - Month 0 (Week 23)
+**Status**: Neo4j + Dark Mode available as opt-in
 
 **Default Configuration**:
 ```yaml
 storage:
-  type: parquet  # Default (unchanged)
+  type: networkx_only  # Default (unchanged)
 ```
+
+**New Modes Available**:
+- `networkx_only`: Current default
+- `dark_mode`: Parallel validation (NEW) 🆕
+- `neo4j_only`: Neo4j only (for early adopters)
 
 **User Action**: None required (backward compatible)
 
-**Who Should Try**:
-- Early adopters
+**Who Should Try Dark Mode**:
+- Early adopters wanting to validate Neo4j
 - Users with performance issues
 - Users needing hybrid queries
+- Anyone curious about Neo4j
+
+**Messaging**:
+> "Try dark mode risk-free! NetworkX continues serving requests while Neo4j runs in parallel. Get a comparison report to see if Neo4j is right for you."
 
 ---
 
-#### v3.1.x (Stable) - Month 3
-**Status**: Neo4j production-ready
+#### v3.1.x (Stable) - Month 3-5 (Weeks 35-43)
+**Status**: Neo4j production-ready, Dark mode validated by core team
 
 **Default Configuration**:
 ```yaml
 storage:
-  type: parquet  # Still default (stable)
+  type: networkx_only  # Still default (stable)
 ```
 
 **User Action**: None required
 
-**Who Should Migrate**:
+**Who Should Migrate via Dark Mode**:
 - Production deployments
 - Large datasets
 - Real-time requirements
+- Teams wanting risk-free migration
+
+**Recommended Migration Process**:
+1. Enable `dark_mode` in staging (1-2 weeks)
+2. Enable `dark_mode` in production (2-4 weeks)
+3. Review comparison report
+4. Switch to `neo4j_only` (if validated)
 
 ---
 
-#### v3.2.0 - Month 6
-**Status**: Neo4j recommended default
+#### v3.2.0 - Month 6-8 (Weeks 44-60)
+**Status**: Neo4j recommended default for new projects
 
-**Default Configuration**:
+**Default Configuration (New Projects)**:
 ```yaml
 storage:
-  type: neo4j  # New default for new projects
+  type: neo4j_only  # New default for new projects
 ```
 
-**Existing Projects**: Unchanged (Parquet)
+**Existing Projects**: Unchanged (`networkx_only`)
 
 **User Action**:
-- New projects: Get Neo4j setup instructions
-- Existing projects: Consider migration
+- **New projects**: Follow Neo4j setup guide
+- **Existing projects**: Consider dark mode migration
 
 **Who Should Migrate**:
 - All new projects (unless simple use case)
-- Existing projects with pain points
+- Existing projects with scale/performance needs
+- Teams wanting modern infrastructure
+
+**Dark Mode Success Stories**:
+- Blog posts showcasing dark mode migrations
+- Case studies with metrics
+- User testimonials
 
 ---
 
-#### v3.3.0 - Month 12
-**Status**: Parquet deprecated (optional)
+#### v3.3.0 - Month 12+ (Week 88+)
+**Status**: NetworkX deprecated (optional)
 
-**Warning Shown**:
+**Warning Shown** (if using `networkx_only`):
 ```
-⚠️  Parquet storage is deprecated and will be removed in v4.0.0
-   Consider migrating to Neo4j: docs/neo4j/migration.md
+⚠️  NetworkX storage is deprecated and will be removed in v4.0.0
+   Migrate to Neo4j using dark mode: docs/neo4j/dark_mode_migration.md
+   Dark mode enables risk-free validation before cutover.
    To suppress this warning: --no-deprecation-warnings
 ```
 
 **User Action**:
-- Plan migration if still on Parquet
-- Or accept staying on v3.x long-term
+- **Option A**: Migrate to Neo4j via dark mode (recommended)
+- **Option B**: Accept staying on v3.x long-term
+- **Option C**: Evaluate if NetworkX meets your needs indefinitely
+
+**Support**:
+- NetworkX remains fully supported in v3.x
+- Security updates continue
+- Bug fixes continue
 
 ---
 
-#### v4.0.0 - Month 18+ (Optional)
-**Status**: Parquet removed
+#### v4.0.0 - Month 18+ (Optional, Conditional)
+**Status**: NetworkX removed (only if conditions met)
 
-**Only if**:
-- > 90% users migrated
-- Strong business case
+**Removal Only if ALL True**:
+- > 90% of active users migrated to Neo4j
+- Strong business case for removal
 - Significant maintenance burden
+- Alternative: Keep NetworkX indefinitely
 
-**User Action**:
+**User Action** (if removal happens):
 - Must migrate to Neo4j
+- Dark mode migration path still available in v3.x
+- Migration support provided
+
+**Note**: This removal is **optional** and may never happen if NetworkX users remain significant.
 - Or stay on v3.x LTS (long-term support)
 
 ---
@@ -294,26 +391,35 @@ driver.close()
 
 ---
 
-### Step 2: Update GraphRAG Configuration
+### Step 2: Update GraphRAG Configuration for Dark Mode
 
 #### Update settings.yaml
 
 ```yaml
-# Before (Parquet only)
+# Before (NetworkX only)
 storage:
-  type: parquet
-  base_dir: ./output
+  type: networkx_only
+  networkx:
+    cache_dir: ./cache
+    vector_store:
+      type: lancedb
+      uri: ./output/lancedb
 
-# After (Hybrid mode - recommended for migration)
+# After (Dark mode - RECOMMENDED for migration)
 storage:
-  type: hybrid  # Write to both, read from Neo4j
+  type: dark_mode  # Run both in parallel, validate Neo4j
 
-  # Parquet config (for backup)
-  parquet:
-    base_dir: ./output
+  # NetworkX config (continues serving production)
+  networkx:
+    enabled: true
+    cache_dir: ./cache
+    vector_store:
+      type: lancedb
+      uri: ./output/lancedb
 
-  # Neo4j config
+  # Neo4j config (shadow execution)
   neo4j:
+    enabled: true
     uri: "bolt://localhost:7687"
     username: "neo4j"
     password: "${NEO4J_PASSWORD}"  # Use env var for security
@@ -331,9 +437,54 @@ storage:
     # Vector index settings
     vector_index:
       enabled: true
-      dimensions: 1536
+      dimensions: 1536  # Or 384 for SentenceTransformer
       similarity_function: cosine
+
+  # Dark mode specific settings
+  dark_mode:
+    enabled: true
+    primary_backend: networkx  # NetworkX is production
+    shadow_backend: neo4j      # Neo4j is shadow
+
+    # Comparison settings
+    comparison:
+      enabled: true
+      log_path: ./dark_mode_logs  # Where to save comparison data
+      log_format: jsonl
+
+      # Metrics to collect
+      metrics:
+        - entity_count
+        - relationship_count
+        - community_match_rate
+        - query_f1
+        - query_ranking_correlation
+        - latency_ratio
+        - error_rates
+
+      # Sample rate (1.0 = 100% of operations)
+      sample_rate: 1.0
+
+    # Error handling
+    error_handling:
+      shadow_failure_action: log  # Don't fail on Neo4j errors
+      continue_on_shadow_error: true
+
+    # Cutover criteria (when it's safe to switch)
+    cutover_criteria:
+      entity_match_rate_threshold: 0.99      # 99% match
+      community_match_rate_threshold: 0.95   # 95% match
+      query_f1_threshold: 0.95               # 95% F1
+      latency_ratio_threshold: 2.0           # < 2x NetworkX
+      shadow_error_rate_threshold: 0.01      # < 1% errors
 ```
+
+**What Dark Mode Does**:
+- NetworkX handles all user requests (production)
+- Neo4j runs identical operations in parallel (shadow)
+- Comparison framework logs differences
+- Neo4j failures don't affect users
+- You get a detailed comparison report
 
 #### Set Environment Variables
 
@@ -459,14 +610,127 @@ graphrag query \
 
 ---
 
-### Step 5: Switch to Neo4j Only (Optional)
+### Step 4: Run Dark Mode and Collect Metrics
 
-Once confident, switch to Neo4j-only mode:
+With dark mode enabled, run your normal operations:
 
+```bash
+# Re-index your data (both NetworkX and Neo4j will process)
+graphrag index --config settings.yaml
+
+# Run queries (both backends execute, NetworkX results returned)
+graphrag query --method local "your query"
+graphrag query --method global "your query"
+
+# Run for 1-2 weeks to collect sufficient data
+# - Indexing operations: both backends process
+# - Query operations: both backends execute
+# - NetworkX results served to users (zero risk)
+# - Neo4j results logged for comparison
+```
+
+**What's Happening**:
+```
+User Request → DarkModeOrchestrator
+                   ↓         ↓
+              NetworkX    Neo4j (shadow)
+                   ↓         ↓
+              User Gets   Logged for
+              Result ✅   Comparison 📊
+```
+
+**Monitoring**:
+```bash
+# Check dark mode logs
+tail -f logs/graphrag.log | grep "dark_mode"
+
+# Check Neo4j is running (should see INFO logs, not ERROR)
+tail -f logs/graphrag.log | grep "neo4j"
+
+# Watch comparison metrics accumulate
+ls -lh dark_mode_logs/
+# Should see: comparison_metrics.jsonl growing
+```
+
+**Duration**:
+- **Minimum**: 1 week, 100+ operations
+- **Recommended**: 2-4 weeks, 1000+ operations
+- **For production**: Run until confident
+
+---
+
+### Step 5: Review Dark Mode Comparison Report
+
+After collecting data, generate the comparison report:
+
+```bash
+# Generate comprehensive report
+graphrag dark-mode-report \
+  --log-path ./dark_mode_logs \
+  --output dark_mode_report.html
+
+# Open report in browser
+open dark_mode_report.html  # Mac
+xdg-open dark_mode_report.html  # Linux
+```
+
+**Report Sections**:
+
+1. **Validation Summary**
+   - Period: Feb 1 - Feb 28, 2026
+   - Total operations: 2,847
+   - Breakdown: 12 indexing, 2,835 queries
+
+2. **Comparison Metrics**
+   ```
+   Metric                      | Threshold | Actual | Pass
+   ----------------------------|-----------|--------|------
+   Entity match rate           | > 99%     | 99.8%  | ✅
+   Relationship match rate     | > 99%     | 99.7%  | ✅
+   Community match rate        | > 95%     | 96.3%  | ✅
+   Avg query F1 score          | > 95%     | 97.2%  | ✅
+   Avg ranking correlation     | > 0.90    | 0.94   | ✅
+   P95 latency ratio           | < 2.0x    | 1.3x   | ✅
+   Neo4j error rate            | < 1%      | 0.2%   | ✅
+   ```
+
+3. **Performance Analysis**
+   - Indexing: Neo4j 6.1x faster (5.2s vs 31.8s)
+   - Queries: Neo4j 1.3x faster (15ms vs 19ms p95)
+   - Memory: Neo4j uses 1.5x more (acceptable)
+
+4. **Issue Log**
+   - 5 Neo4j timeouts (0.2% of operations)
+   - 3 community assignment differences (0.1%)
+   - All within acceptable thresholds
+
+5. **Cutover Recommendation**
+   ```
+   ✅ RECOMMENDATION: GO for cutover
+
+   All metrics pass cutover criteria.
+   Neo4j is ready for production use.
+   ```
+
+**Decision Matrix**:
+
+| Metrics Pass | Recommendation | Action |
+|--------------|----------------|--------|
+| ✅ All pass | **GO** | Proceed to Step 6 (cutover) |
+| ⚠️ Some fail | **INVESTIGATE** | Extend dark mode, fix issues |
+| ❌ Many fail | **NO-GO** | Stay on NetworkX, reconsider |
+
+---
+
+### Step 6: Cutover to Neo4j Only (If Metrics Pass)
+
+Once the report shows all metrics pass, switch to Neo4j-only mode:
+
+**Configuration Change**:
 ```yaml
 # settings.yaml
 storage:
-  type: neo4j  # Neo4j only (no Parquet backup)
+  type: neo4j_only  # Neo4j only (validated via dark mode)
 
   neo4j:
     uri: "bolt://localhost:7687"
@@ -475,14 +739,50 @@ storage:
     database: "neo4j"
 ```
 
-**Benefits**:
-- Slightly faster (no duplicate writes)
-- Simpler configuration
-- Reduced disk usage
+**Deployment**:
+```bash
+# 1. Backup current state
+cp settings.yaml settings.yaml.backup
 
-**Trade-offs**:
-- No Parquet backup (rely on Neo4j backups)
-- Can't easily switch back
+# 2. Update configuration to neo4j_only
+# (edit settings.yaml as shown above)
+
+# 3. Restart GraphRAG
+# (depends on your deployment: restart service, re-run, etc.)
+
+# 4. Verify cutover
+graphrag query --method local "test query"
+# Should use Neo4j, no dark mode logging
+
+# 5. Monitor closely for 24-48 hours
+tail -f logs/graphrag.log | grep "ERROR"
+```
+
+**Rollback Procedure** (if issues arise):
+```yaml
+# Instant rollback - one line change
+storage:
+  type: networkx_only  # Revert to NetworkX
+
+# Or go back to dark mode for more validation
+storage:
+  type: dark_mode
+```
+
+**Benefits of Cutover**:
+- ✅ 6x faster community detection (validated in dark mode)
+- ✅ Faster queries (validated in dark mode)
+- ✅ Hybrid query capabilities
+- ✅ Production features (ACID, backup)
+- ✅ No more dark mode overhead (single backend)
+
+**Monitoring Post-Cutover**:
+- Watch error rates (should be < 0.1%)
+- Monitor latency (should match dark mode predictions)
+- Track user feedback
+- Ready to rollback if needed
+
+**Success!** 🎉 You've migrated to Neo4j with zero risk using dark mode.
 
 ---
 
