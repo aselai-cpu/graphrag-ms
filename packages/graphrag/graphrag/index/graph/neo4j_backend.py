@@ -71,17 +71,44 @@ class Neo4jBackend(GraphBackend):
         self.batch_size = batch_size
         self.node_label = node_label
         self.relationship_type = relationship_type
+        self.driver = None  # Initialize to None for safe cleanup
 
-        # Create Neo4j driver
-        self.driver = neo4j.GraphDatabase.driver(
-            uri,
-            auth=(username, password),
-            **kwargs,
-        )
+        try:
+            # Create Neo4j driver
+            logger.info("Connecting to Neo4j at %s (database: %s)", uri, database)
+            self.driver = neo4j.GraphDatabase.driver(
+                uri,
+                auth=(username, password),
+                **kwargs,
+            )
 
-        # Verify connectivity
-        self.driver.verify_connectivity()
-        logger.info("Connected to Neo4j at %s", uri)
+            # Verify connectivity
+            self.driver.verify_connectivity()
+            logger.info("Successfully connected to Neo4j at %s", uri)
+
+        except neo4j.exceptions.ServiceUnavailable as e:
+            logger.error(
+                "Failed to connect to Neo4j at %s. Is Neo4j running? Error: %s",
+                uri, e
+            )
+            raise ConnectionError(
+                f"Cannot connect to Neo4j at {uri}. "
+                f"Please ensure Neo4j is running and accessible. "
+                f"Original error: {e}"
+            ) from e
+        except neo4j.exceptions.AuthError as e:
+            logger.error(
+                "Authentication failed for Neo4j at %s. Check username/password. Error: %s",
+                uri, e
+            )
+            raise ValueError(
+                f"Neo4j authentication failed at {uri}. "
+                f"Please check NEO4J_PASSWORD environment variable. "
+                f"Original error: {e}"
+            ) from e
+        except Exception as e:
+            logger.error("Unexpected error connecting to Neo4j: %s", e)
+            raise
 
         # Track entity ID column name
         self._entity_id_col: str = "title"
@@ -405,10 +432,14 @@ class Neo4jBackend(GraphBackend):
 
     def close(self) -> None:
         """Close Neo4j driver connection."""
-        if self.driver:
+        if hasattr(self, "driver") and self.driver:
             self.driver.close()
             logger.info("Closed Neo4j connection")
 
     def __del__(self):
         """Clean up on deletion."""
-        self.close()
+        try:
+            self.close()
+        except Exception:
+            # Silently ignore errors during cleanup
+            pass

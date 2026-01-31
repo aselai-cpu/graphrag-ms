@@ -159,10 +159,34 @@ def create_graph_backend_with_dark_mode(
         **primary_backend_kwargs,
     )
 
-    shadow_backend = create_graph_backend(
-        dark_mode_config.shadow_backend,
-        **shadow_backend_kwargs,
-    )
+    # Try to create shadow backend - if it fails, provide helpful error message
+    try:
+        shadow_backend = create_graph_backend(
+            dark_mode_config.shadow_backend,
+            **shadow_backend_kwargs,
+        )
+    except ConnectionError as e:
+        logger.error(
+            "Failed to initialize shadow backend (%s). "
+            "Dark mode requires shadow backend to be accessible. "
+            "Error: %s",
+            dark_mode_config.shadow_backend,
+            e,
+        )
+        raise RuntimeError(
+            f"Dark mode enabled but shadow backend ({dark_mode_config.shadow_backend}) "
+            f"cannot be initialized. Please either:\n"
+            f"  1. Ensure {dark_mode_config.shadow_backend} is running and accessible\n"
+            f"  2. Disable dark mode: Set dark_mode.enabled: false in settings.yaml\n"
+            f"Original error: {e}"
+        ) from e
+    except Exception as e:
+        logger.error(
+            "Unexpected error initializing shadow backend (%s): %s",
+            dark_mode_config.shadow_backend,
+            e,
+        )
+        raise
 
     # Create comparison framework with configured thresholds
     comparison_framework = ComparisonFramework(
