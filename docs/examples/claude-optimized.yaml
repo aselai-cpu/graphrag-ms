@@ -1,0 +1,36 @@
+# Cost-optimized Claude configuration
+# Uses Haiku for extraction, Sonnet for quality work
+
+completion_models:
+  # Fast, cheap extraction
+  haiku_extraction:
+    model_provider: anthropic
+    model: claude-3-haiku-20240307  # $0.25/$1.25 per 1M tokens
+    api_key: ${ANTHROPIC_API_KEY}
+    rate_limit:
+      type: sliding_window
+      max_requests_per_minute: 1000
+
+  # Quality reports and summaries
+  sonnet_quality:
+    model_provider: anthropic
+    model: claude-3-5-sonnet-20241022  # $3/$15 per 1M tokens
+    api_key: ${ANTHROPIC_API_KEY}
+
+embedding_models:
+  default_embedding_model:
+    model_provider: openai
+    model: text-embedding-3-small
+    api_key: ${OPENAI_API_KEY}
+
+# Workflow-specific model assignments
+extract_graph:
+  completion_model_id: haiku_extraction
+
+summarize_descriptions:
+  completion_model_id: sonnet_quality
+
+community_reports:
+  completion_model_id: sonnet_quality
+
+# Expected cost savings: 95% compared to GPT-4 Turbo

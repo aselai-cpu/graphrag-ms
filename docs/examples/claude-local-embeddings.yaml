@@ -1,0 +1,23 @@
+# Claude + Local Embeddings (Maximum cost savings + Privacy)
+# Zero cost for embeddings, 95% cost reduction overall
+
+completion_models:
+  default_completion_model:
+    model_provider: anthropic
+    model: claude-3-haiku-20240307
+    api_key: ${ANTHROPIC_API_KEY}
+
+embedding_models:
+  default_embedding_model:
+    type: sentence_transformer  # Local embeddings
+    model: BAAI/bge-large-en-v1.5  # High-quality model
+    device: cuda  # or cpu, mps (Mac M1/M2)
+    batch_size: 32
+    normalize_embeddings: true
+
+# Benefits:
+# - Zero embedding costs (runs locally)
+# - Full data privacy (never leaves your machine)
+# - No rate limits
+# - Offline capable
+# Expected cost: ~$10-15 per 1000 docs (vs $330 with OpenAI)

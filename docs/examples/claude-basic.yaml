@@ -1,0 +1,23 @@
+# Basic Claude configuration for GraphRAG
+# Replace OpenAI with Claude for text generation
+
+completion_models:
+  default_completion_model:
+    model_provider: anthropic  # Use Anthropic's Claude
+    model: claude-3-5-sonnet-20241022  # Latest Sonnet model
+    api_key: ${ANTHROPIC_API_KEY}  # Set in environment
+
+    # Optional: Configure retry behavior
+    retry:
+      type: exponential_backoff
+      max_retries: 5
+      max_wait: 60.0
+
+embedding_models:
+  default_embedding_model:
+    model_provider: openai  # Keep OpenAI for embeddings
+    model: text-embedding-3-small
+    api_key: ${OPENAI_API_KEY}
+
+# Expected cost savings: 70% compared to GPT-4 Turbo
+# Context window: 200K tokens (vs GPT-4's 128K)
