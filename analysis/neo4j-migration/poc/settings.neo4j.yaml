@@ -1,0 +1,89 @@
+# Neo4j POC Settings
+# This is a minimal configuration file for POC testing
+
+### LLM settings (required for GraphRAG) ###
+completion_models:
+  default_completion_model:
+    model_provider: anthropic
+    model: claude-sonnet-4-5-20250929
+    auth_method: api_key
+    api_key: ${GRAPHRAG_API_KEY}
+    call_args:
+      temperature: 0
+      max_tokens: 4096
+
+embedding_models:
+  default_embedding_model:
+    type: sentence_transformer
+    model_provider: sentence_transformer
+    model: all-MiniLM-L6-v2
+
+### Storage settings ###
+input_storage:
+  type: file
+  base_dir: "input"
+
+output_storage:
+  type: file
+  base_dir: "output"
+
+reporting:
+  type: file
+  base_dir: "logs"
+
+cache:
+  type: json
+  storage:
+    type: file
+    base_dir: "cache"
+
+### Neo4j Storage Configuration ###
+storage:
+  type: neo4j_only  # For POC, test Neo4j directly
+
+  neo4j:
+    enabled: true
+
+    # Connection settings (from docker-compose.yml)
+    uri: "bolt://localhost:7687"
+    username: "neo4j"
+    password: "${NEO4J_PASSWORD}"  # Environment variable
+    database: "neo4j"
+
+    # Connection pool settings
+    max_connection_pool_size: 50
+    connection_acquisition_timeout: 60
+
+    # Performance settings
+    batch_size: 1000
+
+    # Graph Data Science settings
+    gds:
+      enabled: true
+      community_algorithm: louvain
+      max_cluster_size: 10
+      louvain_max_levels: 10
+      louvain_seed: 12345
+      louvain_tolerance: 0.0001
+
+    # Vector index settings (for entity descriptions)
+    vector_index:
+      enabled: true
+      dimensions: 384  # SentenceTransformer all-MiniLM-L6-v2
+      similarity_function: cosine
+
+### Workflow settings (minimal for POC) ###
+chunking:
+  type: tokens
+  size: 1200
+  overlap: 100
+  encoding_model: o200k_base
+
+extract_graph:
+  completion_model_id: default_completion_model
+  prompt: "prompts/extract_graph.txt"
+  entity_types: [organization,person,geo,event]
+  max_gleanings: 1
+
+cluster_graph:
+  max_cluster_size: 10
