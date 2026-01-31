@@ -14,6 +14,58 @@ from graphrag.index.graph.graph_backend import Communities, CommunityResult, Gra
 logger = logging.getLogger(__name__)
 
 
+def sanitize_neo4j_label(label: str | None) -> str | None:
+    """Sanitize entity type to valid Neo4j label name.
+
+    Neo4j label requirements:
+    - Must start with letter or underscore
+    - Can contain letters, numbers, underscores
+    - Case-sensitive
+    - Cannot be empty
+
+    Examples
+    --------
+        "person" -> "Person"
+        "ORGANIZATION" -> "Organization"
+        "geo location" -> "GeoLocation"
+        "" -> None
+        None -> None
+
+    Parameters
+    ----------
+    label : str | None
+        Entity type string to sanitize
+
+    Returns
+    -------
+    str | None
+        Sanitized label name or None if invalid
+    """
+    import re
+
+    if not label or not label.strip():
+        return None
+
+    # Remove leading/trailing whitespace
+    label = label.strip()
+
+    # Replace spaces and special chars with underscores
+    label = re.sub(r'[^a-zA-Z0-9_]', '_', label)
+
+    # Remove leading numbers/underscores
+    label = re.sub(r'^[0-9_]+', '', label)
+
+    # If empty after sanitization, return None
+    if not label:
+        return None
+
+    # Capitalize first letter of each word (PascalCase)
+    parts = label.split('_')
+    label = ''.join(part.capitalize() for part in parts if part)
+
+    return label if label else None
+
+
 class Neo4jBackend(GraphBackend):
     """Neo4j-based graph backend implementation using Graph Data Science (GDS).
 
@@ -44,6 +96,7 @@ class Neo4jBackend(GraphBackend):
         node_label: str = "Entity",
         relationship_type: str = "RELATED_TO",
         gds_library: bool = True,
+        use_entity_type_labels: bool = True,
         **kwargs: Any,
     ):
         """Initialize Neo4j backend.
@@ -66,6 +119,8 @@ class Neo4jBackend(GraphBackend):
             Type for relationships, by default "RELATED_TO"
         gds_library : bool, optional
             Whether to use Neo4j GDS library for community detection, by default True
+        use_entity_type_labels : bool, optional
+            Whether to add entity type as additional node label (requires APOC), by default True
         **kwargs : Any
             Additional Neo4j driver configuration (e.g., max_connection_pool_size)
         """
@@ -75,6 +130,7 @@ class Neo4jBackend(GraphBackend):
         self.node_label = node_label
         self.relationship_type = relationship_type
         self.gds_library = gds_library
+        self.use_entity_type_labels = use_entity_type_labels
         self.driver = None  # Initialize to None for safe cleanup
 
         try:
@@ -84,7 +140,7 @@ class Neo4jBackend(GraphBackend):
             # Filter out our custom parameters
             driver_kwargs = {
                 k: v for k, v in kwargs.items()
-                if k not in ["gds_library"]  # Our custom params that shouldn't go to driver
+                if k not in ["gds_library", "use_entity_type_labels", "node_label", "relationship_type"]  # Our custom params
             }
             self.driver = neo4j.GraphDatabase.driver(
                 uri,
@@ -95,6 +151,23 @@ class Neo4jBackend(GraphBackend):
             # Verify connectivity
             self.driver.verify_connectivity()
             logger.info("Successfully connected to Neo4j at %s", uri)
+
+            # Verify APOC is available if using entity type labels
+            if self.use_entity_type_labels:
+                try:
+                    with self.driver.session(database=self.database) as session:
+                        result = session.run("RETURN apoc.version() AS version")
+                        apoc_version = result.single()["version"]
+                        logger.info("APOC plugin available, version: %s", apoc_version)
+                except Exception as e:
+                    logger.error(
+                        "APOC library not found but use_entity_type_labels=True. Error: %s", e
+                    )
+                    raise RuntimeError(
+                        "APOC library required for use_entity_type_labels=True. "
+                        "Please install APOC (https://neo4j.com/labs/apoc/) "
+                        "or set use_entity_type_labels=False in configuration."
+                    ) from e
 
         except neo4j.exceptions.ServiceUnavailable as e:
             logger.error(
@@ -152,23 +225,66 @@ class Neo4jBackend(GraphBackend):
                 f"FOR (e:{self.node_label}) ON (e.{entity_id_col})"
             )
 
+            # Create type-specific indexes if using type labels
+            if self.use_entity_type_labels and "type" in entities.columns:
+                unique_types = entities["type"].dropna().unique()
+                for entity_type in unique_types:
+                    sanitized_type = sanitize_neo4j_label(entity_type)
+                    if sanitized_type:
+                        logger.debug("Creating index for type: %s", sanitized_type)
+                        session.run(
+                            f"CREATE INDEX {sanitized_type.lower()}_id IF NOT EXISTS "
+                            f"FOR (e:{sanitized_type}) ON (e.{entity_id_col})"
+                        )
+
             # Write entities in batches
             entity_count = 0
             for i in range(0, len(entities), self.batch_size):
                 batch = entities.iloc[i : i + self.batch_size]
 
-                # Prepare batch data (convert NaN to None)
-                batch_data = batch.fillna("").to_dict("records")
+                # Prepare batch data with sanitized type labels
+                batch_data = []
+                for _, row in batch.iterrows():
+                    entity_dict = row.fillna("").to_dict()
 
-                result = session.run(
-                    f"""
-                    UNWIND $entities AS entity
-                    CREATE (e:{self.node_label})
-                    SET e = entity
-                    RETURN count(e) AS created
-                    """,
-                    entities=batch_data,
-                )
+                    # Add sanitized label if using type labels
+                    if self.use_entity_type_labels and "type" in entity_dict:
+                        sanitized_type = sanitize_neo4j_label(entity_dict.get("type"))
+                        entity_dict["_label"] = sanitized_type  # Store for Cypher
+                    else:
+                        entity_dict["_label"] = None
+
+                    batch_data.append(entity_dict)
+
+                # Use APOC to create nodes with dynamic labels
+                if self.use_entity_type_labels:
+                    result = session.run(
+                        f"""
+                        UNWIND $entities AS entity
+                        CALL apoc.create.node(
+                            CASE
+                                WHEN entity._label IS NOT NULL
+                                THEN ['{self.node_label}'] + [entity._label]
+                                ELSE ['{self.node_label}']
+                            END,
+                            apoc.map.removeKey(entity, '_label')
+                        )
+                        YIELD node
+                        RETURN count(node) AS created
+                        """,
+                        entities=batch_data,
+                    )
+                else:
+                    # Fallback to simple CREATE if not using type labels
+                    result = session.run(
+                        f"""
+                        UNWIND $entities AS entity
+                        CREATE (e:{self.node_label})
+                        SET e = entity
+                        RETURN count(e) AS created
+                        """,
+                        entities=batch_data,
+                    )
                 count = result.single()["created"]
                 entity_count += count
                 logger.debug("Batch %d: Created %d entities", i // self.batch_size + 1, count)
@@ -439,6 +555,238 @@ class Neo4jBackend(GraphBackend):
                 f"MATCH ()-[r:{self.relationship_type}]->() RETURN count(r) AS count"
             )
             return result.single()["count"]
+
+    def load_text_units(
+        self,
+        text_units: pd.DataFrame,
+        *,
+        entity_id_col: str = "title",
+    ) -> None:
+        """Load text units into Neo4j and create relationships to entities.
+
+        Creates TextUnit nodes and MENTIONS relationships to entities.
+
+        Parameters
+        ----------
+        text_units : pd.DataFrame
+            DataFrame with columns: id, text, n_tokens, entity_ids, relationship_ids
+        entity_id_col : str, optional
+            Column name for entity identifier, by default "title"
+        """
+        if text_units.empty:
+            logger.info("No text units to load")
+            return
+
+        with self.driver.session(database=self.database) as session:
+            # Clear existing TextUnit nodes
+            logger.info("Clearing existing TextUnit nodes")
+            session.run("MATCH (t:TextUnit) DETACH DELETE t")
+
+            # Create TextUnit nodes in batches
+            text_unit_count = 0
+            for i in range(0, len(text_units), self.batch_size):
+                batch = text_units.iloc[i : i + self.batch_size]
+
+                # Prepare batch data
+                batch_data = []
+                for _, row in batch.iterrows():
+                    unit_dict = {
+                        "id": row["id"],
+                        "text": row.get("text", ""),
+                        "n_tokens": int(row.get("n_tokens", 0)) if pd.notna(row.get("n_tokens")) else 0,
+                    }
+                    batch_data.append(unit_dict)
+
+                # Create TextUnit nodes
+                result = session.run(
+                    """
+                    UNWIND $units AS unit
+                    CREATE (t:TextUnit)
+                    SET t = unit
+                    RETURN count(t) AS created
+                    """,
+                    units=batch_data,
+                )
+                count = result.single()["created"]
+                text_unit_count += count
+                logger.debug("Batch %d: Created %d text units", i // self.batch_size + 1, count)
+
+            logger.info("Created %d TextUnit nodes", text_unit_count)
+
+            # Create MENTIONS relationships to entities
+            mentions_count = 0
+            for _, row in text_units.iterrows():
+                text_unit_id = row["id"]
+                entity_ids = row.get("entity_ids", [])
+
+                # Check if entity_ids is empty or null
+                if entity_ids is None or (isinstance(entity_ids, float) and pd.isna(entity_ids)):
+                    continue
+
+                # Convert to list if needed
+                if isinstance(entity_ids, str):
+                    import ast
+                    entity_ids = ast.literal_eval(entity_ids)
+
+                # Check if list is empty
+                if isinstance(entity_ids, list) and len(entity_ids) == 0:
+                    continue
+
+                # Create relationships in batch
+                result = session.run(
+                    f"""
+                    MATCH (t:TextUnit {{id: $text_unit_id}})
+                    UNWIND $entity_ids AS entity_id
+                    MATCH (e:{self.node_label} {{id: entity_id}})
+                    CREATE (t)-[:MENTIONS]->(e)
+                    RETURN count(*) AS created
+                    """,
+                    text_unit_id=text_unit_id,
+                    entity_ids=entity_ids,
+                )
+                if result.peek():
+                    mentions_count += result.single()["created"]
+
+            logger.info("Created %d MENTIONS relationships", mentions_count)
+
+    def load_communities(
+        self,
+        communities: pd.DataFrame,
+        community_reports: pd.DataFrame | None = None,
+    ) -> None:
+        """Load communities into Neo4j and create hierarchical relationships.
+
+        Creates Community nodes with summaries and creates:
+        - CONTAINS relationships to entities
+        - PARENT_OF relationships for hierarchy
+
+        Parameters
+        ----------
+        communities : pd.DataFrame
+            DataFrame with columns: id, title, level, parent, entity_ids, text_unit_ids
+        community_reports : pd.DataFrame | None, optional
+            DataFrame with community summaries and reports
+        """
+        if communities.empty:
+            logger.info("No communities to load")
+            return
+
+        with self.driver.session(database=self.database) as session:
+            # Clear existing Community nodes
+            logger.info("Clearing existing Community nodes")
+            session.run("MATCH (c:Community) DETACH DELETE c")
+
+            # Merge community reports if provided
+            communities_with_reports = communities.copy()
+            if community_reports is not None and not community_reports.empty:
+                # Merge on community ID
+                communities_with_reports = communities.merge(
+                    community_reports[["community", "summary", "findings", "full_content", "rank"]],
+                    on="community",
+                    how="left",
+                    suffixes=("", "_report"),
+                )
+
+            # Create Community nodes in batches
+            community_count = 0
+            for i in range(0, len(communities_with_reports), self.batch_size):
+                batch = communities_with_reports.iloc[i : i + self.batch_size]
+
+                # Prepare batch data
+                batch_data = []
+                for _, row in batch.iterrows():
+                    comm_dict = {
+                        "id": row["id"],
+                        "community": int(row["community"]) if pd.notna(row["community"]) else -1,
+                        "title": row.get("title", ""),
+                        "level": int(row["level"]) if pd.notna(row["level"]) else 0,
+                        "size": int(row.get("size", 0)) if pd.notna(row.get("size")) else 0,
+                    }
+
+                    # Add optional fields
+                    if "summary" in row and pd.notna(row["summary"]):
+                        comm_dict["summary"] = row["summary"]
+                    if "rank" in row and pd.notna(row["rank"]):
+                        comm_dict["rank"] = float(row["rank"])
+
+                    batch_data.append(comm_dict)
+
+                # Create Community nodes
+                result = session.run(
+                    """
+                    UNWIND $communities AS comm
+                    CREATE (c:Community)
+                    SET c = comm
+                    RETURN count(c) AS created
+                    """,
+                    communities=batch_data,
+                )
+                count = result.single()["created"]
+                community_count += count
+                logger.debug("Batch %d: Created %d communities", i // self.batch_size + 1, count)
+
+            logger.info("Created %d Community nodes", community_count)
+
+            # Create CONTAINS relationships to entities
+            contains_count = 0
+            for _, row in communities_with_reports.iterrows():
+                community_id = row["id"]
+                entity_ids = row.get("entity_ids", [])
+
+                # Check if entity_ids is empty or null
+                if entity_ids is None or (isinstance(entity_ids, float) and pd.isna(entity_ids)):
+                    continue
+
+                # Convert to list if needed
+                if isinstance(entity_ids, str):
+                    import ast
+                    entity_ids = ast.literal_eval(entity_ids)
+
+                # Check if list is empty
+                if isinstance(entity_ids, list) and len(entity_ids) == 0:
+                    continue
+
+                # Create relationships in batch
+                result = session.run(
+                    f"""
+                    MATCH (c:Community {{id: $community_id}})
+                    UNWIND $entity_ids AS entity_id
+                    MATCH (e:{self.node_label} {{id: entity_id}})
+                    CREATE (c)-[:CONTAINS]->(e)
+                    RETURN count(*) AS created
+                    """,
+                    community_id=community_id,
+                    entity_ids=entity_ids,
+                )
+                if result.peek():
+                    contains_count += result.single()["created"]
+
+            logger.info("Created %d CONTAINS relationships", contains_count)
+
+            # Create PARENT_OF relationships for hierarchy
+            parent_count = 0
+            for _, row in communities_with_reports.iterrows():
+                if "parent" not in row or pd.isna(row["parent"]) or row["parent"] == "":
+                    continue
+
+                child_community = int(row["community"])
+                parent_community = int(row["parent"])
+
+                # Find parent community node by community number
+                result = session.run(
+                    """
+                    MATCH (parent:Community {community: $parent_community})
+                    MATCH (child:Community {community: $child_community})
+                    CREATE (parent)-[:PARENT_OF]->(child)
+                    RETURN count(*) AS created
+                    """,
+                    parent_community=parent_community,
+                    child_community=child_community,
+                )
+                if result.peek():
+                    parent_count += result.single()["created"]
+
+            logger.info("Created %d PARENT_OF relationships", parent_count)
 
     def close(self) -> None:
         """Close Neo4j driver connection."""

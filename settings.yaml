@@ -133,6 +133,11 @@ neo4j:
   database: neo4j  # Default database name
   gds_library: true  # Use Graph Data Science library for community detection
 
+  # Label and type configuration
+  node_label: Entity  # Base label for all entity nodes
+  relationship_type: RELATED_TO  # Type for all relationships
+  use_entity_type_labels: true  # Add entity type as additional label (e.g., :Entity:Person). Requires APOC plugin.
+
 extract_claims:
   enabled: false
   completion_model_id: default_completion_model  # Use fast Haiku for claims

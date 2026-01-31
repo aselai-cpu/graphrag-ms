@@ -38,6 +38,11 @@ async def run_workflow(
     use_lcc = config.cluster_graph.use_lcc
     seed = config.cluster_graph.seed
 
+    # Debug logging
+    logger.info("Config check - dark_mode.enabled: %s, neo4j config: %s",
+               config.dark_mode.enabled if hasattr(config, 'dark_mode') else "NO ATTR",
+               "present" if config.neo4j is not None else "None")
+
     # Check if dark mode is enabled
     if config.dark_mode.enabled:
         logger.info("Dark mode enabled - using graph backend abstraction")
@@ -60,6 +65,13 @@ async def run_workflow(
         )
 
     await write_table_to_storage(output, "communities", context.output_storage)
+
+    # Load additional data into Neo4j if Neo4j is configured
+    if config.neo4j is not None:
+        logger.info("Neo4j configured, loading additional data (text units, communities)")
+        await _load_additional_neo4j_data_from_storage(config, context)
+    else:
+        logger.debug("Neo4j not configured, skipping additional data loading")
 
     logger.info("Workflow completed: create_communities")
     return WorkflowFunctionOutput(result=output)
@@ -100,6 +112,9 @@ def create_communities_with_backend(
             "password": config.neo4j.password,
             "database": config.neo4j.database,
             "gds_library": config.neo4j.gds_library,
+            "node_label": config.neo4j.node_label,
+            "relationship_type": config.neo4j.relationship_type,
+            "use_entity_type_labels": config.neo4j.use_entity_type_labels,
         }
         logger.info("Using Neo4j shadow backend: %s (database: %s)",
                    config.neo4j.uri, config.neo4j.database)
@@ -259,3 +274,65 @@ def _process_communities(
         :,
         COMMUNITIES_FINAL_COLUMNS,
     ]
+
+
+async def _load_additional_neo4j_data_from_storage(
+    config: GraphRagConfig,
+    context: PipelineRunContext,
+) -> None:
+    """Load text units, communities, and community reports into Neo4j.
+
+    This function loads additional graph data beyond entities and relationships:
+    - TextUnit nodes with MENTIONS relationships to entities
+    - Community nodes with CONTAINS relationships to entities and PARENT_OF hierarchy
+    """
+    from graphrag.index.graph.neo4j_backend import Neo4jBackend
+
+    logger.info("Loading additional data into Neo4j: text units, communities, community reports")
+
+    # Create a Neo4j backend instance to load additional data
+    if config.neo4j is None:
+        logger.warning("Neo4j configuration not found, skipping additional data loading")
+        return
+
+    try:
+        neo4j_backend = Neo4jBackend(
+            uri=config.neo4j.uri,
+            username=config.neo4j.username,
+            password=config.neo4j.password,
+            database=config.neo4j.database,
+            node_label=config.neo4j.node_label,
+            relationship_type=config.neo4j.relationship_type,
+            use_entity_type_labels=config.neo4j.use_entity_type_labels,
+        )
+
+        # Load text units from storage
+        text_units = await load_table_from_storage("text_units", context.storage)
+        if text_units is not None and not text_units.empty:
+            logger.info("Loading %d text units into Neo4j", len(text_units))
+            neo4j_backend.load_text_units(text_units)
+        else:
+            logger.warning("No text units found in storage")
+
+        # Load communities from storage (created by this workflow)
+        communities = await load_table_from_storage("communities", context.output_storage)
+
+        # Load community reports from storage (if available)
+        try:
+            community_reports = await load_table_from_storage("community_reports", context.storage)
+        except Exception:
+            logger.warning("Community reports not yet available, loading communities without reports")
+            community_reports = None
+
+        if communities is not None and not communities.empty:
+            logger.info("Loading %d communities into Neo4j", len(communities))
+            neo4j_backend.load_communities(communities, community_reports)
+        else:
+            logger.warning("No communities found in storage")
+
+        neo4j_backend.close()
+
+    except Exception as e:
+        # Don't fail the whole workflow if additional data loading fails
+        logger.error("Error loading additional data into Neo4j: %s", e, exc_info=True)
+        logger.warning("Continuing workflow despite Neo4j loading error")

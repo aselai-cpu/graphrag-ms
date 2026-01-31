@@ -31,3 +31,15 @@ class Neo4jConfig(BaseModel):
         description="Whether to use Neo4j Graph Data Science library for community detection",
         default=True,
     )
+    node_label: str = Field(
+        description="Base label for entity nodes in Neo4j",
+        default="Entity",
+    )
+    relationship_type: str = Field(
+        description="Type for entity relationships in Neo4j",
+        default="RELATED_TO",
+    )
+    use_entity_type_labels: bool = Field(
+        description="Whether to add entity type as additional node label (e.g., :Entity:Person). Requires APOC plugin.",
+        default=True,
+    )
