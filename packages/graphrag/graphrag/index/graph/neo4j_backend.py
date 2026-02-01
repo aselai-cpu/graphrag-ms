@@ -788,6 +788,103 @@ class Neo4jBackend(GraphBackend):
 
             logger.info("Created %d PARENT_OF relationships", parent_count)
 
+    def load_documents(
+        self,
+        documents: pd.DataFrame,
+    ) -> None:
+        """Load documents into Neo4j and create relationships to text units.
+
+        Creates Document nodes and HAS_TEXT_UNIT relationships to TextUnits.
+
+        Parameters
+        ----------
+        documents : pd.DataFrame
+            DataFrame with columns: id, title, text_unit_ids
+        """
+        if documents.empty:
+            logger.info("No documents to load")
+            return
+
+        with self.driver.session(database=self.database) as session:
+            # Clear existing Document nodes
+            logger.info("Clearing existing Document nodes")
+            session.run("MATCH (d:Document) DETACH DELETE d")
+
+            # Create Document nodes in batches
+            document_count = 0
+            for i in range(0, len(documents), self.batch_size):
+                batch = documents.iloc[i : i + self.batch_size]
+
+                # Prepare batch data
+                batch_data = []
+                for _, row in batch.iterrows():
+                    doc_dict = {
+                        "id": row["id"],
+                        "title": row.get("title", ""),
+                        "human_readable_id": int(row.get("human_readable_id", 0)) if pd.notna(row.get("human_readable_id")) else 0,
+                    }
+                    # Add optional fields
+                    if "text" in row and pd.notna(row["text"]):
+                        # Truncate very long text to avoid storage issues
+                        doc_dict["text"] = str(row["text"])[:10000]
+                    if "creation_date" in row and pd.notna(row["creation_date"]):
+                        doc_dict["creation_date"] = str(row["creation_date"])
+
+                    batch_data.append(doc_dict)
+
+                # Create Document nodes
+                result = session.run(
+                    """
+                    UNWIND $documents AS doc
+                    CREATE (d:Document)
+                    SET d = doc
+                    RETURN count(d) AS created
+                    """,
+                    documents=batch_data,
+                )
+                if result.peek():
+                    document_count += result.single()["created"]
+
+            logger.info("Created %d Document nodes", document_count)
+
+            # Create HAS_TEXT_UNIT relationships
+            relationships_count = 0
+            for i in range(0, len(documents), self.batch_size):
+                batch = documents.iloc[i : i + self.batch_size]
+
+                for _, row in batch.iterrows():
+                    doc_id = row["id"]
+                    text_unit_ids = row.get("text_unit_ids", [])
+
+                    # Check if text_unit_ids is valid
+                    if text_unit_ids is None or (isinstance(text_unit_ids, float) and pd.isna(text_unit_ids)):
+                        continue
+
+                    # Convert numpy array to list if needed
+                    if hasattr(text_unit_ids, 'tolist'):
+                        text_unit_ids = text_unit_ids.tolist()
+
+                    # Check if list/array is empty
+                    if len(text_unit_ids) == 0:
+                        continue
+
+                    # Create relationships in batch
+                    result = session.run(
+                        """
+                        MATCH (d:Document {id: $doc_id})
+                        UNWIND $text_unit_ids AS text_unit_id
+                        MATCH (t:TextUnit {id: text_unit_id})
+                        CREATE (d)-[:HAS_TEXT_UNIT]->(t)
+                        RETURN count(*) AS created
+                        """,
+                        doc_id=doc_id,
+                        text_unit_ids=text_unit_ids,
+                    )
+                    if result.peek():
+                        relationships_count += result.single()["created"]
+
+            logger.info("Created %d HAS_TEXT_UNIT relationships", relationships_count)
+
     def close(self) -> None:
         """Close Neo4j driver connection."""
         if hasattr(self, "driver") and self.driver:

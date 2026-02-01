@@ -1,38 +1,41 @@
 {
-    "total_runtime": 5.309417963027954,
+    "total_runtime": 17.458897829055786,
     "num_documents": 1,
     "update_documents": 0,
     "input_load_time": 0,
     "workflows": {
         "load_input_documents": {
-            "overall": 0.0674753189086914
+            "overall": 0.056060075759887695
         },
         "create_base_text_units": {
-            "overall": 0.2069859504699707
+            "overall": 0.23212790489196777
         },
         "create_final_documents": {
-            "overall": 0.010540962219238281
+            "overall": 0.012022018432617188
         },
         "extract_graph": {
-            "overall": 0.03181624412536621
+            "overall": 0.5622971057891846
         },
         "finalize_graph": {
-            "overall": 0.013759136199951172
+            "overall": 0.014879941940307617
         },
         "extract_covariates": {
-            "overall": 4.696846008300781e-05
+            "overall": 5.91278076171875e-05
         },
         "create_communities": {
-            "overall": 0.6025078296661377
+            "overall": 1.0134377479553223
         },
         "create_final_text_units": {
-            "overall": 0.011355161666870117
+            "overall": 0.02627706527709961
         },
         "create_community_reports": {
-            "overall": 0.06302523612976074
+            "overall": 0.48270201683044434
         },
         "generate_text_embeddings": {
-            "overall": 4.301062107086182
+            "overall": 14.604388952255249
+        },
+        "load_neo4j_graph": {
+            "overall": 0.453869104385376
         }
     }
 }

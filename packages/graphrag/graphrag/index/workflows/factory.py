@@ -59,6 +59,7 @@ _standard_workflows = [
     "create_final_text_units",
     "create_community_reports",
     "generate_text_embeddings",
+    "load_neo4j_graph",
 ]
 _fast_workflows = [
     "create_base_text_units",
@@ -70,6 +71,7 @@ _fast_workflows = [
     "create_final_text_units",
     "create_community_reports_text",
     "generate_text_embeddings",
+    "load_neo4j_graph",
 ]
 _update_workflows = [
     "update_final_documents",
@@ -80,6 +82,7 @@ _update_workflows = [
     "update_community_reports",
     "update_text_embeddings",
     "update_clean_state",
+    "load_neo4j_graph",
 ]
 PipelineFactory.register_pipeline(
     IndexingMethod.Standard, ["load_input_documents", *_standard_workflows]
