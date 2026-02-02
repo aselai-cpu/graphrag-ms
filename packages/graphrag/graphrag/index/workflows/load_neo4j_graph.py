@@ -17,13 +17,15 @@ async def run_workflow(
     config: GraphRagConfig,
     context: PipelineRunContext,
 ) -> WorkflowFunctionOutput:
-    """Load entities, relationships, text units, and communities into Neo4j.
+    """Load entities, relationships, text units, communities, and claims into Neo4j.
 
     This workflow loads the complete knowledge graph into Neo4j:
     - Entities with multi-type labels (Person, Organization, Geo)
     - Relationships between entities
+    - Documents with HAS_TEXT_UNIT relationships
     - Text units with MENTIONS relationships
     - Communities with CONTAINS and PARENT_OF relationships
+    - Claims with ABOUT, INVOLVES, and EXTRACTED_FROM relationships
     """
     logger.info("Workflow started: load_neo4j_graph")
 
@@ -102,6 +104,15 @@ async def run_workflow(
             backend.load_communities(communities, community_reports)
         else:
             logger.warning("No communities found in storage")
+
+        # Load claims/covariates
+        logger.info("Loading claims")
+        covariates = await load_table_from_storage("covariates", context.output_storage)
+        if covariates is not None and not covariates.empty:
+            logger.info("Loading %d claims into Neo4j", len(covariates))
+            backend.load_claims(covariates)
+        else:
+            logger.info("No claims found in storage (claims extraction may be disabled)")
 
         # Close connection
         backend.close()

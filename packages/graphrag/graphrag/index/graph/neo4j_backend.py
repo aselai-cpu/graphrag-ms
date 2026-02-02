@@ -885,6 +885,175 @@ class Neo4jBackend(GraphBackend):
 
             logger.info("Created %d HAS_TEXT_UNIT relationships", relationships_count)
 
+    def load_claims(
+        self,
+        covariates: pd.DataFrame,
+        *,
+        entity_id_col: str = "title",
+    ) -> None:
+        """Load claims/covariates into Neo4j.
+
+        Creates Claim nodes and relationships:
+        - ABOUT: Claim -> Entity (subject)
+        - INVOLVES: Claim -> Entity (object, if present)
+        - EXTRACTED_FROM: Claim -> TextUnit
+
+        Parameters
+        ----------
+        covariates : pd.DataFrame
+            DataFrame with columns: id, covariate_type, type, description,
+            subject_id, object_id, status, start_date, end_date, source_text, text_unit_id
+        entity_id_col : str, optional
+            Column name for entity identifier, by default "title"
+        """
+        if covariates.empty:
+            logger.info("No claims to load")
+            return
+
+        with self.driver.session(database=self.database) as session:
+            # Clear existing Claim nodes
+            logger.info("Clearing existing Claim nodes")
+            session.run("MATCH (c:Claim) DETACH DELETE c")
+
+            # Create Claim nodes in batches
+            claim_count = 0
+            for i in range(0, len(covariates), self.batch_size):
+                batch = covariates.iloc[i : i + self.batch_size]
+
+                # Prepare batch data
+                batch_data = []
+                for _, row in batch.iterrows():
+                    claim_dict = {
+                        "id": row["id"],
+                        "human_readable_id": int(row.get("human_readable_id", 0)) if pd.notna(row.get("human_readable_id")) else 0,
+                        "covariate_type": row.get("covariate_type", "claim"),
+                        "type": row.get("type", ""),
+                        "description": row.get("description", ""),
+                    }
+
+                    # Add optional fields
+                    if "status" in row and pd.notna(row["status"]):
+                        claim_dict["status"] = str(row["status"])
+                    if "start_date" in row and pd.notna(row["start_date"]):
+                        claim_dict["start_date"] = str(row["start_date"])
+                    if "end_date" in row and pd.notna(row["end_date"]):
+                        claim_dict["end_date"] = str(row["end_date"])
+                    if "source_text" in row and pd.notna(row["source_text"]):
+                        # Truncate very long source text
+                        claim_dict["source_text"] = str(row["source_text"])[:5000]
+
+                    batch_data.append(claim_dict)
+
+                # Create Claim nodes
+                result = session.run(
+                    """
+                    UNWIND $claims AS claim
+                    CREATE (c:Claim)
+                    SET c = claim
+                    RETURN count(c) AS created
+                    """,
+                    claims=batch_data,
+                )
+                if result.peek():
+                    claim_count += result.single()["created"]
+
+            logger.info("Created %d Claim nodes", claim_count)
+
+            # Create ABOUT relationships (claim -> subject entity)
+            about_count = 0
+            for i in range(0, len(covariates), self.batch_size):
+                batch = covariates.iloc[i : i + self.batch_size]
+
+                for _, row in batch.iterrows():
+                    claim_id = row["id"]
+                    subject_id = row.get("subject_id")
+
+                    # Skip if no subject
+                    if subject_id is None or (isinstance(subject_id, float) and pd.isna(subject_id)):
+                        continue
+                    if isinstance(subject_id, str) and subject_id.strip() == "":
+                        continue
+
+                    # Create ABOUT relationship
+                    result = session.run(
+                        f"""
+                        MATCH (c:Claim {{id: $claim_id}})
+                        MATCH (e:{self.node_label} {{{entity_id_col}: $subject_id}})
+                        CREATE (c)-[:ABOUT]->(e)
+                        RETURN count(*) AS created
+                        """,
+                        claim_id=claim_id,
+                        subject_id=str(subject_id),
+                    )
+                    if result.peek():
+                        about_count += result.single()["created"]
+
+            logger.info("Created %d ABOUT relationships", about_count)
+
+            # Create INVOLVES relationships (claim -> object entity, if present)
+            involves_count = 0
+            for i in range(0, len(covariates), self.batch_size):
+                batch = covariates.iloc[i : i + self.batch_size]
+
+                for _, row in batch.iterrows():
+                    claim_id = row["id"]
+                    object_id = row.get("object_id")
+
+                    # Skip if no object or object is "NONE"
+                    if object_id is None or (isinstance(object_id, float) and pd.isna(object_id)):
+                        continue
+                    if isinstance(object_id, str):
+                        object_id_str = object_id.strip().upper()
+                        if object_id_str == "" or object_id_str == "NONE":
+                            continue
+
+                    # Create INVOLVES relationship
+                    result = session.run(
+                        f"""
+                        MATCH (c:Claim {{id: $claim_id}})
+                        MATCH (e:{self.node_label} {{{entity_id_col}: $object_id}})
+                        CREATE (c)-[:INVOLVES]->(e)
+                        RETURN count(*) AS created
+                        """,
+                        claim_id=claim_id,
+                        object_id=str(object_id),
+                    )
+                    if result.peek():
+                        involves_count += result.single()["created"]
+
+            logger.info("Created %d INVOLVES relationships", involves_count)
+
+            # Create EXTRACTED_FROM relationships (claim -> text unit)
+            extracted_count = 0
+            for i in range(0, len(covariates), self.batch_size):
+                batch = covariates.iloc[i : i + self.batch_size]
+
+                for _, row in batch.iterrows():
+                    claim_id = row["id"]
+                    text_unit_id = row.get("text_unit_id")
+
+                    # Skip if no text unit
+                    if text_unit_id is None or (isinstance(text_unit_id, float) and pd.isna(text_unit_id)):
+                        continue
+                    if isinstance(text_unit_id, str) and text_unit_id.strip() == "":
+                        continue
+
+                    # Create EXTRACTED_FROM relationship
+                    result = session.run(
+                        """
+                        MATCH (c:Claim {id: $claim_id})
+                        MATCH (t:TextUnit {id: $text_unit_id})
+                        CREATE (c)-[:EXTRACTED_FROM]->(t)
+                        RETURN count(*) AS created
+                        """,
+                        claim_id=claim_id,
+                        text_unit_id=str(text_unit_id),
+                    )
+                    if result.peek():
+                        extracted_count += result.single()["created"]
+
+            logger.info("Created %d EXTRACTED_FROM relationships", extracted_count)
+
     def close(self) -> None:
         """Close Neo4j driver connection."""
         if hasattr(self, "driver") and self.driver:

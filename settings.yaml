@@ -66,16 +66,23 @@ vector_store:
   db_uri: output/lancedb
   index_schema:
     entity_description:
+      index_name: entity_description_embeddings
       vector_size: 384  # Match SentenceTransformer all-MiniLM-L6-v2 dimension
     text_unit_text:
+      index_name: text_unit_embeddings
       vector_size: 384  # Match SentenceTransformer all-MiniLM-L6-v2 dimension
     community_full_content:
+      index_name: community_report_embeddings
       vector_size: 384  # Match SentenceTransformer all-MiniLM-L6-v2 dimension
 
 ### Workflow settings ###
 
 embed_text:
   embedding_model_id: default_embedding_model
+  names:
+    - entity_description
+    - community_full_content
+    - text_unit_text
 
 extract_graph:
   completion_model_id: default_completion_model  # Use fast Haiku for extraction
@@ -139,7 +146,7 @@ neo4j:
   use_entity_type_labels: true  # Add entity type as additional label (e.g., :Entity:Person). Requires APOC plugin.
 
 extract_claims:
-  enabled: false
+  enabled: true
   completion_model_id: default_completion_model  # Use fast Haiku for claims
   prompt: "prompts/extract_claims.txt"
   description: "Any claims or facts that could be relevant to information discovery."
